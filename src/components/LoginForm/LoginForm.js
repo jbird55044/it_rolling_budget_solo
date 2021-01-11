@@ -6,17 +6,19 @@ class LoginForm extends Component {
   state = {
     username: '',
     password: '',
+    fullName: '',
   };
 
   login = (event) => {
     event.preventDefault();
-
+ 
     if (this.state.username && this.state.password) {
       this.props.dispatch({
         type: 'LOGIN',
         payload: {
           username: this.state.username,
           password: this.state.password,
+          fullName: this.state.fullName,
         },
       });
     } else {

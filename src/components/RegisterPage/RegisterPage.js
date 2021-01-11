@@ -9,6 +9,7 @@ class RegisterPage extends Component {
   state = {
     username: '',
     password: '',
+    fullName: '',
   };
 
   render() {
@@ -31,5 +32,5 @@ class RegisterPage extends Component {
     );
   }
 }
-
+ 
 export default connect(mapStoreToProps)(RegisterPage);

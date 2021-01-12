@@ -16,7 +16,7 @@ router.get('/formfill', (req, res) => {
   tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
   tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
   tlist_point_person.point_person, tlist_point_person.pp_email_address,
-  tlist_frequency.frequency, tlist_frequency.description, 
+  tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
   tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
   tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
   row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
@@ -61,14 +61,13 @@ router.get('/expensefill', (req, res) => {
 }); 
 
 router.put('/formfill', (req, res) => {
-  let budgetId = req.body.editForm.id
   let payload = req.body.editForm
-  // console.log (`formfill PUT BudgetId`, budgetId);
-  // console.log (`formfill PUT Payload`, payload);
+  console.log (`formfill PUT Payload:`, payload);
   const queryText = `UPDATE t_primary_budget SET 
     nomenclature = $2, 
     manufacturer = $3, 
-    capitalizable_candidate = $4 
+    capitalizable_candidate = $4, 
+    frequency_fk = $5 
     WHERE id=$1;`;
 
   const queryValues = [
@@ -76,6 +75,7 @@ router.put('/formfill', (req, res) => {
     payload.nomenclature,
     payload.manufacturer,
     payload.capitalizable_candidate,
+    payload.frequency_fk,
   ];
 
   pool.query(queryText, queryValues)

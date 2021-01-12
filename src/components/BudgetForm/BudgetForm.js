@@ -6,8 +6,6 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
-import Select from '@material-ui/core/Select';
-import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
@@ -19,20 +17,6 @@ import classNames from 'classnames';
 
 
 const styles = theme => ({
-    container: {
-      display: 'flex',
-      flexWrap: 'wrap',
-    },
-    textField: {
-      marginLeft: theme.spacing.unit,
-      marginRight: theme.spacing.unit,
-    },
-    dense: {
-      marginTop: 16,
-    },
-    menu: {
-      width: 200,
-    },
     root: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -40,20 +24,26 @@ const styles = theme => ({
     formControl: {
         margin: theme.spacing.unit,
         minWidth: 120,
-        maxWidth: 300,
+        maxWidth: 350,
     },
-    
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+      textField: {
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        flexBasis: 200,
+    },
+      dense: {
+        marginTop: 6,
+    },
+      menu: {
+        width: 500,
+    }, 
   });
-  const ITEM_HEIGHT = 48;
-  const ITEM_PADDING_TOP = 8;
-  const MenuProps = {
-     PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-      },
-    };
+ 
+  
    
 
 
@@ -251,25 +241,7 @@ class BudgetForm extends Component {
                     <p>----</p>
                     {/* ----------- */}
 
-                    <TextField
-                        select
-                        label="Frequency Selector"
-                        className={classNames(classes.margin, classes.textField)}
-                        value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
-                        onChange={(event)=>this.handleChange(event, 'frequency_fk')}
-                        InputProps={{
-                            startAdornment: <InputAdornment position="start">-</InputAdornment>,
-                        }}
-                        >
-                        <MenuItem value="">
-                            <em>None</em>
-                            </MenuItem>
-                                {this.props.store.tlist.tlistFrequency.map(records => (
-                                    <MenuItem key={records.id} value={records.id}>
-                                    {records.frequency} - {records.description}
-                                    </MenuItem>
-                                ))}
-                    </TextField>
+                   
 
                     {/* ----------- */}
 
@@ -288,6 +260,24 @@ class BudgetForm extends Component {
                             onChange={(event)=>this.handleChange(event,'manufacturer')} />
                     </FormControl>
        
+                    <TextField
+                        select
+                        label="Frequency Selector"
+                        className={classNames(classes.margin, classes.textField)}
+                        value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
+                        onChange={(event)=>this.handleChange(event, 'frequency_fk')}
+                        // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                        >
+                        <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                                {this.props.store.tlist.tlistFrequency.map(records => (
+                                    <MenuItem key={records.id} value={records.id}>
+                                    {records.frequency} - {records.description}
+                                    </MenuItem>
+                                ))}
+                    </TextField>
+
                     </form>
          
                     <FormControlLabel

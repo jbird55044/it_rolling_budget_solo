@@ -7,12 +7,15 @@ import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import Slide from '@material-ui/core/Slide';
 import OutlinedInput from '@material-ui/core/OutlinedInput';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
+import Input from '@material-ui/core/Input';
+import InputAdornment from '@material-ui/core/InputAdornment';
+import classNames from 'classnames';
+
 
 
 const styles = theme => ({
@@ -240,32 +243,25 @@ class BudgetForm extends Component {
             {this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
                 return (
                 <div key={index}>
-                    <p>Budget Information STATE: {this.state.editForm.id} </p>
-                    <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
-                    <p>Relative Record ID {this.state.recordNumber}</p>
+                    {/* <p>Budget Information STATE: {this.state.editForm.id} </p> */}
+                    {/* <p>Budget Information REDUX: {currentBudgetRecord.id} </p> */}
+                    {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
                     {/* <p>Budget Raw Info: {currentBudgetRecord.frequency_fk} </p> */}
                     {/* <p>Budget State Info: {this.state.editForm.frequency_fk} </p> */}
                     <p>----</p>
                     {/* ----------- */}
 
-                    <FormControl variant="outlined" className={classes.formControl}>
-                        <InputLabel
-                            ref={ref => {
-                            this.InputLabelRef = ref;
-                            }}
-                            htmlFor="outlined-age-simple"
-                        >Frequency Selector
-                        </InputLabel>
-                        <Select
-                            value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
-                            onChange={(event)=>this.handleChange(event, 'frequency_fk')}
-                            input={
-                            <OutlinedInput
-                                labelWidth={this.state.labelWidth}
-                                name="age"
-                                id="outlined-age-simple"
-                            />}>
-                            <MenuItem value="">
+                    <TextField
+                        select
+                        label="Frequency Selector"
+                        className={classNames(classes.margin, classes.textField)}
+                        value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
+                        onChange={(event)=>this.handleChange(event, 'frequency_fk')}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">-</InputAdornment>,
+                        }}
+                        >
+                        <MenuItem value="">
                             <em>None</em>
                             </MenuItem>
                                 {this.props.store.tlist.tlistFrequency.map(records => (
@@ -273,35 +269,27 @@ class BudgetForm extends Component {
                                     {records.frequency} - {records.description}
                                     </MenuItem>
                                 ))}
-                        </Select>
-                    </FormControl>
+                    </TextField>
 
                     {/* ----------- */}
 
                     <form className={classes.container} noValidate autoComplete="off">
-                        <TextField
-                        id="nomenclature-id"
-                        label="Nomenclature"
-                        className={classes.textField}
-                        value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
-                        onChange={(event)=>this.handleChange(event,'nomenclature')}
-                        margin="normal"
-                        variant="filled"
-                        />
+                    
+                    <FormControl className={classes.formControl}>
+                        <InputLabel htmlFor="component-simple">Nomenclature</InputLabel>
+                        <Input id="nomenclature-id" 
+                            value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
+                            onChange={(event)=>this.handleChange(event,'nomenclature')} />
+                    </FormControl>
+                    <FormControl className={classes.formControl}>
+                        <InputLabel htmlFor="component-simple">Manufacturer</InputLabel>
+                        <Input id="manufacturer-id" 
+                            value = {this.valueManufacturer(currentBudgetRecord.manufacturer, 'manufacturer')}
+                            onChange={(event)=>this.handleChange(event,'manufacturer')} />
+                    </FormControl>
+       
                     </form>
-                    <form className={classes.container} noValidate autoComplete="off">
-                        <TextField
-                        id="manufacturer-id"
-                        label="Manufacturer"
-                        className={classes.textField}
-                        value = {this.valueManufacturer(currentBudgetRecord.manufacturer, 'manufacturer')}
-                        // value={currentBudgetRecord.manufacturer}
-                        onChange={(event)=>this.handleChange(event,'manufacturer')}
-                        margin="normal"
-                        variant="filled"
-                        />
-                    </form>
-                    <p>Capitalized Candidate Raw: {currentBudgetRecord.capitalizable_candidate}</p>
+         
                     <FormControlLabel
                         control={
                             <Checkbox

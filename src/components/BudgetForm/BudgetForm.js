@@ -103,6 +103,7 @@ class BudgetForm extends Component {
     }
 
     editRecord = () => {
+        console.log (`In editRecord`);
         this.updateState();
         this.setState ({
             recordEditMode: true
@@ -117,24 +118,28 @@ class BudgetForm extends Component {
     }
     
     saveEdit = () => {
+        console.log (`In saveEdit`);
         // do a PUT to move form to db
         this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
-            editForm: this.state.editForm
-            }
-        });
-        //set local state to turn off edit mode so DOM reads from REDUX again
-        this.setState ({
-            recordEditMode: false
-        })
-        // refresh DOM
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+            editForm: this.state.editForm,
             businessUnitId: this.props.store.user.id,
             recordId: this.state.recordNumber,
             }
         });
-        
     }
 
+    clearState = () => {
+        console.log (`In clearState`);
+        this.setState({
+            editForm: {
+                id: 1,
+                nomenclature: '',
+                manufacturer: '',
+                capitalizable_candidate: false,
+                frequency_fk: 1,
+            },
+        });
+    }
 
     handleChange = (event, name, type='text') => {
         console.log (`in Handle Change, name:`, name, 'event', event, 'type', type);
@@ -166,27 +171,28 @@ class BudgetForm extends Component {
     }
     
     moveRecord = (direction) => {
-        if (direction === 'back') {
-            this.setState ({
-                recordNumber: this.state.recordNumber -=1
-            })
-        } else if (direction === 'next') {
-            this.setState ({
-                recordNumber: this.state.recordNumber +=1
-            })
-        }
-        
         if (this.state.recordEditMode === true) {
             this.saveEdit();
         }
-
+        if (direction === 'back') {
+            this.setState ({
+                recordNumber: this.state.recordNumber -=1,
+                recordEditMode: false
+            })
+        } else if (direction === 'next') {
+            this.setState ({
+                recordNumber: this.state.recordNumber +=1,
+                recordEditMode: false
+            })
+        }
         //refresh
+        console.log (`ABOUT TO MOVE`, this.props.store.user.id, this.state.recordNumber);
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
-                businessUnitId: this.props.store.user.id,
-                recordId: this.state.recordNumber,
+            businessUnitId: this.props.store.user.id,
+            recordId: this.state.recordNumber,
             }
         });
-        this.updateState();
+       
     };  //end of moveRecord
     
     valueNominclature = (fieldValue, fieldName) => {
@@ -226,6 +232,7 @@ class BudgetForm extends Component {
     render() {
         const { classes } = this.props;
         return (
+            
             <div className="budgetFormClass">
             
             <h3>Budget Form List:</h3>
@@ -235,6 +242,7 @@ class BudgetForm extends Component {
                 <div key={index}>
                     <p>Budget Information STATE: {this.state.editForm.id} </p>
                     <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
+                    <p>Relative Record ID {this.state.recordNumber}</p>
                     {/* <p>Budget Raw Info: {currentBudgetRecord.frequency_fk} </p> */}
                     {/* <p>Budget State Info: {this.state.editForm.frequency_fk} </p> */}
                     <p>----</p>

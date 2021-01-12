@@ -6,7 +6,11 @@ function* updateBudgetForm( action ) {
   console.log('PUT update Budgetform', action.payload);
   try { 
       yield axios.put('/api/budget/formfill', action.payload)
-      yield put({ type: 'FETCH_BUDGETFORM' }) 
+      yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
+          businessUnitId: action.payload.businessUnitId,
+          recordId: action.payload.recordId
+          }
+       }) 
   } catch (error) {
       console.log('error with PUTTING BudgetForm', error);
   }
@@ -15,7 +19,8 @@ function* updateBudgetForm( action ) {
 // Grab data and populate the main budget form, to include the sub form (expenditures) data
 function* fetchBudgetForm( payload ) {
   let currentRecordId = 1;  //default to department 1 to ,minimize init errors
-  console.log (`fetchBudgetForm Payload:`, payload.recordFinder);
+  console.log (`fetchBudgetForm Payload:`, payload);
+  console.log (`fetchBudgetForm Payload RecordFinder:`, payload.recordFinder);
   // Move GET request from App.js
   // Go to server, update redux store with data from server
   try {

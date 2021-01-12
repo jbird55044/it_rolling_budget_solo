@@ -8,7 +8,13 @@ import React from 'react';
 const AboutPage = () => (
   <div className="container">
     <div>
-      <p>This about page is for anyone to read!</p>
+      <h3>Welcome to the IT Rolling Budget Manager!</h3>
+      <p>This awesome tool is the tool of all tools to manage complex</p>
+      <p>&nbsp;</p>
+      <p>Credit:  James Bird</p>
+      <p>Contact Info: </p>
+      <a href="https://www.JamesDBird.com" target="_blank"  rel="noopener noreferrer">https://www.JamesDBird.com</a>
+
     </div>
   </div>
 );

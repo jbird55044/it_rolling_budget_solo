@@ -18,10 +18,14 @@ const Nav = (props) => {
 
   return (
     <div className="nav">
-      <Link to="/home">
-        <h2 className="nav-title">Prime Solo Project</h2>
-      </Link>
-      <div className="nav-right">
+      <div>
+        <Link to="/home">
+            <h3 className="nav-title-left">IT Rolling Budget Manager.  </h3>
+            <h3 className="nav-title-right">Dept: {props.store.user.bu_description}</h3>
+        </Link>
+
+      </div>
+      <div className="nav-menu">
         <Link className="nav-link" to={loginLinkData.path}>
           {/* Show this link if they are logged in or not,
           but call this link 'Home' if they are logged in,
@@ -31,6 +35,12 @@ const Nav = (props) => {
         {/* Show the link to the info page and the logout button if the user is logged in */}
         {props.store.user.id && (
           <>
+            <Link className="nav-link" to="/budgetform">
+              Budget Form
+            </Link>
+            <Link className="nav-link" to="/adminpage">
+              Admin
+            </Link>
             <Link className="nav-link" to="/info">
               Info Page
             </Link>

@@ -19,6 +19,8 @@ import InfoPage from '../InfoPage/InfoPage';
 import LandingPage from '../LandingPage/LandingPage';
 import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
+import BudgetForm from '../BudgetForm/BudgetForm';
+import AdminPage from '../AdminPage/AdminPage';
 
 import './App.css';
 
@@ -54,7 +56,18 @@ class App extends Component {
               path="/user"
               component={UserPage}
             />
-
+            <ProtectedRoute
+              // logged in shows InfoPage else shows LoginPage
+              exact
+              path="/budgetform"
+              component={BudgetForm}
+            />
+            <ProtectedRoute
+              // logged in shows InfoPage else shows LoginPage
+              exact
+              path="/adminpage"
+              component={AdminPage}
+            />
             <ProtectedRoute
               // logged in shows InfoPage else shows LoginPage
               exact

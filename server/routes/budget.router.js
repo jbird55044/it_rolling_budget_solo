@@ -7,15 +7,14 @@ router.get('/formfill', (req, res) => {
   let businessUnitId = req.query.businessUnitId
   let recordId = req.query.recordId
   let budgetId = req.query.budgetId
-  console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
-  console.log (`----req.query.all:`, req.query);
+  // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
   const queryText = `WITH _t_primary_budget AS 
   ( 
   SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes,
   t_user_owner.business_unit, 
   tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
-  tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
-  tlist_point_person.point_person, tlist_point_person.pp_email_address,
+  tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
+  tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
   tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
   tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
   tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
@@ -67,7 +66,9 @@ router.put('/formfill', (req, res) => {
     nomenclature = $2, 
     manufacturer = $3, 
     capitalizable_candidate = $4, 
-    frequency_fk = $5 
+    frequency_fk = $5,
+    cost_center_fk = $6,  
+    point_person_fk = $7
     WHERE id=$1;`;
 
   const queryValues = [
@@ -76,6 +77,8 @@ router.put('/formfill', (req, res) => {
     payload.manufacturer,
     payload.capitalizable_candidate,
     payload.frequency_fk,
+    payload.cost_center_fk,
+    payload.point_person_fk,
   ];
 
   pool.query(queryText, queryValues)

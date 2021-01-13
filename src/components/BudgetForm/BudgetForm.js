@@ -55,7 +55,9 @@ class BudgetForm extends Component {
             nomenclature: 'test',
             manufacturer: 'test',
             capitalizable_candidate: false,
-            frequency_fk:''
+            frequency_fk: 0,
+            cost_center_fk: 0,
+            point_person_fk: 0,
         },
         recordNumber: 1,
         recordEditMode: false
@@ -73,7 +75,14 @@ class BudgetForm extends Component {
         this.props.dispatch({type: 'FETCH_TLIST_GLCODE'});
         this.props.dispatch({type: 'FETCH_TLIST_BUSINESSUNIT'});
         this.props.dispatch({type: 'FETCH_TLIST_FREQUENCY'});
-
+        this.props.dispatch({type: 'FETCH_TLIST_COSTCENTER', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
+        this.props.dispatch({type: 'FETCH_TLIST_POINTPERSON', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
         this.updateState();
     }
 
@@ -89,6 +98,8 @@ class BudgetForm extends Component {
                     manufacturer: currentBudgetRecord.manufacturer || '',
                     capitalizable_candidate: currentBudgetRecord.capitalizable_candidate,
                     frequency_fk: currentBudgetRecord.frequency_fk,
+                    cost_center_fk: currentBudgetRecord.cost_center_fk,
+                    point_person_fk: currentBudgetRecord.point_person_fk,
                 },
             });
         })
@@ -129,7 +140,9 @@ class BudgetForm extends Component {
                 nomenclature: '',
                 manufacturer: '',
                 capitalizable_candidate: false,
-                frequency_fk: 1,
+                frequency_fk: 0,
+                cost_center_fk: 0,
+                point_person_fk: 0,
             },
         });
     }
@@ -234,15 +247,57 @@ class BudgetForm extends Component {
                 return (
                 <div key={index}>
                     {/* <p>Budget Information STATE: {this.state.editForm.id} </p> */}
-                    {/* <p>Budget Information REDUX: {currentBudgetRecord.id} </p> */}
+                    <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
                     {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
-                    {/* <p>Budget Raw Info: {currentBudgetRecord.frequency_fk} </p> */}
-                    {/* <p>Budget State Info: {this.state.editForm.frequency_fk} </p> */}
+                    <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p>
+                    <p>Budget State Info: {this.state.editForm.cost_center_fk} </p>
                     <p>----</p>
                     {/* ----------- */}
+                    {/* ----------- */}
 
-                   
+                    <form className={classes.container} noValidate autoComplete="off">
 
+                        <TextField
+                            select
+                            label="Cost Center"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.state.recordEditMode? this.state.editForm.cost_center_fk : currentBudgetRecord.cost_center_fk}
+                            onChange={(event)=>this.handleChange(event, 'cost_center_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistCostCenter.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.cost_center} - {records.cost_center_description}
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+
+                        <TextField
+                            select
+                            label="Point Person"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.state.recordEditMode? this.state.editForm.point_person_fk : currentBudgetRecord.point_person_fk}
+                            onChange={(event)=>this.handleChange(event, 'point_person_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistPointPerson.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.point_person} - {records.pp_email_address}
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+
+
+
+
+                    </form>
+                    <hr/>
                     {/* ----------- */}
 
                     <form className={classes.container} noValidate autoComplete="off">
@@ -253,6 +308,7 @@ class BudgetForm extends Component {
                             value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
                             onChange={(event)=>this.handleChange(event,'nomenclature')} />
                     </FormControl>
+                    
                     <FormControl className={classes.formControl}>
                         <InputLabel htmlFor="component-simple">Manufacturer</InputLabel>
                         <Input id="manufacturer-id" 
@@ -262,7 +318,7 @@ class BudgetForm extends Component {
        
                     <TextField
                         select
-                        label="Frequency Selector"
+                        label="Frequency"
                         className={classNames(classes.margin, classes.textField)}
                         value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
                         onChange={(event)=>this.handleChange(event, 'frequency_fk')}
@@ -277,6 +333,8 @@ class BudgetForm extends Component {
                                     </MenuItem>
                                 ))}
                     </TextField>
+
+                  
 
                     </form>
          

@@ -28,6 +28,23 @@ const tlistFrequency = (state = [], action) => {
   }
 }
 
+const tlistCostCenter = (state = [], action) => {
+  switch (action.type) {
+      case 'SET_TLIST_COSTCENTER':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
+const tlistPointPerson = (state = [], action) => {
+  switch (action.type) {
+      case 'SET_TLIST_POINTPERSON':
+          return action.payload;
+      default:
+          return state;
+  }
+}
 
 // these will be on the redux state at:
 // state.tlist.tlistBusinessUnit and state.tlist.tlistGlcode
@@ -35,4 +52,6 @@ export default combineReducers({
   tlistBusinessUnit,
   tlistGlcode,
   tlistFrequency,
+  tlistCostCenter,
+  tlistPointPerson,
 });

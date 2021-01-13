@@ -20,7 +20,7 @@ router.get('/glcode', (req, res) => {
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })
     .catch((err) => {
-      console.log('Error completing gl code query', err);
+      console.log('Error completing gl code query', err);ß
       res.sendStatus(500);
     });
 }); 
@@ -35,5 +35,30 @@ router.get('/frequency', (req, res) => {
       res.sendStatus(500);
     });
 }); 
+
+router.get('/costcenter', (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  const queryText = 'SELECT * FROM tlist_cost_center WHERE owner_fk = $1';
+  console.log ('in tlist_cost_center get, BU ID:', businessUnitId)
+  pool.query(queryText, [businessUnitId])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_cost_center code query', err);
+      res.sendStatus(500);
+    });
+}); 
+
+router.get('/pointperson', (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  const queryText = 'SELECT * FROM tlist_point_person WHERE owner_fk = $1';
+  console.log ('in tlist_point_person get, BU ID:', businessUnitId)
+  pool.query(queryText, [businessUnitId])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_point_person code query', err);
+      res.sendStatus(500);
+    });
+}); 
+
 
 module.exports = router; 

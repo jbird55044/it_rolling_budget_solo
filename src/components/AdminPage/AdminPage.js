@@ -15,6 +15,14 @@ class AdminPage extends Component {
         this.props.dispatch({type: 'FETCH_TLIST_GLCODE'});
         this.props.dispatch({type: 'FETCH_TLIST_BUSINESSUNIT'});
         this.props.dispatch({type: 'FETCH_TLIST_FREQUENCY'});
+        this.props.dispatch({type: 'FETCH_TLIST_COSTCENTER', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
+        this.props.dispatch({type: 'FETCH_TLIST_POINTPERSON', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
 
     }
 
@@ -44,14 +52,29 @@ class AdminPage extends Component {
                 })}
 
                 <p>GL Code</p>
-                        {this.props.store.tlist.tlistGlcode.map((glcode, index) => {
-                                return (
-                                    <div key={index}>
-                                    {JSON.stringify(glcode)}
-                                    </div>
-                                );
-                        })} 
-
+                    {this.props.store.tlist.tlistGlcode.map((glcode, index) => {
+                            return (
+                                <div key={index}>
+                                {JSON.stringify(glcode)}
+                                </div>
+                            );
+                    })} 
+                <p>Cost Centers</p>
+                    {this.props.store.tlist.tlistCostCenter.map((costCenter, index) => {
+                            return (
+                                <div key={index}>
+                                {JSON.stringify(costCenter)}
+                                </div>
+                            );
+                    })} 
+                <p>Point Person</p>
+                {this.props.store.tlist.tlistCostCenter.map((pointPerson, index) => {
+                        return (
+                            <div key={index}>
+                            {JSON.stringify(pointPerson)}
+                            </div>
+                        );
+                })} 
             </div>
         );
     }

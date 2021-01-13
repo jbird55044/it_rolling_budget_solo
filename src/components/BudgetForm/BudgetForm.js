@@ -123,6 +123,23 @@ class BudgetForm extends Component {
         });
     }
 
+    deleteRecord = (editCheck) => {
+        if (editCheck === 'needEdit') {
+            alert ('need to be in edit mode to delete record');
+            return;
+        }
+        console.log (`In Delete Form`);
+        // TODO - confirmation of delete
+        // Call Saga to delete - passing values to update record as well
+        this.props.dispatch({type: 'DELETE_BUDGETFORM', payload: {
+            deleteRecordId : this.state.editForm.id,
+            businessUnitId: this.props.store.user.id,
+            recordId: this.state.recordNumber,
+            }
+        });
+        this.clearState();
+    }
+
     clearState = () => {
         console.log (`In clearState`);
         this.setState({
@@ -136,6 +153,7 @@ class BudgetForm extends Component {
                 frequency_fk: 0,
                 capitalizable_candidate: false,
             },
+            recordEditMode: false
         });
     }
 
@@ -238,7 +256,7 @@ class BudgetForm extends Component {
             {this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
                 return (
                 <div key={index}>
-                    {/* <p>Budget Information STATE: {this.state.editForm.id} </p> */}
+                    <p>Budget Information STATE: {this.state.editForm.id} </p>
                     <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
                     {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
                     <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p>
@@ -292,7 +310,6 @@ class BudgetForm extends Component {
                     <hr/>
                     {/* ----------- */}
 
-                    <FormControl className={classes.margin}>
                     <TextField
                         select
                         style = {{minWidth: 800}}
@@ -311,7 +328,6 @@ class BudgetForm extends Component {
                                     </MenuItem>
                                 ))}
                     </TextField>
-                    </FormControl>
                     {/* ----------- */}
 
                     <FormControl className={classes.margin}>
@@ -393,7 +409,11 @@ class BudgetForm extends Component {
                 <button onClick={()=>this.editRecord()}>Edit Record</button>
                 {/* <button onClick={()=>this.saveEdit()}>Save Edit</button> */}
                 <button onClick={()=>this.cancelEdit()}>Cancel Edit</button>
-                {/* <p>Local State Edit Record:</p> {JSON.stringify(this.state.editForm)} */}
+                
+                {this.state.recordEditMode?
+                <button onClick={()=>this.deleteRecord()}>DELETE</button>:
+                <button onClick={()=>this.deleteRecord('needEdit')}>delete</button>
+                }
 
             </div>
          

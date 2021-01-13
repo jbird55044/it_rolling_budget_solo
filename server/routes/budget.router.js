@@ -27,7 +27,7 @@ router.get('/formfill', (req, res) => {
   JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
-    WHERE t_primary_budget.owner_fk = $1 
+    WHERE t_primary_budget.owner_fk = $1 AND archived = false
   )
   SELECT * FROM _t_primary_budget WHERE row_number = $2;`;
   console.log ('in budgetForm get')
@@ -86,12 +86,25 @@ router.put('/formfill', (req, res) => {
   pool.query(queryText, queryValues)
     .then(() => { res.sendStatus(200); })
     .catch((err) => {
-      console.log('Error completing SELECT budget query', err);
+      console.log('Error completing PUT budget query', err);
       res.sendStatus(500);
     });
   });
   
+  router.put('/deleteform', (req, res) => {
+    let payload = req.body
+    console.log (`formfill DELETE PUT Payload:`, payload);
+    const queryText = `UPDATE t_primary_budget SET archived = true WHERE id=$1;`;
+    const queryValues = [ payload.deleteRecordId ];
+    pool.query(queryText, queryValues)
+      .then(() => { res.sendStatus(200); })
+      .catch((err) => {
+        console.log('Error completing DELETE budget query', err);
+        res.sendStatus(500);
+      });
+    });
 
+  
 
 
 

@@ -20,28 +20,17 @@ const styles = theme => ({
     root: {
         display: 'flex',
         flexWrap: 'wrap',
-    },
-    formControl: {
+      },
+      margin: {
         margin: theme.spacing.unit,
-        minWidth: 120,
-        maxWidth: 350,
-    },
-    container: {
-        display: 'flex',
-        flexWrap: 'wrap',
-    },
+      },
+      withoutLabel: {
+        marginTop: theme.spacing.unit * 3,
+      },
       textField: {
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
         flexBasis: 200,
-    },
-      dense: {
-        marginTop: 6,
-    },
-      menu: {
-        width: 500,
-    }, 
-  });
+      },
+    });
  
   
    
@@ -52,12 +41,13 @@ class BudgetForm extends Component {
     state = {
         editForm: {
             id: 1,
-            nomenclature: 'test',
-            manufacturer: 'test',
-            capitalizable_candidate: false,
-            frequency_fk: 0,
             cost_center_fk: 0,
             point_person_fk: 0,
+            gl_code_fk: 0,
+            nomenclature: '',
+            manufacturer: '',
+            frequency_fk: 0,
+            capitalizable_candidate: false,
         },
         recordNumber: 1,
         recordEditMode: false
@@ -94,12 +84,13 @@ class BudgetForm extends Component {
             this.setState({
                 editForm: {
                     id: currentBudgetRecord.id,
-                    nomenclature: currentBudgetRecord.nomenclature,
-                    manufacturer: currentBudgetRecord.manufacturer || '',
-                    capitalizable_candidate: currentBudgetRecord.capitalizable_candidate,
-                    frequency_fk: currentBudgetRecord.frequency_fk,
                     cost_center_fk: currentBudgetRecord.cost_center_fk,
                     point_person_fk: currentBudgetRecord.point_person_fk,
+                    gl_code_fk: currentBudgetRecord.gl_code_fk,
+                    nomenclature: currentBudgetRecord.nomenclature,
+                    manufacturer: currentBudgetRecord.manufacturer || '',
+                    frequency_fk: currentBudgetRecord.frequency_fk,
+                    capitalizable_candidate: currentBudgetRecord.capitalizable_candidate,
                 },
             });
         })
@@ -137,12 +128,13 @@ class BudgetForm extends Component {
         this.setState({
             editForm: {
                 id: 1,
-                nomenclature: '',
-                manufacturer: '',
-                capitalizable_candidate: false,
-                frequency_fk: 0,
                 cost_center_fk: 0,
                 point_person_fk: 0,
+                gl_code_fk: 0,
+                nomenclature: '',
+                manufacturer: '',
+                frequency_fk: 0,
+                capitalizable_candidate: false,
             },
         });
     }
@@ -301,7 +293,30 @@ class BudgetForm extends Component {
                     {/* ----------- */}
 
                     <form className={classes.container} noValidate autoComplete="off">
-                    
+                    <FormControl fullWidth className={classes.margin}>
+                    <TextField
+                        select
+                        label="GL Code"
+                        className={classNames(classes.margin, classes.textField)}
+                        value={this.state.recordEditMode? this.state.editForm.gl_code_fk : currentBudgetRecord.gl_code_fk}
+                        onChange={(event)=>this.handleChange(event, 'gl_code_fk')}
+                        // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                        >
+                        <MenuItem value="">
+                            <em>None</em>
+                            </MenuItem>
+                                {this.props.store.tlist.tlistGlcode.map(records => (
+                                    <MenuItem key={records.id} value={records.id}>
+                                    {records.gl_account} - {records.gl_name} - {records.gl_type}- {records.gl_examples}
+                                    </MenuItem>
+                                ))}
+                    </TextField>
+                    </FormControl>
+                    </form>
+                    {/* ----------- */}
+
+                    <form className={classes.container} noValidate autoComplete="off">
+
                     <FormControl className={classes.formControl}>
                         <InputLabel htmlFor="component-simple">Nomenclature</InputLabel>
                         <Input id="nomenclature-id" 

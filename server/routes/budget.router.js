@@ -12,7 +12,7 @@ router.get('/formfill', (req, res) => {
   ( 
   SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes,
   t_user_owner.business_unit, 
-  tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
+  tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
   tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
   tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
   tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
@@ -63,22 +63,24 @@ router.put('/formfill', (req, res) => {
   let payload = req.body.editForm
   console.log (`formfill PUT Payload:`, payload);
   const queryText = `UPDATE t_primary_budget SET 
-    nomenclature = $2, 
-    manufacturer = $3, 
-    capitalizable_candidate = $4, 
-    frequency_fk = $5,
-    cost_center_fk = $6,  
-    point_person_fk = $7
+    cost_center_fk = $2,  
+    point_person_fk = $3,
+    gl_code_fk=$4
+    nomenclature = $5, 
+    manufacturer = $6, 
+    frequency_fk = $7,
+    capitalizable_candidate = $8, 
     WHERE id=$1;`;
 
   const queryValues = [
     payload.id,
-    payload.nomenclature,
-    payload.manufacturer,
-    payload.capitalizable_candidate,
-    payload.frequency_fk,
     payload.cost_center_fk,
     payload.point_person_fk,
+    payload.gl_code_fk,
+    payload.nomenclature,
+    payload.manufacturer,
+    payload.frequency_fk,
+    payload.capitalizable_candidate,
   ];
 
   pool.query(queryText, queryValues)

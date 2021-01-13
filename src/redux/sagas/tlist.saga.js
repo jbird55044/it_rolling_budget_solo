@@ -86,6 +86,40 @@ function* fetchTlistPointPerson( payload ) {
   }
 } 
 
+function* fetchTlistCapitalizedLife() {
+  // Move GET request from App.js
+  console.log('In fetchTlistCapitalizedLife saga');
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/tlist/capitalizedlife');
+      // put data into store via Reducer
+      yield put({ type: 'SET_TLIST_CAPITALIZEDLIFE', payload: response.data });
+  } catch ( error ) {
+      console.log('error with fetchTlistCapitalizedLife get request', error);
+  }
+} 
+
+function* fetchTlistExpenditureType( payload ) {
+  // Move GET request from App.js
+  console.log('In fetchTlistExpenditureType saga');
+  
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/tlist/expendituretype', {
+        params:{
+            businessUnitId: payload.recordFinder.businessUnitId,
+        }
+    })
+      // put data into store via Reducer
+      yield put({ type: 'SET_TLIST_EXPENDITURETYPE', payload: response.data });
+  } catch ( error ) {
+      console.log('error with fetchTlistExpenditureType get request', error);
+  }
+} 
+
+
 function* loginSaga() {
   yield takeLatest('FETCH_TLIST_SELECTORS', fetchTlistSelectors);
   yield takeLatest('FETCH_TLIST_BUSINESSUNIT', fetchTlistBusinessUnit);
@@ -93,6 +127,8 @@ function* loginSaga() {
   yield takeLatest('FETCH_TLIST_FREQUENCY', fetchTlistFrequency);
   yield takeLatest('FETCH_TLIST_COSTCENTER', fetchTlistCostCenter);
   yield takeLatest('FETCH_TLIST_POINTPERSON', fetchTlistPointPerson);
+  yield takeLatest('FETCH_TLIST_CAPITALIZEDLIFE', fetchTlistCapitalizedLife);
+  yield takeLatest('FETCH_TLIST_EXPENDITURETYPE', fetchTlistExpenditureType);
 }
 
 export default loginSaga;

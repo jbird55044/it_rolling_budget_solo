@@ -48,6 +48,10 @@ class BudgetForm extends Component {
             manufacturer: '',
             frequency_fk: 0,
             capitalizable_candidate: false,
+            capitalize_life_fk: 0,
+            expenditure_type_fk: 0,
+            credit_card_use: false,
+            needs_review: false
         },
         recordNumber: 1,
         recordEditMode: false
@@ -73,6 +77,11 @@ class BudgetForm extends Component {
             businessUnitId: this.props.store.user.id,
             }
         });
+        this.props.dispatch({type: 'FETCH_TLIST_CAPITALIZEDLIFE'});
+        this.props.dispatch({type: 'FETCH_TLIST_EXPENDITURETYPE', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
         this.updateState();
     }
 
@@ -91,6 +100,10 @@ class BudgetForm extends Component {
                     manufacturer: currentBudgetRecord.manufacturer || '',
                     frequency_fk: currentBudgetRecord.frequency_fk,
                     capitalizable_candidate: currentBudgetRecord.capitalizable_candidate,
+                    capitalize_life_fk: currentBudgetRecord.capitalize_life_fk,
+                    expenditure_type_fk: currentBudgetRecord.expenditure_type_fk,
+                    credit_card_use: currentBudgetRecord.credit_card_use,
+                    needs_review: currentBudgetRecord.needs_review
                 },
             });
         })
@@ -152,6 +165,10 @@ class BudgetForm extends Component {
                 manufacturer: '',
                 frequency_fk: 0,
                 capitalizable_candidate: false,
+                capitalize_life_fk: 0,
+                expenditure_type_fk: 0,
+                credit_card_use: false,
+                needs_review: false
             },
             recordEditMode: false
         });
@@ -259,8 +276,8 @@ class BudgetForm extends Component {
                     <p>Budget Information STATE: {this.state.editForm.id} </p>
                     <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
                     {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
-                    <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p>
-                    <p>Budget State Info: {this.state.editForm.cost_center_fk} </p>
+                    {/* <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p> */}
+                    {/* <p>Budget State Info: {this.state.editForm.cost_center_fk} </p> */}
                     <p>----</p>
                     {/* ----------- */}
                     {/* ----------- */}
@@ -347,9 +364,7 @@ class BudgetForm extends Component {
                     </FormControl>
 
                     <hr/>
-                    <form className={classes.container} noValidate autoComplete="off">
-
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.margin}>
                     <TextField
                         select
                         label="Frequency"
@@ -370,6 +385,19 @@ class BudgetForm extends Component {
                     </FormControl>
          
                     <FormControlLabel
+                        className={classes.margin}
+                        control={
+                            <Checkbox
+                            checked={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
+                            onChange={(event)=>this.handleChange(event,'credit_card_use', 'binary')}
+                            value={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
+                            color="primary"
+                            />
+                        }
+                        label="Credit Card?"
+                    />
+                    <FormControlLabel
+                        className={classes.margin}
                         control={
                             <Checkbox
                             checked={this.state.recordEditMode? this.state.editForm.capitalizable_candidate : currentBudgetRecord.capitalizable_candidate}
@@ -380,7 +408,61 @@ class BudgetForm extends Component {
                         }
                         label="Capitalized Candidate"
                     />
-                    </form>
+                     {currentBudgetRecord.capitalizable_candidate?
+                     <FormControl className={classes.margin}>
+                        <TextField
+                            select
+                            label="Capitalized Life"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.state.recordEditMode? this.state.editForm.capitalize_life_fk : currentBudgetRecord.capitalize_life_fk}
+                            onChange={(event)=>this.handleChange(event, 'capitalize_life_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistCapitalizedLife.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.life_nominclature} 
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+                    </FormControl>:
+                    <p></p>}
+
+                    <FormControl className={classes.margin}>
+                        <TextField
+                            select
+                            label="Expenditure Type"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.state.recordEditMode? this.state.editForm.expenditure_type_fk : currentBudgetRecord.expenditure_type_fk}
+                            onChange={(event)=>this.handleChange(event, 'expenditure_type_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistExpenditureType.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.expenditure_type} - {records.expenditure_description}
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+                    </FormControl>
+
+                    <FormControlLabel
+                        className={classes.margin}
+                        control={
+                            <Checkbox
+                            checked={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
+                            onChange={(event)=>this.handleChange(event,'needs_review', 'binary')}
+                            value={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
+                            color="primary"
+                            />
+                        }
+                        label="Tentative Entry"
+                    />
+
                 </div>
                 );
             })}

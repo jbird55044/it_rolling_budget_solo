@@ -60,5 +60,28 @@ router.get('/pointperson', (req, res) => {
     });
 }); 
 
+router.get('/capitalizedlife', (req, res) => {
+  const queryText = 'SELECT * FROM tlist_capitalized_life';
+  console.log ('in tlist_capitalized_life get')
+  pool.query(queryText)
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_capitalized_life code query', err);
+      res.sendStatus(500);
+    });
+}); 
+
+router.get('/expendituretype', (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  const queryText = 'SELECT * FROM tlist_expenditure_type WHERE owner_fk = $1';
+  console.log ('in tlist_expenditure_type get, BU ID:', businessUnitId)
+  pool.query(queryText, [businessUnitId])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_expenditure_type code query', err);
+      res.sendStatus(500);
+    });
+}); 
+
 
 module.exports = router; 

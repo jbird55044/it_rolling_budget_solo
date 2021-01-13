@@ -23,6 +23,11 @@ class AdminPage extends Component {
         });
         this.props.dispatch({type: 'FETCH_TLIST_GLCODE'});
         this.props.dispatch({type: 'FETCH_TLIST_FREQUENCY'});
+        this.props.dispatch({type: 'FETCH_TLIST_CAPITALIZEDLIFE'});
+        this.props.dispatch({type: 'FETCH_TLIST_EXPENDITURETYPE', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
 
     }
     
@@ -59,7 +64,7 @@ class AdminPage extends Component {
                             </div>
                         );
                     })} 
-                    
+
                 <p>Frequency</p>
                         {this.props.store.tlist.tlistFrequency.map((frequency, index) => {
                             return (
@@ -75,6 +80,24 @@ class AdminPage extends Component {
                             return (
                                 <div key={index}>
                                 {JSON.stringify(glcode)}
+                                </div>
+                            );
+                    })} 
+
+                <p>Capitalized Life</p>
+                    {this.props.store.tlist.tlistCapitalizedLife.map((capLife, index) => {
+                            return (
+                                <div key={index}>
+                                {JSON.stringify(capLife)}
+                                </div>
+                            );
+                    })} 
+
+                <p>Expenditure Type</p>
+                    {this.props.store.tlist.tlistExpenditureType.map((expType, index) => {
+                            return (
+                                <div key={index}>
+                                {JSON.stringify(expType)}
                                 </div>
                             );
                     })} 

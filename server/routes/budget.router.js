@@ -16,8 +16,8 @@ router.get('/formfill', (req, res) => {
   tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
   tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
   tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
-  tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
-  tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
+  tlist_expenditure_type.id AS expenditure_type_fk, tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
+  tlist_capitalized_life.id AS capitalize_life_fk, tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
   row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
   FROM t_primary_budget
   JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
@@ -65,11 +65,15 @@ router.put('/formfill', (req, res) => {
   const queryText = `UPDATE t_primary_budget SET 
     cost_center_fk = $2,  
     point_person_fk = $3,
-    gl_code_fk=$4
+    gl_code_fk=$4,
     nomenclature = $5, 
     manufacturer = $6, 
     frequency_fk = $7,
-    capitalizable_candidate = $8, 
+    capitalizable_candidate = $8,
+    capitalize_life_fk= $9,
+    expenditure_type_fk = $10,
+    credit_card_use = $11,
+    needs_review = $12
     WHERE id=$1;`;
 
   const queryValues = [
@@ -81,6 +85,10 @@ router.put('/formfill', (req, res) => {
     payload.manufacturer,
     payload.frequency_fk,
     payload.capitalizable_candidate,
+    payload.capitalize_life_fk, 
+    payload.expenditure_type_fk,
+    payload.credit_card_use,
+    payload.needs_review,
   ];
 
   pool.query(queryText, queryValues)

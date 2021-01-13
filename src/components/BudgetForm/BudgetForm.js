@@ -5,6 +5,7 @@ import './BudgetForm.css'
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -13,13 +14,22 @@ import Checkbox from '@material-ui/core/Checkbox';
 import Input from '@material-ui/core/Input';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import classNames from 'classnames';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Slide from '@material-ui/core/Slide';
 
 
 
 const styles = theme => ({
-    root: {
+    container: {
         display: 'flex',
         flexWrap: 'wrap',
+      },
+      formControl: {
+        margin: theme.spacing.unit,
       },
       margin: {
         margin: theme.spacing.unit,
@@ -30,10 +40,24 @@ const styles = theme => ({
       textField: {
         flexBasis: 200,
       },
+      buttons: {
+        boxSizing: 'border-box',
+        width: 400,
+        float: 'left'
+      },
+      bcolor1: {
+          backgroundColor: 'antiquewhite',
+      },
+      bcolor2: {
+        backgroundColor: 'biege',
+    }
     });
  
   
-   
+    function Transition(props) {
+        return <Slide direction="up" {...props} />;
+      }
+      
 
 
 class BudgetForm extends Component {
@@ -54,7 +78,8 @@ class BudgetForm extends Component {
             needs_review: false
         },
         recordNumber: 1,
-        recordEditMode: false
+        recordEditMode: false,
+        deleteConfirmDialog: false
     }
     
     // Stage Redux with up to date db info
@@ -121,7 +146,8 @@ class BudgetForm extends Component {
 
     cancelEdit = () => {
         this.setState ({
-            recordEditMode: false
+            recordEditMode: false,
+            deleteConfirmDialog: false
         })
     }
     
@@ -136,11 +162,17 @@ class BudgetForm extends Component {
         });
     }
 
-    deleteRecord = (editCheck) => {
+    deleteConfirm = (editCheck) => {
         if (editCheck === 'needEdit') {
             alert ('need to be in edit mode to delete record');
             return;
         }
+        this.setState ({
+            deleteConfirmDialog: true
+        })
+    }
+
+    deleteRecord = () => {
         console.log (`In Delete Form`);
         // TODO - confirmation of delete
         // Call Saga to delete - passing values to update record as well
@@ -170,7 +202,8 @@ class BudgetForm extends Component {
                 credit_card_use: false,
                 needs_review: false
             },
-            recordEditMode: false
+            recordEditMode: false,
+            deleteConfirmDialog:false
         });
     }
 
@@ -266,8 +299,7 @@ class BudgetForm extends Component {
         const { classes } = this.props;
         return (
             
-            <div className="budgetFormClass">
-            
+        <div>
             <h3>Budget Form List:</h3>
 
             {this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
@@ -282,7 +314,7 @@ class BudgetForm extends Component {
                     {/* ----------- */}
                     {/* ----------- */}
 
-                    <form className={classes.container} noValidate autoComplete="off">
+                    <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
 
                         <TextField
                             select
@@ -319,166 +351,150 @@ class BudgetForm extends Component {
                                         </MenuItem>
                                     ))}
                         </TextField>
-
-
-
-
                     </form>
                     <hr/>
                     {/* ----------- */}
-
-                    <TextField
-                        select
-                        style = {{minWidth: 800}}
-                        label="GL Code"
-                        className={classNames(classes.margin, classes.textField)}
-                        value={this.state.recordEditMode? this.state.editForm.gl_code_fk : currentBudgetRecord.gl_code_fk}
-                        onChange={(event)=>this.handleChange(event, 'gl_code_fk')}
-                        // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
-                        >
-                        <MenuItem value="">
-                            <em>None</em>
-                            </MenuItem>
-                                {this.props.store.tlist.tlistGlcode.map(records => (
-                                    <MenuItem key={records.id} value={records.id}>
-                                    {records.gl_account} - {records.gl_name} - {records.gl_type}- {records.gl_examples}
-                                    </MenuItem>
-                                ))}
-                    </TextField>
-                    {/* ----------- */}
-
-                    <FormControl className={classes.margin}>
-                        <InputLabel htmlFor="component-simple">Nomenclature</InputLabel>
-                        <Input id="nomenclature-id" 
-                            style = {{minWidth: 300}}
-                            value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
-                            onChange={(event)=>this.handleChange(event,'nomenclature')} />
-                    </FormControl>
                     
-                    <FormControl className={classes.formControl}>
-                        <InputLabel htmlFor="component-simple">Manufacturer</InputLabel>
-                        <Input id="manufacturer-id" 
-                            style = {{minWidth: 300}}
+                    <form className={classes.container, classes.bcolor2} noValidate autoComplete="off">
+
+                        <TextField
+                            select
+                            style = {{minWidth: 800}}
+                            label="GL Code"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.state.recordEditMode? this.state.editForm.gl_code_fk : currentBudgetRecord.gl_code_fk}
+                            onChange={(event)=>this.handleChange(event, 'gl_code_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistGlcode.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.gl_account} - {records.gl_name} - {records.gl_type}- {records.gl_examples}
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+                        {/* ----------- */}
+
+                        <TextField
+                            label="Nomenclature"
+                            style = {{minWidth: 400}}
+                            className={classNames(classes.margin, classes.textField)}
+                            value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
+                            onChange={(event)=>this.handleChange(event,'nomenclature')}  
+                            ></TextField>
+
+                        <TextField
+                            label="Manufacturer"
+                            style = {{minWidth: 400}}
+                            className={classNames(classes.margin, classes.textField)}
                             value = {this.valueManufacturer(currentBudgetRecord.manufacturer, 'manufacturer')}
-                            onChange={(event)=>this.handleChange(event,'manufacturer')} />
-                    </FormControl>
-
+                            onChange={(event)=>this.handleChange(event,'manufacturer')}  
+                            ></TextField>
+                    </form>
                     <hr/>
-                    <FormControl className={classes.margin}>
-                    <TextField
-                        select
-                        label="Frequency"
-                        className={classNames(classes.margin, classes.textField)}
-                        value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
-                        onChange={(event)=>this.handleChange(event, 'frequency_fk')}
-                        // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
-                        >
-                        <MenuItem value="">
-                            <em>None</em>
-                            </MenuItem>
-                                {this.props.store.tlist.tlistFrequency.map(records => (
-                                    <MenuItem key={records.id} value={records.id}>
-                                    {records.frequency} - {records.description}
+                    <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
+                        <TextField
+                            select
+                            label="Frequency"
+                            className={classNames(classes.margin, classes.textField)}
+                            value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
+                            onChange={(event)=>this.handleChange(event, 'frequency_fk')}
+                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                            >
+                            <MenuItem value="">
+                                <em>None</em>
+                                </MenuItem>
+                                    {this.props.store.tlist.tlistFrequency.map(records => (
+                                        <MenuItem key={records.id} value={records.id}>
+                                        {records.frequency} - {records.description}
+                                        </MenuItem>
+                                    ))}
+                        </TextField>
+            
+                        <FormControlLabel
+                            className={classes.margin}
+                            control={
+                                <Checkbox
+                                checked={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
+                                onChange={(event)=>this.handleChange(event,'credit_card_use', 'binary')}
+                                value={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
+                                color="primary"
+                                />
+                            }
+                            label="Credit Card?"
+                        />
+                        <FormControlLabel
+                            className={classes.margin}
+                            control={
+                                <Checkbox
+                                checked={this.state.recordEditMode? this.state.editForm.capitalizable_candidate : currentBudgetRecord.capitalizable_candidate}
+                                onChange={(event)=>this.handleChange(event,'capitalizable_candidate', 'binary')}
+                                value={this.state.recordEditMode? this.state.editForm.capitalizable_candidate : currentBudgetRecord.capitalizable_candidate}
+                                color="primary"
+                                />
+                            }
+                            label="Capitalized Candidate"
+                        />
+                        {currentBudgetRecord.capitalizable_candidate?
+                            <TextField
+                                select
+                                label="Capitalized Life"
+                                className={classNames(classes.margin, classes.textField)}
+                                value={this.state.recordEditMode? this.state.editForm.capitalize_life_fk : currentBudgetRecord.capitalize_life_fk}
+                                onChange={(event)=>this.handleChange(event, 'capitalize_life_fk')}
+                                // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                                >
+                                <MenuItem value="">
+                                    <em>None</em>
                                     </MenuItem>
-                                ))}
-                    </TextField>
-                    </FormControl>
-         
-                    <FormControlLabel
-                        className={classes.margin}
-                        control={
-                            <Checkbox
-                            checked={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
-                            onChange={(event)=>this.handleChange(event,'credit_card_use', 'binary')}
-                            value={this.state.recordEditMode? this.state.editForm.credit_card_use : currentBudgetRecord.credit_card_use}
-                            color="primary"
-                            />
-                        }
-                        label="Credit Card?"
-                    />
-                    <FormControlLabel
-                        className={classes.margin}
-                        control={
-                            <Checkbox
-                            checked={this.state.recordEditMode? this.state.editForm.capitalizable_candidate : currentBudgetRecord.capitalizable_candidate}
-                            onChange={(event)=>this.handleChange(event,'capitalizable_candidate', 'binary')}
-                            value={this.state.recordEditMode? this.state.editForm.capitalizable_candidate : currentBudgetRecord.capitalizable_candidate}
-                            color="primary"
-                            />
-                        }
-                        label="Capitalized Candidate"
-                    />
-                     {currentBudgetRecord.capitalizable_candidate?
-                     <FormControl className={classes.margin}>
-                        <TextField
-                            select
-                            label="Capitalized Life"
-                            className={classNames(classes.margin, classes.textField)}
-                            value={this.state.recordEditMode? this.state.editForm.capitalize_life_fk : currentBudgetRecord.capitalize_life_fk}
-                            onChange={(event)=>this.handleChange(event, 'capitalize_life_fk')}
-                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
-                            >
-                            <MenuItem value="">
-                                <em>None</em>
-                                </MenuItem>
-                                    {this.props.store.tlist.tlistCapitalizedLife.map(records => (
-                                        <MenuItem key={records.id} value={records.id}>
-                                        {records.life_nominclature} 
-                                        </MenuItem>
-                                    ))}
-                        </TextField>
-                    </FormControl>:
-                    <p></p>}
+                                        {this.props.store.tlist.tlistCapitalizedLife.map(records => (
+                                            <MenuItem key={records.id} value={records.id}>
+                                            {records.life_nominclature} 
+                                            </MenuItem>
+                                        ))}
+                            </TextField>:
+                        <p></p>}
 
-                    <FormControl className={classes.margin}>
-                        <TextField
-                            select
-                            label="Expenditure Type"
-                            className={classNames(classes.margin, classes.textField)}
-                            value={this.state.recordEditMode? this.state.editForm.expenditure_type_fk : currentBudgetRecord.expenditure_type_fk}
-                            onChange={(event)=>this.handleChange(event, 'expenditure_type_fk')}
-                            // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
-                            >
-                            <MenuItem value="">
-                                <em>None</em>
-                                </MenuItem>
-                                    {this.props.store.tlist.tlistExpenditureType.map(records => (
-                                        <MenuItem key={records.id} value={records.id}>
-                                        {records.expenditure_type} - {records.expenditure_description}
-                                        </MenuItem>
-                                    ))}
-                        </TextField>
-                    </FormControl>
+                            <TextField
+                                select
+                                label="Expenditure Type"
+                                className={classNames(classes.margin, classes.textField)}
+                                value={this.state.recordEditMode? this.state.editForm.expenditure_type_fk : currentBudgetRecord.expenditure_type_fk}
+                                onChange={(event)=>this.handleChange(event, 'expenditure_type_fk')}
+                                // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                                >
+                                <MenuItem value="">
+                                    <em>None</em>
+                                    </MenuItem>
+                                        {this.props.store.tlist.tlistExpenditureType.map(records => (
+                                            <MenuItem key={records.id} value={records.id}>
+                                            {records.expenditure_type} - {records.expenditure_description}
+                                            </MenuItem>
+                                        ))}
+                            </TextField>
 
-                    <FormControlLabel
-                        className={classes.margin}
-                        control={
-                            <Checkbox
-                            checked={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
-                            onChange={(event)=>this.handleChange(event,'needs_review', 'binary')}
-                            value={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
-                            color="primary"
-                            />
-                        }
-                        label="Tentative Entry"
-                    />
-
+                        <FormControlLabel
+                            className={classes.margin}
+                            control={
+                                <Checkbox
+                                checked={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
+                                onChange={(event)=>this.handleChange(event,'needs_review', 'binary')}
+                                value={this.state.recordEditMode? this.state.editForm.needs_review : currentBudgetRecord.needs_review}
+                                color="primary"
+                                />
+                            }
+                            label="Tentative Entry"
+                        />
+                    </form>
                 </div>
                 );
             })}
 
-            <p>----</p>
-          
-            {this.props.store.budget.expenseFillList.map((expenses, index) => {
-                return (
-                    <div key={index}>
-                    {/* <p>Expense Info</p> {budgetForm.id} */}
-                    {JSON.stringify(expenses)}
-                    </div>
-                );
-            })}
+           <hr/>
 
-            <div  className="formControlClass">
+            <div className={classes.buttons}>
                 {this.state.recordEditMode?
                 <button onClick={()=>this.moveRecord('back')}>Save-Back Record</button>:
                 <button onClick={()=>this.moveRecord('back')}>Back Record</button>
@@ -493,13 +509,50 @@ class BudgetForm extends Component {
                 <button onClick={()=>this.cancelEdit()}>Cancel Edit</button>
                 
                 {this.state.recordEditMode?
-                <button onClick={()=>this.deleteRecord()}>DELETE</button>:
-                <button onClick={()=>this.deleteRecord('needEdit')}>delete</button>
+                <button onClick={()=>this.deleteConfirm()}>DELETE</button>:
+                <button onClick={()=>this.deleteConfirm('needEdit')}>delete</button>
                 }
 
             </div>
-         
+            <div>
+                {this.props.store.budget.expenseFillList.map((expenses, index) => {
+                        return (
+                            <div key={index}>
+                            {/* <p>Expense Info</p> {budgetForm.id} */}
+                            {JSON.stringify(expenses)}
+                            </div>
+                        );
+                    })}
             </div>
+            <div>
+            <Dialog
+                open={this.state.deleteConfirmDialog}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={this.handleClose}
+                aria-labelledby="alert-dialog-slide-title"
+                aria-describedby="alert-dialog-slide-description"
+                >
+                <DialogTitle id="alert-dialog-slide-title">
+                    {"Delete Record?"}
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="alert-dialog-slide-description">
+                    Would you like to delete record: {this.state.editForm.id} ?.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={this.cancelEdit} color="primary">
+                    Cancel
+                    </Button>
+                    <Button onClick={this.deleteRecord} color="alert">
+                    Delete
+                    </Button>
+                </DialogActions>
+                </Dialog>
+            </div>
+            
+        </div>
         );
     }
 }

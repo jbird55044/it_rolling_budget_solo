@@ -75,7 +75,8 @@ class BudgetForm extends Component {
             capitalize_life_fk: 0,
             expenditure_type_fk: 0,
             credit_card_use: false,
-            needs_review: false
+            needs_review: false,
+            notes: ''
         },
         recordNumber: 1,
         recordEditMode: false,
@@ -128,7 +129,8 @@ class BudgetForm extends Component {
                     capitalize_life_fk: currentBudgetRecord.capitalize_life_fk,
                     expenditure_type_fk: currentBudgetRecord.expenditure_type_fk,
                     credit_card_use: currentBudgetRecord.credit_card_use,
-                    needs_review: currentBudgetRecord.needs_review
+                    needs_review: currentBudgetRecord.needs_review,
+                    notes: currentBudgetRecord.notes
                 },
             });
         })
@@ -200,7 +202,8 @@ class BudgetForm extends Component {
                 capitalize_life_fk: 0,
                 expenditure_type_fk: 0,
                 credit_card_use: false,
-                needs_review: false
+                needs_review: false,
+                notes: ''
             },
             recordEditMode: false,
             deleteConfirmDialog:false
@@ -276,6 +279,17 @@ class BudgetForm extends Component {
         let returnValue='';
         if (this.state.recordEditMode) {
             returnValue = this.state.editForm.manufacturer
+        } else {
+            returnValue = fieldValue
+        }
+        if (returnValue === null) return ''
+        return returnValue;
+    }
+
+    valueNotes = (fieldValue, fieldName) => {
+        let returnValue='';
+        if (this.state.recordEditMode) {
+            returnValue = this.state.editForm.notes
         } else {
             returnValue = fieldValue
         }
@@ -399,7 +413,7 @@ class BudgetForm extends Component {
                             select
                             label="Frequency"
                             className={classNames(classes.margin, classes.textField)}
-                            value={this.valueFrequency(currentBudgetRecord.frequency_fk, 'frequency_fk')}
+                            value={this.state.recordEditMode? this.state.editForm.frequency_fk : currentBudgetRecord.frequency_fk}
                             onChange={(event)=>this.handleChange(event, 'frequency_fk')}
                             // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
                             >
@@ -487,6 +501,15 @@ class BudgetForm extends Component {
                             }
                             label="Tentative Entry"
                         />
+                         <TextField
+                            label="Notes"
+                            variant="outlined"
+                            style = {{minWidth: 600}}
+                            className={classNames(classes.margin, classes.textField)}
+                            value = {this.valueNotes(currentBudgetRecord.notes, 'notes')}
+                            onChange={(event)=>this.handleChange(event,'notes')}  
+                            ></TextField>
+
                     </form>
                 </div>
                 );
@@ -545,7 +568,7 @@ class BudgetForm extends Component {
                     <Button onClick={this.cancelEdit} color="primary">
                     Cancel
                     </Button>
-                    <Button onClick={this.deleteRecord} color="alert">
+                    <Button onClick={this.deleteRecord} color="secondary">
                     Delete
                     </Button>
                 </DialogActions>

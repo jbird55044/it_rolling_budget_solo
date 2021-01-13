@@ -73,7 +73,8 @@ router.put('/formfill', (req, res) => {
     capitalize_life_fk= $9,
     expenditure_type_fk = $10,
     credit_card_use = $11,
-    needs_review = $12
+    needs_review = $12,
+    notes = $13
     WHERE id=$1;`;
 
   const queryValues = [
@@ -89,6 +90,7 @@ router.put('/formfill', (req, res) => {
     payload.expenditure_type_fk,
     payload.credit_card_use,
     payload.needs_review,
+    payload.notes,
   ];
 
   pool.query(queryText, queryValues)

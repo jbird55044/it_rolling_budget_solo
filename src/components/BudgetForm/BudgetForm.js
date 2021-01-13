@@ -292,10 +292,10 @@ class BudgetForm extends Component {
                     <hr/>
                     {/* ----------- */}
 
-                    <form className={classes.container} noValidate autoComplete="off">
-                    <FormControl fullWidth className={classes.margin}>
+                    <FormControl className={classes.margin}>
                     <TextField
                         select
+                        style = {{minWidth: 800}}
                         label="GL Code"
                         className={classNames(classes.margin, classes.textField)}
                         value={this.state.recordEditMode? this.state.editForm.gl_code_fk : currentBudgetRecord.gl_code_fk}
@@ -312,14 +312,12 @@ class BudgetForm extends Component {
                                 ))}
                     </TextField>
                     </FormControl>
-                    </form>
                     {/* ----------- */}
 
-                    <form className={classes.container} noValidate autoComplete="off">
-
-                    <FormControl className={classes.formControl}>
+                    <FormControl className={classes.margin}>
                         <InputLabel htmlFor="component-simple">Nomenclature</InputLabel>
                         <Input id="nomenclature-id" 
+                            style = {{minWidth: 300}}
                             value = {this.valueNominclature(currentBudgetRecord.nomenclature, 'nomenclature')}
                             onChange={(event)=>this.handleChange(event,'nomenclature')} />
                     </FormControl>
@@ -327,10 +325,15 @@ class BudgetForm extends Component {
                     <FormControl className={classes.formControl}>
                         <InputLabel htmlFor="component-simple">Manufacturer</InputLabel>
                         <Input id="manufacturer-id" 
+                            style = {{minWidth: 300}}
                             value = {this.valueManufacturer(currentBudgetRecord.manufacturer, 'manufacturer')}
                             onChange={(event)=>this.handleChange(event,'manufacturer')} />
                     </FormControl>
-       
+
+                    <hr/>
+                    <form className={classes.container} noValidate autoComplete="off">
+
+                    <FormControl className={classes.formControl}>
                     <TextField
                         select
                         label="Frequency"
@@ -348,10 +351,7 @@ class BudgetForm extends Component {
                                     </MenuItem>
                                 ))}
                     </TextField>
-
-                  
-
-                    </form>
+                    </FormControl>
          
                     <FormControlLabel
                         control={
@@ -364,6 +364,7 @@ class BudgetForm extends Component {
                         }
                         label="Capitalized Candidate"
                     />
+                    </form>
                 </div>
                 );
             })}

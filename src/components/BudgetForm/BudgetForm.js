@@ -88,6 +88,7 @@ class BudgetForm extends Component {
         },
         recordNumber: 1,
         recordEditMode: false,
+        recordAddMode: false,
         deleteConfirmDialog: false,
     }
     
@@ -159,6 +160,7 @@ class BudgetForm extends Component {
     cancelEdit = () => {
         this.setState ({
             recordEditMode: false,
+            recordAddMode: false,
             deleteConfirmDialog: false
         })
     }
@@ -170,13 +172,24 @@ class BudgetForm extends Component {
                 last_update: this.getDate()
             }
         });
-        // do a PUT to move form to db
-        this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
-            editForm: this.state.editForm,
-            businessUnitId: this.props.store.user.id,
-            recordId: this.state.recordNumber,
-            }
-        });
+
+        if (this.state.recordAddMode) {
+            // do a POST to move populated form to db NEW record number
+            this.props.dispatch({type: 'ADD_NEW_BUDGETFORM', payload: {
+                editForm: this.state.editForm,
+                businessUnitId: this.props.store.user.id,
+                recordId: this.state.recordNumber,
+                }
+            });
+        } else {
+            // do a PUT to move populated form to db current record number
+            this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
+                editForm: this.state.editForm,
+                businessUnitId: this.props.store.user.id,
+                recordId: this.state.recordNumber,
+                }
+            });
+        }
     }
 
     deleteConfirm = () => {
@@ -202,6 +215,17 @@ class BudgetForm extends Component {
         this.clearState();
     }
 
+    addRecord = () => {
+        console.log (`in add record`);
+        this.clearState();
+        this.setState ({
+            recordEditMode: true,
+            recordAddMode: true
+        })
+
+    }
+
+
     clearState = () => {
         console.log (`In clearState`);
         this.setState({
@@ -222,6 +246,7 @@ class BudgetForm extends Component {
                 last_update: ''
             },
             recordEditMode: false,
+            recordAddMode: false,
             deleteConfirmDialog:false,
         });
     }
@@ -355,7 +380,7 @@ class BudgetForm extends Component {
                     <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
 
                         <TextField
-                            select
+                            select style = {{minWidth: 100}}
                             label="Cost Center"
                             className={classNames(classes.margin, classes.textField)}
                             value={this.state.recordEditMode? this.state.editForm.cost_center_fk : currentBudgetRecord.cost_center_fk}
@@ -373,7 +398,7 @@ class BudgetForm extends Component {
                         </TextField>
 
                         <TextField
-                            select
+                            select style = {{minWidth: 400}}
                             label="Point Person"
                             className={classNames(classes.margin, classes.textField)}
                             value={this.state.recordEditMode? this.state.editForm.point_person_fk : currentBudgetRecord.point_person_fk}
@@ -396,8 +421,7 @@ class BudgetForm extends Component {
                     <form className={classes.container, classes.bcolor2} noValidate autoComplete="off">
 
                         <TextField
-                            select
-                            style = {{minWidth: 800}}
+                            select style = {{minWidth: 800}}
                             label="GL Code"
                             className={classNames(classes.margin, classes.textField)}
                             value={this.state.recordEditMode? this.state.editForm.gl_code_fk : currentBudgetRecord.gl_code_fk}
@@ -434,7 +458,7 @@ class BudgetForm extends Component {
                     <hr/>
                     <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
                         <TextField
-                            select
+                            select style = {{minWidth: 250}}
                             label="Frequency"
                             className={classNames(classes.margin, classes.textField)}
                             value={this.state.recordEditMode? this.state.editForm.frequency_fk : currentBudgetRecord.frequency_fk}
@@ -477,7 +501,7 @@ class BudgetForm extends Component {
                         />
                         {currentBudgetRecord.capitalizable_candidate || this.state.recordEditMode?
                             <TextField
-                                select
+                                select style = {{minWidth: 100}}
                                 label="Capitalized Life"
                                 className={classNames(classes.margin, classes.textField)}
                                 value={this.state.recordEditMode? this.state.editForm.capitalize_life_fk : currentBudgetRecord.capitalize_life_fk}
@@ -496,7 +520,7 @@ class BudgetForm extends Component {
                         <p></p>}
 
                             <TextField
-                                select
+                                select style = {{minWidth: 400}}
                                 label="Expenditure Type"
                                 className={classNames(classes.margin, classes.textField)}
                                 value={this.state.recordEditMode? this.state.editForm.expenditure_type_fk : currentBudgetRecord.expenditure_type_fk}
@@ -551,14 +575,25 @@ class BudgetForm extends Component {
                 <button onClick={()=>this.moveRecord('next')}>Next Record</button>
                 }
                 <p></p>
-                <button onClick={()=>this.editRecord()}>Edit Record</button>
-                {/* <button onClick={()=>this.saveEdit()}>Save Edit</button> */}
-                <button onClick={()=>this.cancelEdit()}>Cancel Edit</button>
+                {!this.state.recordAddMode?
+                <button onClick={()=>this.editRecord()}>Edit Record</button>:
+                <p></p>}
+
+                {this.state.recordEditMode && !this.state.recordAddMode?
+                <button onClick={()=>this.cancelEdit()}>Cancel Edit</button>:
+                <p></p>}
+
+                {this.state.recordEditMode && this.state.recordAddMode?
+                <button onClick={()=>this.cancelEdit()}>Cancel Add</button>:
+                <p></p>}
                 
-                {this.state.recordEditMode?
+                {this.state.recordEditMode && !this.state.recordAddMode?
                 <button onClick={()=>this.deleteConfirm()}>DELETE</button>:
                 <p></p>}
-                <button onClick={()=>this.addRecord()}>Add New Record</button>        
+
+                {!this.state.recordAddMode && !this.state.recordEditMode?
+                <button onClick={()=>this.addRecord()}>Add New Record</button>:
+                <p></p>}  
             </div>
             <div>
                 {this.props.store.budget.expenseFillList.map((expenses, index) => {

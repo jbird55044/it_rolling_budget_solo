@@ -185,15 +185,15 @@ INSERT INTO "tlist_capitalized_life" ("life","life_nominclature") VALUES
 (5, '5 Years');
 
 INSERT INTO "tlist_cost_center" ("owner_fk", "cost_center", "cc_accounting", "cost_center_description") VALUES
-(1, 'BT_Mgt', 'BT Management', 'BT Management, Admin, and Executive Costs'),
-(1, 'BTAD', 'Application Development', 'Developers, DBA, Software Tools'),
-(1, 'BTEN', 'Platform Engineering', 'Engineers, System Architects, Admin Tools, Middleware'),
-(1, 'BTPM', 'Project Management', 'PMO, PMs, and Business Analysts, Proj Mgt Tools'),
-(1, 'BTOP', 'BT Operations', 'Helpdesk Support, and ITSM Tools'),
-(2, 'BDMK', 'BD Marketing', 'Marketing, Internal Communications'),
-(2, 'BDBD', 'Business Development', 'Lead Generation, Outward facing web developers, Wordpress'),
-(2, 'BDEC', 'E-Comm', 'E-Commerace, Shopping Cart, Advertising'),
-(3, 'GOOP', 'GO Operations', 'All Staff, and Operations for GO');
+(1, 'BT_Mgt', 'BT Management', 'BT Management & Admin'),
+(1, 'BTAD', 'Application Development', 'Developers, DBA'),
+(1, 'BTEN', 'Platform Engineering', 'Engineers, System Architects'),
+(1, 'BTPM', 'Project Management', 'PMO, PMs, BAs'),
+(1, 'BTOP', 'BT Operations', 'HD Support & ITSM'),
+(2, 'BDMK', 'BD Marketing', 'Marketing & Int-Comm'),
+(2, 'BDBD', 'Business Development', 'Lead Gen, Wordpress'),
+(2, 'BDEC', 'E-Comm', 'E-Comm, Advertising'),
+(3, 'GOOP', 'GO Operations', 'All Staff &Ops');
 
 INSERT INTO "tlist_expenditure_type" ("owner_fk", "expenditure_type", "expenditure_description") VALUES
 (1,'Cash Purchase','Cash on the Barrelhead'),

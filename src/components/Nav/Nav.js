@@ -38,6 +38,9 @@ const Nav = (props) => {
             <Link className="nav-link" to="/budgetform">
               Budget Form
             </Link>
+            <Link className="nav-link" to="/reportmenu">
+              Reporting
+            </Link>
             <Link className="nav-link" to="/adminpage">
               Admin
             </Link>

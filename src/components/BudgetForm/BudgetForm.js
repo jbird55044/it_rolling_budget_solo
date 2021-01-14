@@ -50,7 +50,14 @@ const styles = theme => ({
       },
       bcolor2: {
         backgroundColor: 'biege',
-    }
+      },
+      headerClass: {
+        display: 'box',
+        boxSizing: 'none',
+        width: '100%',
+        float: 'right',
+        backgroundColor: 'white',
+      }
     });
  
   
@@ -76,11 +83,12 @@ class BudgetForm extends Component {
             expenditure_type_fk: 0,
             credit_card_use: false,
             needs_review: false,
-            notes: ''
+            notes: '',
+            last_update: ''
         },
         recordNumber: 1,
         recordEditMode: false,
-        deleteConfirmDialog: false
+        deleteConfirmDialog: false,
     }
     
     // Stage Redux with up to date db info
@@ -130,8 +138,10 @@ class BudgetForm extends Component {
                     expenditure_type_fk: currentBudgetRecord.expenditure_type_fk,
                     credit_card_use: currentBudgetRecord.credit_card_use,
                     needs_review: currentBudgetRecord.needs_review,
-                    notes: currentBudgetRecord.notes
+                    notes: currentBudgetRecord.notes,
+                    last_update: this.getDate()
                 },
+                
             });
         })
         return
@@ -154,7 +164,12 @@ class BudgetForm extends Component {
     }
     
     saveEdit = () => {
-        console.log (`In saveEdit`);
+        console.log (`In saveEdit`, this.getDate());
+        this.setState ({
+            editForm: {
+                last_update: this.getDate()
+            }
+        });
         // do a PUT to move form to db
         this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
             editForm: this.state.editForm,
@@ -203,10 +218,11 @@ class BudgetForm extends Component {
                 expenditure_type_fk: 0,
                 credit_card_use: false,
                 needs_review: false,
-                notes: ''
+                notes: '',
+                last_update: ''
             },
             recordEditMode: false,
-            deleteConfirmDialog:false
+            deleteConfirmDialog:false,
         });
     }
 
@@ -264,6 +280,20 @@ class BudgetForm extends Component {
        
     };  //end of moveRecord
     
+    getDate = () => {
+        let today = new Date();
+        let date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear();
+        return date
+    }  // end of getDate fn
+
+    valueSqlDate = (fieldValue, fieldName) => {
+        let year = fieldValue.slice(0, 4);
+        let month = fieldValue.slice(5, 7);
+        let day = fieldValue.slice(8, 10);
+        return `${month}/${day}/${year}`
+    };
+    
+
     valueNominclature = (fieldValue, fieldName) => {
         let returnValue='';
         if (this.state.recordEditMode) {
@@ -297,17 +327,6 @@ class BudgetForm extends Component {
         return returnValue;
     }
     
-    valueFrequency = (fieldValue, fieldName) => {
-        let returnValue='';
-        if (this.state.recordEditMode) {
-            returnValue = this.state.editForm.frequency_fk
-        } else {
-            returnValue = fieldValue
-        }
-        if (returnValue === null) return ''
-        return returnValue;
-    }
-
     
     render() {
         const { classes } = this.props;
@@ -315,18 +334,23 @@ class BudgetForm extends Component {
             
         <div>
             <h3>Budget Form List:</h3>
+            
 
             {this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
                 return (
                 <div key={index}>
-                    <p>Budget Information STATE: {this.state.editForm.id} </p>
-                    <p>Budget Information REDUX: {currentBudgetRecord.id} </p>
-                    {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
-                    {/* <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p> */}
-                    {/* <p>Budget State Info: {this.state.editForm.cost_center_fk} </p> */}
-                    <p>----</p>
-                    {/* ----------- */}
-                    {/* ----------- */}
+                    <div  className={classes.headerClass} noValidate autoComplete="off">
+                        <p>Last Update: {this.valueSqlDate(currentBudgetRecord.last_update, 'last_update')}</p>
+                        <p>&nbsp;</p>
+                        <p> ID: {this.state.recordEditMode? this.state.editForm.id : currentBudgetRecord.id} </p>
+                    </div>
+                    <div  className={classes.headerClass} noValidate autoComplete="off">
+                        <p>Budget Information STATE: {this.state.editForm.id} </p>
+                        {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
+                        {/* <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p> */}
+                        {/* <p>Budget State Info: {this.state.editForm.cost_center_fk} </p> */}
+                        <p>---_____------_____-----_____</p>
+                    </div>
 
                     <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
 

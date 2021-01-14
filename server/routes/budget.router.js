@@ -10,7 +10,7 @@ router.get('/formfill', (req, res) => {
   // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
   const queryText = `WITH _t_primary_budget AS 
   ( 
-  SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes,
+  SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
   t_user_owner.business_unit, 
   tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
   tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
@@ -74,7 +74,8 @@ router.put('/formfill', (req, res) => {
     expenditure_type_fk = $10,
     credit_card_use = $11,
     needs_review = $12,
-    notes = $13
+    notes = $13,
+    last_update = $14
     WHERE id=$1;`;
 
   const queryValues = [
@@ -91,6 +92,7 @@ router.put('/formfill', (req, res) => {
     payload.credit_card_use,
     payload.needs_review,
     payload.notes,
+    payload.last_update
   ];
 
   pool.query(queryText, queryValues)

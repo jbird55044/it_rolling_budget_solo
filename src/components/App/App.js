@@ -21,6 +21,7 @@ import LoginPage from '../LoginPage/LoginPage';
 import RegisterPage from '../RegisterPage/RegisterPage';
 import BudgetForm from '../BudgetForm/BudgetForm';
 import AdminPage from '../AdminPage/AdminPage';
+import ReportMenu from '../ReportMenu/ReportMenu';
 
 import './App.css';
 
@@ -61,6 +62,12 @@ class App extends Component {
               exact
               path="/budgetform"
               component={BudgetForm}
+            />
+             <ProtectedRoute
+              // logged in shows InfoPage else shows LoginPage
+              exact
+              path="/reportmenu"
+              component={ReportMenu}
             />
             <ProtectedRoute
               // logged in shows InfoPage else shows LoginPage

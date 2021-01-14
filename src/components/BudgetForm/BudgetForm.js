@@ -345,11 +345,11 @@ class BudgetForm extends Component {
                         <p> ID: {this.state.recordEditMode? this.state.editForm.id : currentBudgetRecord.id} </p>
                     </div>
                     <div  className={classes.headerClass} noValidate autoComplete="off">
-                        <p>Budget Information STATE: {this.state.editForm.id} </p>
+                        {/* <p>Budget Information STATE: {this.state.editForm.id} </p> */}
                         {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
                         {/* <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p> */}
                         {/* <p>Budget State Info: {this.state.editForm.cost_center_fk} </p> */}
-                        <p>---_____------_____-----_____</p>
+                        <p>-------------------------------------------</p>
                     </div>
 
                     <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
@@ -558,7 +558,7 @@ class BudgetForm extends Component {
                 {this.state.recordEditMode?
                 <button onClick={()=>this.deleteConfirm()}>DELETE</button>:
                 <p></p>}
-
+                <button onClick={()=>this.addRecord()}>Add New Record</button>        
             </div>
             <div>
                 {this.props.store.budget.expenseFillList.map((expenses, index) => {

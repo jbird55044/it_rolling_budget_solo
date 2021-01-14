@@ -51,7 +51,7 @@ function* fetchBudgetForm( payload ) {
   }
 } 
 
-function* deleteBudgetForm( action ) {
+function* deleteBudgetForm ( action ) {
   console.log('Delete via PUT Budgetform', action.payload);
   try { 
       yield axios.put('/api/budget/deleteform', action.payload)
@@ -65,10 +65,29 @@ function* deleteBudgetForm( action ) {
   }
 }
 
+function* addNewBudgetForm ( action ) {
+  console.log('PUT update Budgetform', action.payload);
+  try { 
+      console.log ('Add POST Payload:', action.payload)
+      yield axios.post('/api/budget/addform', action.payload)
+
+      yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
+          businessUnitId: action.payload.businessUnitId,
+          recordId: action.payload.recordId
+          }
+       }) 
+  } catch (error) {
+      console.log('error with PUTTING BudgetForm', error);
+  }
+}
+
+
+
 function* budgetSaga() {
   yield takeLatest ('FETCH_BUDGETFORM', fetchBudgetForm);
   yield takeLatest('UPDATE_BUDGETFORM', updateBudgetForm);
   yield takeLatest('DELETE_BUDGETFORM', deleteBudgetForm);
+  yield takeLatest('ADD_NEW_BUDGETFORM', addNewBudgetForm);
 }
 
 export default budgetSaga;

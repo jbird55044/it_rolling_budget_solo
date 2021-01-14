@@ -104,7 +104,7 @@ router.put('/formfill', (req, res) => {
   });
   
   router.put('/deleteform', (req, res) => {
-    let payload = req.body
+    let payload = req.body.editForm
     console.log (`formfill DELETE PUT Payload:`, payload);
     const queryText = `UPDATE t_primary_budget SET archived = true WHERE id=$1;`;
     const queryValues = [ payload.deleteRecordId ];
@@ -116,11 +116,43 @@ router.put('/formfill', (req, res) => {
       });
     });
 
-  
+    router.post('/addform', (req, res) => {
+      let payload = req.body.editForm
+      console.log('incoming POST req.body:', payload);
+      // RETURNING "id" will give us back the id of the created budget item
+      const queryText = `INSERT INTO "t_primary_budget" (
+        "owner_fk",           "gl_code_fk",           "cost_center_fk",
+        "point_person_fk",    "nomenclature",         "manufacturer",
+        "frequency_fk",       "expenditure_type_fk",  "capitalizable_candidate",
+        "capitalize_life_fk", "credit_card_use",      "needs_review",
+         "notes",             "last_update"            ) VALUES (
+         $1,  $2,  $3,
+         $4,  $5,  $6,
+         $7,  $8,  $9,
+         $10, $11, $12,
+         $13, $14
+         ) RETURNING "id";`;
+
+      const queryValues = [
+        payload.id,                 payload.gl_code_fk,          payload.cost_center_fk,
+        payload.point_person_fk,    payload.nomenclature,        payload.manufacturer,
+        payload.frequency_fk,       payload.expenditure_type_fk, payload.capitalizable_candidate,
+        payload.capitalize_life_fk, payload.credit_card_use,     payload.needs_review,
+        payload.notes,              payload.last_update
+      ];
+         // FIRST QUERY MAKES MOVIE
+      pool.query(queryText, queryValues)
+      .then(result => {
+        const createdBudgetId = result.rows[0].id
+        console.log('New Record Id:', createdBudgetId); //ID IS HERE!
+      }).catch(err => {
+        console.log(err);
+        res.sendStatus(500)
+      })
+  });
 
 
-
-//  ------------ old 
+//  ------------ old code for examples -------------------
 // File Post
 router.post('/uploadposter', (req, res) => {
   console.log (`in poster: req-files:`, req.files);

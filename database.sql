@@ -173,7 +173,7 @@ WHERE t_primary_expenditure.budget_fk = 128;
 
 INSERT INTO "t_user_owner" ("username", "password", "full_name", "business_unit", "bu_description") VALUES 
 ('jbird', '$2a$10$tI7vFaMyz02s.snyt3.M.Onr1meaoRrQpHVKGaiPb4tplukWfnnvu', 'James Bird','BT', 'Business Technology'),
-('jbird2', '$2a$10$nD2vq1.DDY9j4ANMbcfSxuJDt5meleAl4yz4DoyYHDa99h7XK3XUS', 'James Bird2','DB', 'Business Development'),
+('jbird2', '$2a$10$nD2vq1.DDY9j4ANMbcfSxuJDt5meleAl4yz4DoyYHDa99h7XK3XUS', 'James Bird2','BD', 'Business Development'),
 ('jbird3', '$2a$10$C1Ncu2PD2g1R9Osa4.9sSeqh4bd5iq39SaGcVqmWrk./UNHpw9qs.', 'James Bird3','GO', 'Geo-Spacial Design'), 
 ('jbird4', '$2a$10$Pepq9EyqYNL/AXG2paSKNeBAuE/azOt5N9oEGUctSQzpHv4OYFc2i', 'James Bird4','MD', 'Marketing and Digital');
 

@@ -4,7 +4,7 @@ const pool = require('../modules/pool')
 
 
 router.get('/businessunit', (req, res) => {
-  const queryText = 'SELECT username, full_name, busienss_unit, bu_description FROM t_user_owner';
+  const queryText = 'SELECT username, full_name, business_unit, bu_description FROM t_user_owner';
   console.log ('in t_user_owner get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })

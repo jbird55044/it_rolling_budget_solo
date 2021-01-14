@@ -179,17 +179,17 @@ class BudgetForm extends Component {
         });
     }
 
-    deleteConfirm = (editCheck) => {
-        if (editCheck === 'needEdit') {
+    deleteConfirm = () => {
+        this.setState ({
+            deleteConfirmDialog: true
+        });
+    }
+    
+    deleteRecord = () => {
+        if (!this.state.recordEditMode) {
             alert ('need to be in edit mode to delete record');
             return;
         }
-        this.setState ({
-            deleteConfirmDialog: true
-        })
-    }
-
-    deleteRecord = () => {
         console.log (`In Delete Form`);
         // TODO - confirmation of delete
         // Call Saga to delete - passing values to update record as well
@@ -475,7 +475,7 @@ class BudgetForm extends Component {
                             }
                             label="Capitalized Candidate"
                         />
-                        {currentBudgetRecord.capitalizable_candidate?
+                        {currentBudgetRecord.capitalizable_candidate || this.state.recordEditMode?
                             <TextField
                                 select
                                 label="Capitalized Life"
@@ -557,8 +557,7 @@ class BudgetForm extends Component {
                 
                 {this.state.recordEditMode?
                 <button onClick={()=>this.deleteConfirm()}>DELETE</button>:
-                <button onClick={()=>this.deleteConfirm('needEdit')}>delete</button>
-                }
+                <p></p>}
 
             </div>
             <div>

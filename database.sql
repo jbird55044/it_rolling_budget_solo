@@ -81,15 +81,17 @@ CREATE TABLE "t_primary_budget" (
    "point_person_fk" INT REFERENCES "tlist_point_person",
    "nomenclature" VARCHAR(80),                               
    "manufacturer" VARCHAR(80),
-   "frequency_fk" INT REFERENCES "tlist_frequency",
-   "expenditure_type_fk" INT REFERENCES "tlist_expenditure_type",
+   "frequency_fk" INT REFERENCES "tlist_frequency" DEFAULT 1,
+   "expenditure_type_fk" INT REFERENCES "tlist_expenditure_type" DEFAULT 1,
    "capitalizable_candidate" BOOLEAN,
-   "capitalize_life_fk" INT REFERENCES "tlist_capitalized_life",
-   "credit_card_use" BOOLEAN,
-   "needs_review" BOOLEAN,
+   "capitalize_life_fk" INT REFERENCES "tlist_capitalized_life" DEFAULT 1,
+   "credit_card_use" BOOLEAN DEFAULT false,
+   "needs_review" BOOLEAN DEFAULT false,
    "notes" TEXT,
-   "last_update" TIMESTAMP 
+   "last_update" TIMESTAMP,
+   "archived" BOOLEAN DEFAULT false 
 );
+
 
 CREATE TABLE "t_primary_expenditure" (
    "id" SERIAL PRIMARY KEY,

@@ -77,10 +77,10 @@ class BudgetForm extends Component {
             gl_code_fk: 0,
             nomenclature: '',
             manufacturer: '',
-            frequency_fk: 0,
+            frequency_fk: 1,
             capitalizable_candidate: false,
-            capitalize_life_fk: 0,
-            expenditure_type_fk: 0,
+            capitalize_life_fk: 1,
+            expenditure_type_fk: 1,
             credit_card_use: false,
             needs_review: false,
             notes: '',
@@ -122,7 +122,8 @@ class BudgetForm extends Component {
 
     // new record staging, get record from DB and put in REDUX
     updateState = () => {
-        console.log (`in update State`);
+        let lastUpdateGrabber = this.getDate()
+        console.log (`in update State`, lastUpdateGrabber);
         this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
             console.log (`in budgetFormFillList map2`, currentBudgetRecord);
             this.setState({
@@ -140,7 +141,7 @@ class BudgetForm extends Component {
                     credit_card_use: currentBudgetRecord.credit_card_use,
                     needs_review: currentBudgetRecord.needs_review,
                     notes: currentBudgetRecord.notes,
-                    last_update: this.getDate()
+                    last_update: lastUpdateGrabber
                 },
                 
             });
@@ -167,12 +168,7 @@ class BudgetForm extends Component {
     
     saveEdit = () => {
         console.log (`In saveEdit`, this.getDate());
-        this.setState ({
-            editForm: {
-                last_update: this.getDate()
-            }
-        });
-
+       
         if (this.state.recordAddMode) {
             // do a POST to move populated form to db NEW record number
             this.props.dispatch({type: 'ADD_NEW_BUDGETFORM', payload: {
@@ -227,7 +223,8 @@ class BudgetForm extends Component {
 
 
     clearState = () => {
-        console.log (`In clearState`);
+        let lastUpdateGrabber = this.getDate()
+        console.log (`In clearState`, lastUpdateGrabber);
         this.setState({
             editForm: {
                 id: 1,
@@ -236,14 +233,14 @@ class BudgetForm extends Component {
                 gl_code_fk: 0,
                 nomenclature: '',
                 manufacturer: '',
-                frequency_fk: 0,
+                frequency_fk: 1,
                 capitalizable_candidate: false,
-                capitalize_life_fk: 0,
-                expenditure_type_fk: 0,
+                capitalize_life_fk: 1,
+                expenditure_type_fk: 1,
                 credit_card_use: false,
                 needs_review: false,
                 notes: '',
-                last_update: ''
+                last_update: lastUpdateGrabber
             },
             recordEditMode: false,
             recordAddMode: false,
@@ -280,19 +277,27 @@ class BudgetForm extends Component {
         }
     }
     
-    moveRecord = (direction) => {
+    moveRecord = (recordMove) => {
         if (this.state.recordEditMode === true) {
             this.saveEdit();
         }
-        if (direction === 'back') {
+        if (recordMove === 'back') {
             this.setState ({
                 recordNumber: this.state.recordNumber -=1,
-                recordEditMode: false
+                recordEditMode: false,
+                recordAddMode: false
             })
-        } else if (direction === 'next') {
+        } else if (recordMove === 'next') {
             this.setState ({
                 recordNumber: this.state.recordNumber +=1,
-                recordEditMode: false
+                recordEditMode: false,
+                recordAddMode: false
+            })
+        } else {
+            this.setState ({
+                recordNumber: recordMove,
+                recordEditMode: false,
+                recordAddMode: false
             })
         }
         //refresh
@@ -311,7 +316,7 @@ class BudgetForm extends Component {
         return date
     }  // end of getDate fn
 
-    valueSqlDate = (fieldValue, fieldName) => {
+    cleanSqlDate = (fieldValue, fieldName) => {
         let year = fieldValue.slice(0, 4);
         let month = fieldValue.slice(5, 7);
         let day = fieldValue.slice(8, 10);
@@ -365,7 +370,7 @@ class BudgetForm extends Component {
                 return (
                 <div key={index}>
                     <div  className={classes.headerClass} noValidate autoComplete="off">
-                        <p>Last Update: {this.valueSqlDate(currentBudgetRecord.last_update, 'last_update')}</p>
+                        <p>Last Update: {this.cleanSqlDate(currentBudgetRecord.last_update, 'last_update')}</p>
                         <p>&nbsp;</p>
                         <p> ID: {this.state.recordEditMode? this.state.editForm.id : currentBudgetRecord.id} </p>
                     </div>
@@ -549,14 +554,14 @@ class BudgetForm extends Component {
                             }
                             label="Tentative Entry"
                         />
-                         <TextField
+                        <TextField
                             label="Notes"
                             variant="outlined"
                             style = {{minWidth: 600}}
                             className={classNames(classes.margin, classes.textField)}
                             value = {this.valueNotes(currentBudgetRecord.notes, 'notes')}
                             onChange={(event)=>this.handleChange(event,'notes')}  
-                            ></TextField>
+                        ></TextField>
 
                     </form>
                 </div>

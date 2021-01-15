@@ -125,7 +125,7 @@ class BudgetForm extends Component {
             }
         });
         this.setState ({
-            recordNumber: this.props.store.budget.budgetFormCount
+            recordNumber: this.props.store.budgetForm.budgetFormCount
         })
         this.updateState();
 
@@ -135,7 +135,7 @@ class BudgetForm extends Component {
     updateState = () => {
         let lastUpdateGrabber = this.getDate()
         console.log (`in update State`, lastUpdateGrabber);
-        this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
+        this.props.store.budgetForm.budgetFormFillList.map((currentBudgetRecord, index) => {
             console.log (`in budgetFormFillList map2`, currentBudgetRecord);
             this.setState({
                 editForm: {
@@ -188,6 +188,10 @@ class BudgetForm extends Component {
                 relitiveRecordId: this.state.recordNumber,
                 }
             });
+            this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
+                businessUnitId: this.props.store.user.id,
+                }
+            });
         } else {
             // do a PUT to move populated form to db current record number
             this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
@@ -197,6 +201,11 @@ class BudgetForm extends Component {
                 }
             });
         }
+        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            relitiveRecordId: this.state.recordNumber,
+            }
+        });
     }
 
     deleteConfirm = () => {
@@ -226,7 +235,7 @@ class BudgetForm extends Component {
         console.log (`in add record`);
         this.clearState();
         this.setState ({
-            recordNumber: this.props.store.budget.budgetFormCount,
+            recordNumber: this.props.store.budgetForm.budgetFormCount,
             recordEditMode: true,
             recordAddMode: true
         })
@@ -315,14 +324,14 @@ class BudgetForm extends Component {
                 recordEditMode: false,
                 recordAddMode: false
             })
-            if (this.state.recordNumber > this.props.store.budget.budgetFormCount ) {
+            if (this.state.recordNumber > this.props.store.budgetForm.budgetFormCount ) {
                 this.setState ({
-                    recordNumber: this.state.recordNumber = this.props.store.budget.budgetFormCount,
+                    recordNumber: this.state.recordNumber = this.props.store.budgetForm.budgetFormCount,
                 })
             }
         } else if (recordMove === 'last') {
             this.setState ({
-                recordNumber: this.props.store.budget.budgetFormCount,
+                recordNumber: this.props.store.budgetForm.budgetFormCount,
                 recordEditMode: false,
                 recordAddMode: false
             })
@@ -333,15 +342,23 @@ class BudgetForm extends Component {
                 recordAddMode: false
             })
         }
-        //refresh
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+       this.refreshDom();
+       
+    };  //end of moveRecord
+    
+    refreshDom = () => {
+         //refresh
+         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
             relitiveRecordId: this.state.recordNumber,
             }
         });
-       
-    };  //end of moveRecord
-    
+        this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
+    }
+
     getDate = () => {
         let today = new Date();
         let date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear();
@@ -398,7 +415,7 @@ class BudgetForm extends Component {
             <h3>Budget Form List:</h3>
             
 
-            {this.props.store.budget.budgetFormFillList.map((currentBudgetRecord, index) => {
+            {this.props.store.budgetForm.budgetFormFillList.map((currentBudgetRecord, index) => {
                 return (
                 <div key={index}>
                     <div  className={classes.headerClass} noValidate autoComplete="off">
@@ -604,16 +621,20 @@ class BudgetForm extends Component {
 
             <div className={classes.buttons}>
                 {this.state.recordEditMode?
-                <button onClick={()=>this.moveRecord('back')}>Save-Back Record</button>:
+                <button onClick={()=>this.moveRecord(this.state.recordNumber)}>Save Record</button>:
                 <button onClick={()=>this.moveRecord('back')}>Back Record</button>
                 }
                 {this.state.recordEditMode?
-                <button onClick={()=>this.moveRecord('next')}>Save-Next Record</button>:
+                <button onClick={()=>this.moveRecord(this.state.recordNumber)}>Save Record</button>:
                 <button onClick={()=>this.moveRecord('next')}>Next Record</button>
                 }
                  {this.state.recordEditMode?
                 <p></p>:
                 <button onClick={()=>this.moveRecord('last')}>Last Record</button>
+                }
+                {this.state.recordEditMode?
+                <p></p>:
+                <button onClick={()=>this.refreshDom()}>Refresh</button>
                 }
                 <p></p>
                 {!this.state.recordAddMode?
@@ -647,7 +668,7 @@ class BudgetForm extends Component {
 
             </div>
             <div>
-                {this.props.store.budget.expenseFillList.map((expenses, index) => {
+                {this.props.store.budgetForm.expenseFillList.map((expenses, index) => {
                         return (
                             <div key={index}>
                             {/* <p>Expense Info</p> {budgetForm.id} */}

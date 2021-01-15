@@ -52,7 +52,7 @@ class AdminPage extends Component {
                      })}
 
                 <p style={{textDecoration: "underline"}}>Budget Record Count from CTE sql call</p>
-                    {this.props.store.budget.budgetFormCount}
+                    {this.props.store.budgetForm.budgetFormCount}
 
                 <p style={{textDecoration: "underline"}}>Cost Centers</p>
                     {this.props.store.tlist.tlistCostCenter.map((costCenter, index) => {

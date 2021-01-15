@@ -22,6 +22,7 @@ import RegisterPage from '../RegisterPage/RegisterPage';
 import BudgetForm from '../BudgetForm/BudgetForm';
 import AdminPage from '../AdminPage/AdminPage';
 import ReportMenu from '../ReportMenu/ReportMenu';
+import ReportList1 from '../ReportList1/ReportList1'
 
 import './App.css';
 
@@ -112,7 +113,12 @@ class App extends Component {
               component={LandingPage}
               authRedirect="/user"
             />
-
+            <Route
+              // shows AboutPage at all times (logged in or not)
+              exact
+              path="/report1"
+              component={ReportList1}
+            />
             {/* If none of the other routes matched, we will show a 404. */}
             <Route render={() => <h1>404</h1>} />
           </Switch>

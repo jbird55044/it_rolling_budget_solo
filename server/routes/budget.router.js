@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../modules/pool')
+const {rejectUnauthenticated,} = require('../modules/authentication-middleware');
  
 // Primary Record getter using SQL CTE and Partitioning
-router.get('/formfill', (req, res) => {
+router.get('/formfill', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   let relitiveRecordId = req.query.relitiveRecordId
   let budgetId = req.query.budgetId
@@ -43,7 +44,7 @@ router.get('/formfill', (req, res) => {
 }); 
 
 // get max record number for form management
-router.get('/formcount', (req, res) => {
+router.get('/formcount', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
   const queryText = `SELECT COUNT (t_primary_budget.id) FROM t_primary_budget WHERE owner_fk = $1 AND archived = false;`;
@@ -60,7 +61,7 @@ router.get('/formcount', (req, res) => {
 }); 
 
 
-router.get('/expensefill', (req, res) => {
+router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   const queryText = `SELECT *
   FROM t_primary_expenditure
@@ -76,7 +77,7 @@ router.get('/expensefill', (req, res) => {
     });
 }); 
 
-router.put('/formfill', (req, res) => {
+router.put('/formfill', rejectUnauthenticated, (req, res) => {
   let payload = req.body.editForm
   console.log (`formfill PUT Payload:`, payload);
   const queryText = `UPDATE t_primary_budget SET 
@@ -120,7 +121,7 @@ router.put('/formfill', (req, res) => {
     });
   });
   
-  router.put('/deleteform', (req, res) => {
+  router.put('/deleteform', rejectUnauthenticated, (req, res) => {
     let payload = req.body
     console.log (`formfill DELETE PUT Payload:`, payload);
     const queryText = `UPDATE t_primary_budget SET archived = true WHERE id=$1;`;
@@ -133,7 +134,7 @@ router.put('/formfill', (req, res) => {
       });
     });
 
-    router.post('/addform', (req, res) => {
+    router.post('/addform', rejectUnauthenticated, (req, res) => {
       let payload = req.body.editForm
       console.log('incoming POST req.body:', payload);
       // RETURNING "id" will give us back the id of the created budget item

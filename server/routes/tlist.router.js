@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../modules/pool')
+const {rejectUnauthenticated,} = require('../modules/authentication-middleware');
 
-
-router.get('/businessunit', (req, res) => {
+router.get('/businessunit', rejectUnauthenticated, (req, res) => {
   const queryText = 'SELECT username, full_name, business_unit, bu_description FROM t_user_owner';
   console.log ('in t_user_owner get')
   pool.query(queryText)
@@ -14,7 +14,7 @@ router.get('/businessunit', (req, res) => {
     });
 }); 
 
-router.get('/glcode', (req, res) => {
+router.get('/glcode', rejectUnauthenticated, (req, res) => {
   const queryText = 'SELECT * FROM tlist_gl_code';
   console.log ('in tlist_gl_code get')
   pool.query(queryText)
@@ -25,7 +25,7 @@ router.get('/glcode', (req, res) => {
     });
 }); 
 
-router.get('/frequency', (req, res) => {
+router.get('/frequency', rejectUnauthenticated, (req, res) => {
   const queryText = 'SELECT * FROM tlist_frequency';
   console.log ('in tlist_frequency get')
   pool.query(queryText)
@@ -36,7 +36,7 @@ router.get('/frequency', (req, res) => {
     });
 }); 
 
-router.get('/costcenter', (req, res) => {
+router.get('/costcenter', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   const queryText = 'SELECT * FROM tlist_cost_center WHERE owner_fk = $1';
   console.log ('in tlist_cost_center get, BU ID:', businessUnitId)
@@ -48,7 +48,7 @@ router.get('/costcenter', (req, res) => {
     });
 }); 
 
-router.get('/pointperson', (req, res) => {
+router.get('/pointperson', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   const queryText = 'SELECT * FROM tlist_point_person WHERE owner_fk = $1';
   console.log ('in tlist_point_person get, BU ID:', businessUnitId)
@@ -60,7 +60,7 @@ router.get('/pointperson', (req, res) => {
     });
 }); 
 
-router.get('/capitalizedlife', (req, res) => {
+router.get('/capitalizedlife', rejectUnauthenticated, (req, res) => {
   const queryText = 'SELECT * FROM tlist_capitalized_life';
   console.log ('in tlist_capitalized_life get')
   pool.query(queryText)
@@ -71,7 +71,7 @@ router.get('/capitalizedlife', (req, res) => {
     });
 }); 
 
-router.get('/expendituretype', (req, res) => {
+router.get('/expendituretype', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   const queryText = 'SELECT * FROM tlist_expenditure_type WHERE owner_fk = $1';
   console.log ('in tlist_expenditure_type get, BU ID:', businessUnitId)

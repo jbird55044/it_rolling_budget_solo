@@ -1,7 +1,10 @@
-.homePageClass {
+.report1Class {
     margin: 30px;
+    max-width: 90%;
+
 }
 
-.homePageClass img {
-    max-width: 80%;
+.report1TableClass {
+    background-color: antiquewhite;
+    width: 90%;
 }

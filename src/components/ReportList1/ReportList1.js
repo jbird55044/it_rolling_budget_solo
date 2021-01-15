@@ -2,9 +2,16 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import mapStoreToProps from '../../redux/mapStoreToProps';
 import ReportItem1 from '../ReportItem1/ReportItem1'
+import { withStyles } from '@material-ui/core/styles';
 
 import './ReportList1.css'
 
+const styles = theme => ({
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+      },
+    });
 
 class ReportList1 extends Component {
   
@@ -12,7 +19,6 @@ class ReportList1 extends Component {
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETCOLLECTION', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
             }
         });
         this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
@@ -25,16 +31,23 @@ class ReportList1 extends Component {
     
     render() {
         return (
-            <div className="homePageClass">
-                <h1>Report List 1</h1>
+            <div className="report1Class">
+                <h1>Report One</h1>
+                <table className="report1TableClass">
+                    <thead>
+                        <tr><th>ID</th><th>nomenclature</th><th>gl_account</th><th>gl_name</th><th>cost_center</th><th>description</th><th>Cap_life</th></tr>
+                    </thead>
+                    <tbody>
+                        {this.props.store.budgetCollection.reportBudgetCollection.map((lineItem) => {
+                        return (
+                            // JSON.stringify(lineItem)
+                            <ReportItem1 key={lineItem.id} lineItem={lineItem} />
+                            );
+                        })}
+                    </tbody>
 
-                <ul>
-                {/* {this.props.store.budgetCollection.budgetFormFillList.map((basketItem) => {
-                    return (
-                        <ReportItem1 key={basketItem.id} basketItem={basketItem} />
-                    );
-                })} */}
-            </ul>
+               
+                </table>
          </div>
         )
     }
@@ -44,5 +57,6 @@ const putReduxStateOnProps = (reduxState) => ({
     reduxState
   })
 
-export default connect(mapStoreToProps)(ReportList1);
+export default connect(mapStoreToProps)(withStyles(styles)(ReportList1));
+// export default connect(mapStoreToProps)(ReportList1);
  

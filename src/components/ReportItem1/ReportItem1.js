@@ -7,34 +7,18 @@ import './ReportItem1.css'
 
 class ReportItem1 extends Component {
   
-    async componentDidMount() {
-        // Get's data to fill form, both Budget and Expense (prefills for ID grab)
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
-            }
-        });
-        this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            }
-        });
-        // this.updateState();
-    }
-  
     
     render() {
         return (
-            <div className="homePageClass">
-                <h1>Report List 1</h1>
-
-                <ul>
-                {this.props.store.budgetCollection.budgetFormFillList.map((basketItem) => {
-                    return (
-                        <ReportItem1 key={basketItem.id} basketItem={basketItem} />
-                    );
-                })}
-            </ul>
-         </div>
+            <tr>
+                <td>{this.props.lineItem.id}</td>
+                <td>{this.props.lineItem.nomenclature}</td>
+                <td>{this.props.lineItem.gl_account}</td>
+                <td>{this.props.lineItem.gl_name}</td>
+                <td>{this.props.lineItem.cost_center}</td>
+                <td>{this.props.lineItem.description}</td>
+                <td>{this.props.lineItem.life_nominclature}</td>
+            </tr>
         )
     }
 }

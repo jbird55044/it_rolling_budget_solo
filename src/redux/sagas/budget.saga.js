@@ -8,7 +8,7 @@ function* updateBudgetForm( action ) {
       yield axios.put('/api/budget/formfill', action.payload)
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          recordId: action.payload.recordId
+          relitiveRecordId: action.payload.recordId
           }
        }) 
   } catch (error) {
@@ -28,7 +28,7 @@ function* fetchBudgetForm( payload ) {
       const response = yield axios.get('/api/budget/formfill', {
           params:{
               businessUnitId: payload.recordFinder.businessUnitId,
-              recordId: payload.recordFinder.recordId,
+              relitiveRecordId: payload.recordFinder.relitiveRecordId,
           }
       })
       yield put({ type: 'SET_BUDGETFORMFILL', payload: response.data });
@@ -51,13 +51,35 @@ function* fetchBudgetForm( payload ) {
   }
 } 
 
+// Grab number of record in current form grab for business unit
+function* fetchBudgetRecordCount( payload ) {
+  let countNumber = 1;
+  let currentRecordId = 1;  //default to department 1 to ,minimize init errors
+  console.log (`fetchBudgetRecordCount Payload:`, payload);
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/budget/formcount', {
+          params:{
+              businessUnitId: payload.recordFinder.businessUnitId,
+          }
+      })
+      yield countNumber = response.data[0].count
+      yield console.log (`count =`, countNumber);
+      
+      yield put({ type: 'SET_BUDGETFORMCOUNT', payload: countNumber });
+  } catch ( error ) {
+      console.log('error with fetchBudgetRecordCount get request', error);
+  }
+} 
+
 function* deleteBudgetForm ( action ) {
   console.log('Delete via PUT Budgetform', action.payload);
   try { 
       yield axios.put('/api/budget/deleteform', action.payload)
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          recordId: action.payload.recordId
+          relitiveRecordId: action.payload.recordId
           }
        }) 
   } catch (error) {
@@ -73,7 +95,7 @@ function* addNewBudgetForm ( action ) {
 
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          recordId: action.payload.recordId
+          relitiveRecordId: action.payload.recordId
           }
        }) 
   } catch (error) {
@@ -88,6 +110,7 @@ function* budgetSaga() {
   yield takeLatest('UPDATE_BUDGETFORM', updateBudgetForm);
   yield takeLatest('DELETE_BUDGETFORM', deleteBudgetForm);
   yield takeLatest('ADD_NEW_BUDGETFORM', addNewBudgetForm);
+  yield takeLatest('FETCH_BUDGET_RECORD_COUNT', fetchBudgetRecordCount);
 }
 
 export default budgetSaga;

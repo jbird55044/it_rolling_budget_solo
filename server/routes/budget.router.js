@@ -2,10 +2,10 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../modules/pool')
  
-
+// Primary Record getter using SQL CTE and Partitioning
 router.get('/formfill', (req, res) => {
   let businessUnitId = req.query.businessUnitId
-  let recordId = req.query.recordId
+  let relitiveRecordId = req.query.relitiveRecordId
   let budgetId = req.query.budgetId
   // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
   const queryText = `WITH _t_primary_budget AS 
@@ -31,13 +31,30 @@ router.get('/formfill', (req, res) => {
   )
   SELECT * FROM _t_primary_budget WHERE row_number = $2;`;
   console.log ('in budgetForm get')
-  pool.query(queryText, [businessUnitId, recordId])
+  pool.query(queryText, [businessUnitId, relitiveRecordId])
     .then((result) => { 
       res.send(result.rows); 
       // console.log (`budgetForm rows:`,result.rows);
     })
     .catch((err) => {
       console.log('Error completing formfill query', err);
+      res.sendStatus(500);
+    });
+}); 
+
+// get max record number for form management
+router.get('/formcount', (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
+  const queryText = `SELECT COUNT (t_primary_budget.id) FROM t_primary_budget WHERE owner_fk = $1 AND archived = false;`;
+  console.log ('in formCount get')
+  pool.query(queryText, [businessUnitId])
+    .then((result) => { 
+      res.send(result.rows); 
+      // console.log (`budgetForm rows:`,result.rows);
+    })
+    .catch((err) => {
+      console.log('Error completing formCount query', err);
       res.sendStatus(500);
     });
 }); 
@@ -104,7 +121,7 @@ router.put('/formfill', (req, res) => {
   });
   
   router.put('/deleteform', (req, res) => {
-    let payload = req.body.editForm
+    let payload = req.body
     console.log (`formfill DELETE PUT Payload:`, payload);
     const queryText = `UPDATE t_primary_budget SET archived = true WHERE id=$1;`;
     const queryValues = [ payload.deleteRecordId ];

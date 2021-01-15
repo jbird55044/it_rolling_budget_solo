@@ -13,6 +13,10 @@ class AdminPage extends Component {
     tlistRefresher = () => {
         console.log (`Refresh T-Lists Activated`);
         this.props.dispatch({type: 'FETCH_TLIST_BUSINESSUNIT'});
+        this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            }
+        });
         this.props.dispatch({type: 'FETCH_TLIST_COSTCENTER', recordFinder: {
             businessUnitId: this.props.store.user.id,
             }
@@ -38,7 +42,7 @@ class AdminPage extends Component {
                 <p>Here you will be able to do great stuff.</p>
                 <button onClick={this.tlistRefresher}>Refresh all T-Lists</button>
 
-                <p>Business Unit</p>
+                <p style={{textDecoration: "underline"}}>Business Unit</p>
                          {this.props.store.tlist.tlistBusinessUnit.map((businessUnit, index) => {
                              return (
                                  <div key={index}>
@@ -47,7 +51,10 @@ class AdminPage extends Component {
                          );
                      })}
 
-                <p>Cost Centers</p>
+                <p style={{textDecoration: "underline"}}>Budget Record Count from CTE sql call</p>
+                    {this.props.store.budget.budgetFormCount}
+
+                <p style={{textDecoration: "underline"}}>Cost Centers</p>
                     {this.props.store.tlist.tlistCostCenter.map((costCenter, index) => {
                             return (
                                 <div key={index}>
@@ -56,7 +63,7 @@ class AdminPage extends Component {
                             );
                     })} 
                     
-                <p>Point Person</p>
+                <p style={{textDecoration: "underline"}}>Point Person</p>
                      {this.props.store.tlist.tlistCostCenter.map((pointPerson, index) => {
                         return (
                             <div key={index}>
@@ -65,7 +72,7 @@ class AdminPage extends Component {
                         );
                     })} 
 
-                <p>Frequency</p>
+                <p style={{textDecoration: "underline"}}>Frequency</p>
                         {this.props.store.tlist.tlistFrequency.map((frequency, index) => {
                             return (
                                 <div key={index}>
@@ -75,7 +82,7 @@ class AdminPage extends Component {
                         })}
 
 
-                <p>GL Code</p>
+                <p style={{textDecoration: "underline"}}>GL Code</p>
                     {this.props.store.tlist.tlistGlcode.map((glcode, index) => {
                             return (
                                 <div key={index}>
@@ -84,7 +91,7 @@ class AdminPage extends Component {
                             );
                     })} 
 
-                <p>Capitalized Life</p>
+                <p style={{textDecoration: "underline"}}>Capitalized Life</p>
                     {this.props.store.tlist.tlistCapitalizedLife.map((capLife, index) => {
                             return (
                                 <div key={index}>
@@ -93,7 +100,7 @@ class AdminPage extends Component {
                             );
                     })} 
 
-                <p>Expenditure Type</p>
+                <p style={{textDecoration: "underline"}}>Expenditure Type</p>
                     {this.props.store.tlist.tlistExpenditureType.map((expType, index) => {
                             return (
                                 <div key={index}>

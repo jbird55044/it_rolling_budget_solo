@@ -12,7 +12,7 @@ const passport = require('./strategies/user.strategy');
 const userRouter = require('./routes/user.router');
 const budgetRouter = require('./routes/budget.router.js')
 const tlistRouter = require('./routes/tlist.router.js')
-const collectionRouter = require('./routes/collection.router')
+const reportRouter = require('./routes/report.router')
 
 
 // Body parser middleware
@@ -30,7 +30,7 @@ app.use(passport.session());
 app.use('/api/user', userRouter);
 app.use('/api/budget', budgetRouter);
 app.use('/api/tlist', tlistRouter)
-app.use('/api/collection', collectionRouter)
+app.use('/api/report', reportRouter)
 
 
 // Serve static files

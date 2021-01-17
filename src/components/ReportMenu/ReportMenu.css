@@ -1,7 +1,8 @@
-.homePageClass {
-    margin: 30px;
+.menuBoxClass {
+    border: 2px solid black;
+    background-image: url("../../images/marble1_wallpaper.png");
 }
 
-.homePageClass img {
-    max-width: 80%;
+.reportSelectorClass {
+    margin: 30px;
 }

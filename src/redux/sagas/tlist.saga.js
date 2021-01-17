@@ -120,6 +120,21 @@ function* fetchTlistExpenditureType( payload ) {
 } 
 
 
+function* fetchTlistYear() {
+  // Move GET request from App.js
+  console.log('In fetchTlistYear saga');
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/tlist/year');
+      // put data into store via Reducer
+      yield put({ type: 'SET_TLIST_YEAR', payload: response.data });
+  } catch ( error ) {
+      console.log('error with fetchTlistYear get request', error);
+  }
+} 
+
+
 function* loginSaga() {
   yield takeLatest('FETCH_TLIST_SELECTORS', fetchTlistSelectors);
   yield takeLatest('FETCH_TLIST_BUSINESSUNIT', fetchTlistBusinessUnit);
@@ -129,6 +144,7 @@ function* loginSaga() {
   yield takeLatest('FETCH_TLIST_POINTPERSON', fetchTlistPointPerson);
   yield takeLatest('FETCH_TLIST_CAPITALIZEDLIFE', fetchTlistCapitalizedLife);
   yield takeLatest('FETCH_TLIST_EXPENDITURETYPE', fetchTlistExpenditureType);
+  yield takeLatest('FETCH_TLIST_YEAR', fetchTlistYear);
 }
 
 export default loginSaga;

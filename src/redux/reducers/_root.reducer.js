@@ -3,7 +3,7 @@ import errors from './errors.reducer';
 import user from './user.reducer';
 import budgetForm from './budgetform.reducer';
 import tlist from './tlist.reducer';
-import budgetCollection from './budgetcollection.reducer';
+import budgetReport from './budgetreport.reducer';
 
 // rootReducer is the primary reducer for our entire project
 // It bundles up all of the other reducers so our project can use them.
@@ -16,7 +16,7 @@ const rootReducer = combineReducers({
   user, // will have an id and username if someone is logged in
   budgetForm, // primary in and outs of the budget form
   tlist, // primary GETs for all lists (pulldowns and selectors)
-  budgetCollection, // primary GETs for full budgetlists
+  budgetReport, // primary GETs for full budgetlists
 });
 
 export default rootReducer;

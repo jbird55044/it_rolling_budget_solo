@@ -304,6 +304,7 @@ class BudgetForm extends Component {
     
     moveRecord = (recordMove) => {
         console.log ('recordNumber type:', typeof(this.state.recordNumber))
+        
         if (this.state.recordEditMode === true) {
             this.saveEdit();
         }
@@ -331,13 +332,13 @@ class BudgetForm extends Component {
             }
         } else if (recordMove === 'last') {
             this.setState ({
-                recordNumber: this.props.store.budgetForm.budgetFormCount,
+                recordNumber: parseInt(this.props.store.budgetForm.budgetFormCount),
                 recordEditMode: false,
                 recordAddMode: false
             })
         } else {
             this.setState ({
-                recordNumber: recordMove,
+                recordNumber: parseInt(recordMove),
                 recordEditMode: false,
                 recordAddMode: false
             })
@@ -346,6 +347,22 @@ class BudgetForm extends Component {
        
     };  //end of moveRecord
     
+// // check for specific user input criteria 
+// function isValidString(str) {  
+//     if ( typeof str != "string" ) return false  
+//     if ( str.trim().length < 3 ) return false
+//     return true
+// };  //end of isValidString fn
+    
+
+//   // check for specific user input criteria 
+//   function isValidNumber(str) {
+//     if (typeof str != "string") return false //Process as string  
+//     if ( str.length < 3 ) return false
+//     return !isNaN(str) && !isNaN(parseFloat(str)) 
+//   }; // end of isValidNumber fn
+
+
     refreshDom = () => {
          //refresh
          this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
@@ -661,7 +678,7 @@ class BudgetForm extends Component {
                     label="Record"
                     variant="outlined"
                     style = {{width: 80}}
-                    className={classNames(classes.margin, classes.textField)}
+                    className={classNames(classes.margin, classes.intField)}
                     value = {this.state.recordNumber}
                     onChange={(event)=>this.handleChange(event,'recordNumber', 'controlInt')}  
                 ></TextField>

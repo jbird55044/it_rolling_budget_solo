@@ -2,12 +2,9 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import mapStoreToProps from '../../redux/mapStoreToProps';
 import ReportItem1 from '../ReportItem1/ReportItem1'
-import {
-    Table,
-        } from 'react-bootstrap'
 import { withStyles } from '@material-ui/core/styles';
 
-import './ReportList1.css'
+import './ReportList2.css'
 
 const styles = theme => ({
     container: {
@@ -16,11 +13,11 @@ const styles = theme => ({
       },
     });
 
-class ReportList1 extends Component {
+class ReportList2 extends Component {
   
     async componentDidMount() {
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
-        this.props.dispatch({type: 'FETCH_BUDGETREPORT', recordFinder: {
+        this.props.dispatch({type: 'FETCH_BUDGETCOLLECTION', recordFinder: {
             businessUnitId: this.props.store.user.id,
             }
         });
@@ -35,13 +32,13 @@ class ReportList1 extends Component {
     render() {
         return (
             <div className="report1Class">
-                <h3>Report One - Human With Total</h3>
-                <Table className="report1TableClass" striped bordered hover size="sm">
+                <h1>Report Two</h1>
+                <table className="report1TableClass">
                     <thead>
-                        <tr><th>ID</th><th>Nomenclature</th><th>GL Account</th><th>GL Name</th><th>Cost Center</th><th>Description</th></tr>
+                        <tr><th>ID</th><th>nomenclature</th><th>gl_account</th><th>gl_name</th><th>cost_center</th><th>description</th><th>Cap_life</th></tr>
                     </thead>
                     <tbody>
-                        {this.props.store.budgetReport.reportBudgetReport.map((lineItem) => {
+                        {this.props.store.budgetCollection.reportBudgetCollection.map((lineItem) => {
                         return (
                             // JSON.stringify(lineItem)
                             <ReportItem1 key={lineItem.id} lineItem={lineItem} />
@@ -50,7 +47,7 @@ class ReportList1 extends Component {
                     </tbody>
 
                
-                </Table>
+                </table>
          </div>
         )
     }
@@ -60,6 +57,6 @@ const putReduxStateOnProps = (reduxState) => ({
     reduxState
   })
 
-export default connect(mapStoreToProps)(withStyles(styles)(ReportList1));
+export default connect(mapStoreToProps)(withStyles(styles)(ReportList2));
 // export default connect(mapStoreToProps)(ReportList1);
  

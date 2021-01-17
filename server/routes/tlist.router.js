@@ -83,5 +83,16 @@ router.get('/expendituretype', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
+router.get('/year', rejectUnauthenticated, (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  const queryText = 'SELECT * FROM tlist_year';
+  console.log ('in tlist_year get')
+  pool.query(queryText)
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_year code query', err);
+      res.sendStatus(500);
+    });
+}); 
 
 module.exports = router; 

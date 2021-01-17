@@ -1,10 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import mapStoreToProps from '../../redux/mapStoreToProps';
-import {
-    Nav,
+import TextField from '@material-ui/core/TextField';
+import MenuItem from '@material-ui/core/MenuItem';
+import classNames from 'classnames';
+import { withStyles } from '@material-ui/core/styles';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
-        } from 'react-bootstrap'
+
+
 import {
     HashRouter as Router,
     Route,
@@ -13,50 +17,73 @@ import {
 
 import './ReportMenu.css'
 
+const styles = theme => ({
+    container: {
+        display: 'flex',
+        flexWrap: 'wrap',
+      },
+      margin: {
+        margin: theme.spacing.unit - 3,
+        paddingTop: theme.spacing.unit - 2,
+        paddingBottom: theme.spacing.unit - 2,
+      },
+      textField: {
+        flexBasis: 200,
+      },
+      });
 
 class ReportMenu extends Component {
+
+    state = {
+        selectedYear: 0,
+    };
   
     async componentDidMount() {
         // Get's data to populate year pull-down
         this.props.dispatch({type: 'FETCH_TLIST_YEAR'});
     }
+
+    handleChange = (event, name) => {
+        this.setState({
+            ...this.state.editForm,
+            [name]: event.target.value 
+        });
+    }
     
     render() {
+        const { classes } = this.props;
+
         return (
             <>
 
             <TextField
-                select style = {{minWidth: 400}}
-                label="Point Person"
+                select style = {{minWidth: 100}}
+                label=""
                 className={classNames(classes.margin, classes.textField)}
-                value={this.state.recordEditMode? this.state.editForm.point_person_fk : currentBudgetRecord.point_person_fk}
-                onChange={(event)=>this.handleChange(event, 'point_person_fk')}
-                // InputProps={{startAdornment: <InputAdornment position="start">-</InputAdornment>,}}
+                value={this.state.selectedYear}
+                onChange={(event)=>this.handleChange(event, 'selectedYear')}
+                InputProps={{startAdornment: <InputAdornment position="start">Report Year:</InputAdornment>,}}
                 >
                 <MenuItem value="">
-                    <em>None</em>
+                    <em>2020</em>
                     </MenuItem>
-                        {this.props.store.tlist.tlistPointPerson.map(records => (
+                        {this.props.store.tlist.tlistYear.map(records => (
                             <MenuItem key={records.id} value={records.id}>
-                            {records.point_person} - {records.pp_email_address}
+                            {records.year}
                             </MenuItem>
                         ))}
             </TextField>
 
-            {JSON.stringify(this.props.store.tlist.tlistYear)}
-            <Nav defaultActiveKey="/reportmenu" className="flex-column menuBoxClass">
-                <h2>Reporting Menu</h2>
-                <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>
-                <p></p>
-                <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>
-            </Nav>
-            
             <div className="menuBoxClass">
                 <h2>Reporting Menu</h2>
-                    
-                <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>
+
+                {this.state.selectedYear > 0?    
+                <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
+                <p>Report 1 - Human (please select year first)</p>}
                 <p></p>
-                <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>
+                {this.state.selectedYear > 0 ?  
+                <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>:
+                <p>Report 2 - Machine (please select year first)</p>}
                 
             </div>
             </>
@@ -68,5 +95,6 @@ const putReduxStateOnProps = (reduxState) => ({
     reduxState
   })
 
-export default connect(mapStoreToProps)(ReportMenu);
+export default connect(mapStoreToProps)(withStyles(styles)(ReportMenu));
+// export default connect(mapStoreToProps)(ReportMenu);
  

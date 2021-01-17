@@ -19,6 +19,14 @@ const reportRecordExpenseFill = (state = [], action) => {
   }
 }
 
+const reportSelectedYear = (state = '', action) => {
+  switch (action.type) {
+      case 'SET_SELECTEDYEAR':
+          return action.payload;
+      default:
+          return state;
+  }
+}
 
 // make one object that has keys loginMessage, registrationMessage
 // these will be on the redux state at:
@@ -26,4 +34,5 @@ const reportRecordExpenseFill = (state = [], action) => {
 export default combineReducers({
   reportBudgetReport,
   reportRecordExpenseFill,
+  reportSelectedYear,
 });

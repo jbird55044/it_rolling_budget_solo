@@ -12,6 +12,7 @@ function* fetchBudgetReport( payload ) {
       const response = yield axios.get('/api/report/fulllist', {
           params:{
               businessUnitId: payload.recordFinder.businessUnitId,
+              selectedYear: payload.recordFinder.businessUnitId
           }
       })
       yield put({ type: 'SET_BUDGETREPORT', payload: response.data });

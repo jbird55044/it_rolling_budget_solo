@@ -48,6 +48,7 @@ class ReportMenu extends Component {
             ...this.state.editForm,
             [name]: event.target.value 
         });
+        this.props.dispatch({type: 'SET_SELECTEDYEAR', payload: event.target.value});
     }
     
     render() {
@@ -60,13 +61,12 @@ class ReportMenu extends Component {
                 select style = {{minWidth: 100}}
                 label=""
                 className={classNames(classes.margin, classes.textField)}
-                value={this.state.selectedYear}
+                value={this.props.store.budgetReport.reportSelectedYear}
                 onChange={(event)=>this.handleChange(event, 'selectedYear')}
                 InputProps={{startAdornment: <InputAdornment position="start">Report Year:</InputAdornment>,}}
                 >
                 <MenuItem value="">
-                    <em>2020</em>
-                    </MenuItem>
+                    </MenuItem>ß
                         {this.props.store.tlist.tlistYear.map(records => (
                             <MenuItem key={records.id} value={records.id}>
                             {records.year}
@@ -75,10 +75,10 @@ class ReportMenu extends Component {
             </TextField>
 
             <div className="menuBoxClass">
-                <h2>Reporting Menu</h2>
+                <h2>Rolling Budget Reports:</h2>
 
                 {this.state.selectedYear > 0?    
-                <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
+                <Link selectedYear={this.state.selectedYear} className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
                 <p>Report 1 - Human (please select year first)</p>}
                 <p></p>
                 {this.state.selectedYear > 0 ?  
@@ -91,9 +91,7 @@ class ReportMenu extends Component {
     }
 }
 
-const putReduxStateOnProps = (reduxState) => ({
-    reduxState
-  })
+
 
 export default connect(mapStoreToProps)(withStyles(styles)(ReportMenu));
 // export default connect(mapStoreToProps)(ReportMenu);

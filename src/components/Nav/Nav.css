@@ -1,42 +1,45 @@
 
 .nav {
-  box-sizing: border-box;
-  margin: 0 0 30px;
-  background-color: #00acb0;
-  overflow: hidden;
+  width: 1200px;
+  height: 130px;
+  padding: 30px;
+  padding-top: 10px;
+  background-image: url(../../images/marble2_wallpaper.png);
+  background-repeat: no-repeat;
+  background-size: cover;
 
 }
 
-.nav-title-left {
-    width: 40%;
-    float: left;
-    font-size: 18px;
-    font-weight: 400;
-    color: #f2f2f2;
+.navTitleClass {
+    
     padding-left: 10px;
     margin-top: 5px;
     margin-bottom: 5px;
   }
+  
+  .navTitleH3-Left {
+    font-size: 36px;
+    font-weight: 400;
+    float: left;
+    color: #283618;
+  }
+  .navTitleH3-Right {
+    font-size: 24px;
+    font-weight: 400;
+    float: right;
+    color: #283618;
+  }
+  
 
-.nav-title-right {
-  width: 40%;
-  float: right;
-  font-size: 18px;
-  font-weight: 400;
-  color: #f2f2f2;
-  margin-top: 5px;
-  margin-bottom: 5px;
 
-}
-
-.nav-menu {
+.navMenuClass {
   width: 100%;
   float: right;
 }
 
 .nav-link {
   color: #f2f2f2;
-  background-color: #00acb0;
+  background-color: #606C38;
   padding: 10px 10px;
   text-decoration: none;
   font-size: 15px;

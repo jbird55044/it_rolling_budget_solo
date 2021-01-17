@@ -23,9 +23,9 @@ const styles = theme => ({
         flexWrap: 'wrap',
       },
       margin: {
-        margin: theme.spacing.unit - 3,
-        paddingTop: theme.spacing.unit - 2,
-        paddingBottom: theme.spacing.unit - 2,
+        margin: theme.spacing.unit,
+        paddingTop: theme.spacing.unit,
+        paddingBottom: theme.spacing.unit,
       },
       textField: {
         flexBasis: 200,
@@ -34,20 +34,14 @@ const styles = theme => ({
 
 class ReportMenu extends Component {
 
-    state = {
-        selectedYear: 0,
-    };
-  
+     
     async componentDidMount() {
         // Get's data to populate year pull-down
         this.props.dispatch({type: 'FETCH_TLIST_YEAR'});
     }
 
     handleChange = (event, name) => {
-        this.setState({
-            ...this.state.editForm,
-            [name]: event.target.value 
-        });
+        console.log ('value 1:', event.target.value)
         this.props.dispatch({type: 'SET_SELECTEDYEAR', payload: event.target.value});
     }
     
@@ -55,38 +49,39 @@ class ReportMenu extends Component {
         const { classes } = this.props;
 
         return (
-            <>
+            <div>
 
-            <TextField
-                select style = {{minWidth: 100}}
-                label=""
-                className={classNames(classes.margin, classes.textField)}
-                value={this.props.store.budgetReport.reportSelectedYear}
-                onChange={(event)=>this.handleChange(event, 'selectedYear')}
-                InputProps={{startAdornment: <InputAdornment position="start">Report Year:</InputAdornment>,}}
-                >
-                <MenuItem value="">
-                    </MenuItem>ß
-                        {this.props.store.tlist.tlistYear.map(records => (
-                            <MenuItem key={records.id} value={records.id}>
-                            {records.year}
-                            </MenuItem>
-                        ))}
-            </TextField>
+                <TextField
+                    select style = {{minWidth: 100}}
+                    variant="outlined"
+                    label=""
+                    className={classNames(classes.margin, classes.textField)}
+                    value={this.props.store.budgetReport.reportSelectedYear}
+                    onChange={(event)=>this.handleChange(event, 'selectedYear')}
+                    InputProps={{startAdornment: <InputAdornment position="start">Report Year:</InputAdornment>,}}
+                    >
+                    <MenuItem value="">
+                        </MenuItem>
+                            {this.props.store.tlist.tlistYear.map(records => (
+                                <MenuItem key={records.id} value={records.id}>
+                                {records.year}
+                                </MenuItem>
+                            ))}
+                </TextField>
 
-            <div className="menuBoxClass">
-                <h2>Rolling Budget Reports:</h2>
+                <div className="menuBoxClass">
+                    <h2>Rolling Budget Reports:</h2>
 
-                {this.state.selectedYear > 0?    
-                <Link selectedYear={this.state.selectedYear} className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
-                <p>Report 1 - Human (please select year first)</p>}
-                <p></p>
-                {this.state.selectedYear > 0 ?  
-                <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>:
-                <p>Report 2 - Machine (please select year first)</p>}
-                
+                    {this.props.store.budgetReport.reportSelectedYear > 0?    
+                    <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
+                    <p>Report 1 - Human (please select year first)</p>}
+                    <p></p>
+                    {this.props.store.budgetReport.reportSelectedYear > 0 ?  
+                    <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>:
+                    <p>Report 2 - Machine (please select year first)</p>}
+                    
+                </div>
             </div>
-            </>
         )
     }
 }

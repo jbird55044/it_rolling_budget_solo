@@ -28,6 +28,15 @@ const reportSelectedYear = (state = '', action) => {
   }
 }
 
+const reportSelectedYearSpelledOut = (state = '', action) => {
+  switch (action.type) {
+      case 'SET_SPELLEDOUT_YEAR':
+          return action.payload[0].year;
+      default:
+          return state;
+  }
+}
+
 // make one object that has keys loginMessage, registrationMessage
 // these will be on the redux state at:
 // state.errors.loginMessage and state.errors.registrationMessage
@@ -35,4 +44,5 @@ export default combineReducers({
   reportBudgetReport,
   reportRecordExpenseFill,
   reportSelectedYear,
+  reportSelectedYearSpelledOut,
 });

@@ -18,14 +18,15 @@ const Nav = (props) => {
 
   return (
     <div className="nav">
-      <div>
+      <div className="navTitleClass" >
         <Link to="/home">
-            <h3 className="nav-title-left">Rolling Budget Manager. </h3>
-            <h3 className="nav-title-right">Dept: {props.store.user.bu_description}</h3>
+            <h3 className="navTitleH3-Left">Rolling Budget Manager. </h3>
+            <p></p>
+            <h3 className="navTitleH3-Right">Dept: {props.store.user.bu_description}</h3>
         </Link>
-
       </div>
-      <div className="nav-menu">
+
+      <div className="navMenuClass">
         <Link className="nav-link" to={loginLinkData.path}>
           {/* Show this link if they are logged in or not,
           but call this link 'Home' if they are logged in,

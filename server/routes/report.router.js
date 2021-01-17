@@ -8,7 +8,7 @@ router.get('/fulllist', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   let selectedYear = req.query.selectedYear
   let budgetId = req.query.budgetId
-  console.log (`----Report Router`, businessUnitId );
+  console.log (`----Report Router`, businessUnitId, 'selected year:', selectedYear  );
   const queryText = `SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
   t_user_owner.business_unit, 
   tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
@@ -56,6 +56,18 @@ router.get('/expensefill', rejectUnauthenticated, (req, res) => {
     })
     .catch((err) => {
       console.log('Error completing expensefill query', err);
+      res.sendStatus(500);
+    });
+}); 
+
+router.get('/spelledoutyear', rejectUnauthenticated, (req, res) => {
+  let selectedYear = req.query.selectedYear
+  const queryText = 'SELECT year FROM tlist_year WHERE id=$1';
+  console.log ('in tlist_year (spelledout out) get', selectedYear)
+  pool.query(queryText, [selectedYear])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing tlist_year code query', err);
       res.sendStatus(500);
     });
 }); 

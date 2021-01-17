@@ -1,7 +1,11 @@
 .menuBoxClass {
+    max-width: 40%;
     margin: 40px;
-    border: 2px solid black;
+    padding: 15px;
+    border: 2px solid #283618;
+    border-radius: 5px;
     background-image: url("../../images/marble1_wallpaper.png");
+    color: #283618;
 }
 
 .reportSelectorClass {

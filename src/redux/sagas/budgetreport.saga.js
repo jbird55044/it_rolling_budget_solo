@@ -54,10 +54,28 @@ function* fetchExpenseFill ( payload ) {
     }
   } 
 
+  function* fetchSpelledOutYear ( payload ) {
+    let currentRecordId = 1;  //default to department 1 to ,minimize init errors
+    console.log (`fetchSpelledOutYear Payload:`, payload);
+    // Go to server, update redux store with data from server
+    try {
+        // get data from db
+        const response = yield axios.get('/api/report/spelledoutyear', {
+            params:{
+              selectedYear: payload.recordFinder.selectedYear,
+            }
+        })
+        yield put({ type: 'SET_SPELLEDOUT_YEAR', payload: response.data });
+    } catch ( error ) {
+        console.log('error with fetchSpelledOutYear get request', error);
+    }
+  } 
+
 
 function* budgetcollectionSaga() {
   yield takeLatest ('FETCH_BUDGETREPORT', fetchBudgetReport);
   yield takeLatest ('FETCH_EXPENSEFILL', fetchExpenseFill);
+  yield takeLatest ('FETCH_SPELLEDOUT_YEAR', fetchSpelledOutYear);
 }
 
 export default budgetcollectionSaga;

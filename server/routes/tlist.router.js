@@ -15,7 +15,7 @@ router.get('/businessunit', rejectUnauthenticated, (req, res) => {
 }); 
 
 router.get('/glcode', rejectUnauthenticated, (req, res) => {
-  const queryText = 'SELECT * FROM tlist_gl_code';
+  const queryText = 'SELECT * FROM tlist_gl_code WHERE show_in_list = true';
   console.log ('in tlist_gl_code get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })

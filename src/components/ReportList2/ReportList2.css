@@ -22,8 +22,8 @@
 }
 
 .buttonExportDivClass Button:hover {
-    color: #BC6C25;
-    border: #BC6C25;
+    color: #DDA15E;
+    border: #DDA15E;
     background-color: #283618;
 }
 
@@ -33,7 +33,7 @@
 }
 
 .buttonExportClass :hover {
-    color: #BC6C25;
-    border: #BC6C25;
+    color: #DDA15E;
+    border: #DDA15E;
     background-color: #283618;
 }

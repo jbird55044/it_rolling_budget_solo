@@ -48,10 +48,10 @@ const styles = theme => ({
         float: 'left'
       },
       bcolor1: {
-          backgroundColor: 'antiquewhite',
+          backgroundColor: '#FEFAE0',
       },
       bcolor2: {
-        backgroundColor: 'biege',
+        backgroundColor: '#FDF2B0',
       },
       headerClass: {
         display: 'box',
@@ -428,7 +428,7 @@ class BudgetForm extends Component {
         const { classes } = this.props;
         return (
             
-        <div>
+        <div className="pageDivClass">
             <h3>Budget Form List:</h3>
             
 
@@ -508,7 +508,7 @@ class BudgetForm extends Component {
                                         </MenuItem>
                                     ))}
                         </TextField>
-                        {/* ----------- */}
+                        <p></p>
 
                         <TextField
                             label="Nomenclature"
@@ -590,6 +590,7 @@ class BudgetForm extends Component {
                             </TextField>:
                         <p></p>}
 
+                            <p></p>
                             <TextField
                                 select style = {{minWidth: 400}}
                                 label="Expenditure Type"

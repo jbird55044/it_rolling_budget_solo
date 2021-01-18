@@ -37,7 +37,7 @@ Button
   font-size: 1.1rem;
   outline: 0;
   cursor: pointer;
-}ß
+}
 
 .btn_sizeMin {
   min-height: 50px;
@@ -55,8 +55,9 @@ Button
 }
 
 .btn:hover {
-  background-color: #008183;
+  background-color: #283618;
   text-decoration: none;
+  color: #DDA15E;
 }
 
 /* This line makes the "Register" and "Login" buttons look like links */
@@ -72,8 +73,8 @@ Button
 
 .btn_asLink:hover {
   background-color: transparent;
-  border-color: #008183;
-  color: #008183;
+  border-color: #DDA15E;
+  color: #283618;
 }
 
 /* --------------------------------------------------------------------------------
@@ -84,10 +85,10 @@ Alert
   box-sizing: border-box;
   padding: 15px 10px;
   margin: 15px 0;
-  border: 2px solid #e01616;
-  background-color: #efefef;
+  border: 2px solid #DDA15E;
+  background-color: #FEFAE0;
   border-radius: 3px;
-  color: #e01616;
+  color: #DDA15E;
   font-size: 0.8rem;
 }
 

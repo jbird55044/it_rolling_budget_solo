@@ -48,7 +48,7 @@ class LoginForm extends Component {
               type="text"
               name="username"
               required
-              value={this.state.username}
+              value={this.state.username.toLowerCase()}
               onChange={this.handleInputChangeFor('username')}
             />
           </label>

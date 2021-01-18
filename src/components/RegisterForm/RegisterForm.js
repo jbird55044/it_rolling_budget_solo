@@ -43,7 +43,7 @@ class RegisterForm extends Component {
             <input
               type="text"
               name="username"
-              value={this.state.username}
+              value={this.state.username.toLowerCase()}
               required
               onChange={this.handleInputChangeFor('username')}
             />

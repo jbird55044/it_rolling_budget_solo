@@ -1,6 +1,6 @@
 
 .nav {
-  width: 1200px;
+  width: 1100px;
   height: 130px;
   padding: 30px;
   padding-top: 10px;
@@ -53,6 +53,7 @@
 }
 
 .nav-link:hover {
-  background-color: #008183;
+  background-color: #606C38;
+  color: #DDA15E;
 }
 

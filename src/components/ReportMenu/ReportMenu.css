@@ -10,4 +10,10 @@
 
 .reportSelectorClass {
     margin: 30px;
+    color: #283618;
+}
+
+.reportSelectorClass :hover {
+    margin: 30px;
+    color: #DDA15E;
 }

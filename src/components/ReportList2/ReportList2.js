@@ -31,7 +31,7 @@ class ReportList2 extends Component {
             selectedYear: this.props.store.budgetReport.reportSelectedYear,
             }
         });
-        this.props.dispatch({type: 'FETCH_BUDGETREPORT', recordFinder: {
+        this.props.dispatch({type: 'FETCH_BUDGETREPORT2', recordFinder: {
             businessUnitId: this.props.store.user.id,
             selectedYear: this.props.store.budgetReport.reportSelectedYear,
             }
@@ -46,8 +46,8 @@ class ReportList2 extends Component {
             <div>
 
                 <div className="buttonExportDivClass">
-                    <ExportReactCSV csvData={this.props.store.budgetReport.reportBudgetReport} fileName={this.state.fileName} />
-                    <ExportReactExcel csvData={this.props.store.budgetReport.reportBudgetReport} fileName={this.state.fileName} />
+                    <ExportReactCSV csvData={this.props.store.budgetReport.reportBudgetReport2} fileName={this.state.fileName} />
+                    <ExportReactExcel csvData={this.props.store.budgetReport.reportBudgetReport2} fileName={this.state.fileName} />
                 </div>
                 <div className="report1Class">
                     <h3>Report - 'Machine to Machine'  Buget totals for: {this.props.store.budgetReport.reportSelectedYearSpelledOut} </h3>
@@ -55,10 +55,10 @@ class ReportList2 extends Component {
                     <Table className="report1TableClass" bordered hover size="sm">
                         
                         <tbody>
-                            {this.props.store.budgetReport.reportBudgetReport.map((lineItem) => {
+                            {this.props.store.budgetReport.reportBudgetReport2.map((lineItem, index) => {
                             return (
                                 // JSON.stringify(lineItem)
-                                <ReportItem2 key={lineItem.id} lineItem={lineItem} />
+                                <ReportItem2 key={index} lineItem={lineItem} />
                                 );
                             })}
                         </tbody>

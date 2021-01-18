@@ -48,7 +48,6 @@ class ReportItem2 extends Component {
         return (
             <>
             <tr>
-                {/* {JSON.stringify(this.props.lineItem)} */}
                 <td>{this.props.lineItem.id}</td>
                 <td>{this.props.lineItem.nomenclature}</td>
                 <td>{this.props.lineItem.gl_account}</td>
@@ -56,7 +55,7 @@ class ReportItem2 extends Component {
                 <td>{this.props.lineItem.cost_center}</td>
                 <td>{this.props.lineItem.description}</td>
                 <td>{this.props.lineItem.life}</td>
-                <td>{this.props.lineItem.total}</td>
+                <td>{this.props.lineItem.amount}</td>
             </tr>
             </>
         )

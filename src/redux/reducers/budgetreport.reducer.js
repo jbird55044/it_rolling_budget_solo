@@ -1,9 +1,19 @@
 import { combineReducers } from 'redux';
 
 // Used to store specific budget returned from the server
-const reportBudgetReport = (state = [], action) => {
+const reportBudgetReport1 = (state = [], action) => {
   switch (action.type) {
-      case 'SET_BUDGETREPORT':
+      case 'SET_BUDGETREPORT1':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
+// Used to store specific budget returned from the server
+const reportBudgetReport2 = (state = [], action) => {
+  switch (action.type) {
+      case 'SET_BUDGETREPORT2':
           return action.payload;
       default:
           return state;
@@ -41,7 +51,8 @@ const reportSelectedYearSpelledOut = (state = '', action) => {
 // these will be on the redux state at:
 // state.errors.loginMessage and state.errors.registrationMessage
 export default combineReducers({
-  reportBudgetReport,
+  reportBudgetReport1,
+  reportBudgetReport2,
   reportRecordExpenseFill,
   reportSelectedYear,
   reportSelectedYearSpelledOut,

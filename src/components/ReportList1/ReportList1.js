@@ -24,7 +24,7 @@ class ReportList1 extends Component {
             selectedYear: this.props.store.budgetReport.reportSelectedYear,
             }
         });
-        this.props.dispatch({type: 'FETCH_BUDGETREPORT', recordFinder: {
+        this.props.dispatch({type: 'FETCH_BUDGETREPORT1', recordFinder: {
             businessUnitId: this.props.store.user.id,
             selectedYear: this.props.store.budgetReport.reportSelectedYear,
             }
@@ -42,7 +42,7 @@ class ReportList1 extends Component {
                         <tr><th>ID</th><th>Nomenclature</th><th>GL Account</th><th>GL Name</th><th>Cost Center</th><th>Description</th></tr>
                     </thead>
                     <tbody>
-                        {this.props.store.budgetReport.reportBudgetReport.map((lineItem) => {
+                        {this.props.store.budgetReport.reportBudgetReport1.map((lineItem) => {
                         return (
                             // JSON.stringify(lineItem)
                             <ReportItem1 key={lineItem.id} lineItem={lineItem} />

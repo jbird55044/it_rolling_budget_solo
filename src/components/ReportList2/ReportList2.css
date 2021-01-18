@@ -8,3 +8,32 @@
     background-color: white;
     width: 90%;
 }
+
+.buttonExportDivClass {
+    margin-left: 20px;
+    padding: 10px;
+}
+
+.buttonExportDivClass Button {
+    margin-left: 20px;
+    padding: 10px;
+    color: #FEFAE0;
+    background-color: #283618 ;
+}
+
+.buttonExportDivClass Button:hover {
+    color: #BC6C25;
+    border: #BC6C25;
+    background-color: #283618;
+}
+
+.buttonExportClass {
+    color: #FEFAE0;
+    background-color: #283618 ;
+}
+
+.buttonExportClass :hover {
+    color: #BC6C25;
+    border: #BC6C25;
+    background-color: #283618;
+}

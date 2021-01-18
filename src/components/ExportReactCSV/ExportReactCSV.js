@@ -8,8 +8,8 @@ import Button from 'react-bootstrap/Button';
 
 export const ExportReactCSV = ({csvData, fileName}) => {
     return (
-        <Button className="buttonClass" variant="warning">
-            <CSVLink data={csvData} filename={fileName}>Export CSV</CSVLink>
+        <Button className="buttonExportClass">
+            <CSVLink className="buttonExportClass" data={csvData} filename={fileName}>Export CSV</CSVLink>
         </Button>
     )
 }

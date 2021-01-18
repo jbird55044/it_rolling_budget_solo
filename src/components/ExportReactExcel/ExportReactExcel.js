@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx';
 
 
 
-export const ExportCSV = ({csvData, fileName}) => {
+export const ExportReactExcel = ({csvData, fileName}) => {
 
     const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
     const fileExtension = '.xlsx';
@@ -23,7 +23,7 @@ export const ExportCSV = ({csvData, fileName}) => {
     }
 
     return (
-        <Button className="buttonClass"  variant="danger" onClick={(e) => exportToCSV(csvData,fileName)}>Export Excel</Button>
+        <Button className="buttonExportClass"  onClick={(e) => exportToCSV(csvData,fileName)}>Export Excel</Button>
 
     )
 }

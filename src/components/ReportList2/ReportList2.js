@@ -7,7 +7,7 @@ import {
         } from 'react-bootstrap'
 import { withStyles } from '@material-ui/core/styles';
 import { ExportReactCSV } from '../ExportReactCSV/ExportReactCSV';
-import { ExportCSV } from '../ExportCSV/ExportCSV';
+import { ExportReactExcel } from '../ExportReactExcel/ExportReactExcel';
 
 
 import './ReportList2.css'
@@ -45,9 +45,9 @@ class ReportList2 extends Component {
 
             <div>
 
-                <div className="buttonExportClass">
+                <div className="buttonExportDivClass">
                     <ExportReactCSV csvData={this.props.store.budgetReport.reportBudgetReport} fileName={this.state.fileName} />
-                    <ExportCSV csvData={this.props.store.budgetReport.reportBudgetReport} fileName={this.state.fileName} />
+                    <ExportReactExcel csvData={this.props.store.budgetReport.reportBudgetReport} fileName={this.state.fileName} />
                 </div>
                 <div className="report1Class">
                     <h3>Report - 'Machine to Machine'  Buget totals for: {this.props.store.budgetReport.reportSelectedYearSpelledOut} </h3>

@@ -20,7 +20,7 @@ const Nav = (props) => {
     <div className="nav">
       <div className="navTitleClass" >
         <Link to="/home">
-            <h3 className="navTitleH3-Left">Rolling Budget Manager. </h3>
+            <h3 className="navTitleH3-Left">Rolling Budget Manager </h3>
             <p></p>
             <h3 className="navTitleH3-Right">Dept: {props.store.user.bu_description}</h3>
         </Link>

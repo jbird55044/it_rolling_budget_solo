@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import mapStoreToProps from '../../redux/mapStoreToProps';
 import { connect } from 'react-redux';
 import './BudgetForm.css'
+import ExpenditureForm from '../ExpenditureForm/ExpenditureForm'
+
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
@@ -92,10 +94,12 @@ class BudgetForm extends Component {
         recordEditMode: false,
         recordAddMode: false,
         deleteConfirmDialog: false,
+        expenseWindowOpen: false
     }
     
     // Stage Redux with up to date db info
     async componentDidMount() {
+        console.log (` . . . Component Did Mount . . . `);
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
@@ -376,6 +380,12 @@ class BudgetForm extends Component {
         });
     }
 
+    openExpense = (recordId) => {
+        this.setState({
+            expenseWindowOpen: !this.state.expenseWindowOpen,
+        })
+    }
+
     getDate = () => {
         let today = new Date();
         let date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear();
@@ -632,6 +642,12 @@ class BudgetForm extends Component {
                             onChange={(event)=>this.handleChange(event,'notes')}  
                         ></TextField>
 
+                        
+                        <button onClick={()=>this.openExpense(this.state.recordNumber)}>{currentBudgetRecord.total} -Expenditure Window</button>
+                        {this.state.expenseWindowOpen?
+                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} total={currentBudgetRecord.total}/>:
+                            <p></p>}
+
                     </form>
                 </div>
                 );
@@ -687,16 +703,7 @@ class BudgetForm extends Component {
                 ></TextField>
 
             </div>
-            <div>
-                {this.props.store.budgetForm.expenseFillList.map((expenses, index) => {
-                        return (
-                            <div key={index}>
-                            {/* <p>Expense Info</p> {budgetForm.id} */}
-                            {JSON.stringify(expenses)}
-                            </div>
-                        );
-                    })}
-            </div>
+            
             <div>
             <Dialog
                 open={this.state.deleteConfirmDialog}
@@ -734,9 +741,6 @@ BudgetForm.propTypes = {
     classes: PropTypes.object.isRequired,
 };
   
-// const putReduxStateOnProps = (reduxState) => ({
-//     reduxState
-//   })
 
 export default connect(mapStoreToProps)(withStyles(styles)(BudgetForm));
  

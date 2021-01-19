@@ -20,7 +20,7 @@ router.get('/glcode', rejectUnauthenticated, (req, res) => {
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })
     .catch((err) => {
-      console.log('Error completing gl code query', err);ß
+      console.log('Error completing gl code query', err);
       res.sendStatus(500);
     });
 }); 

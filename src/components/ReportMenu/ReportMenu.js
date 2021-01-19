@@ -10,8 +10,6 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 
 
 import {
-    HashRouter as Router,
-    Route,
     Link,
   } from 'react-router-dom';
 

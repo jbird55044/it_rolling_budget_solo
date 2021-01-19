@@ -113,9 +113,6 @@ class AdminPage extends Component {
     }
 }
 
-const putReduxStateOnProps = (reduxState) => ({
-    reduxState
-  })
 
 export default connect(mapStoreToProps)(AdminPage);
  

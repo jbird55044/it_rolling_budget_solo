@@ -14,35 +14,6 @@ class ReportItem2 extends Component {
         //     }
         // });
     }
-    convertNumToMoneyString = (number) => {
-        // convert to money format
-        let charNumberNew = '';
-        let charNumberOld = '';
-        let cents= null;
-        charNumberOld = number.toString();
-        if ( charNumberOld.indexOf('.') > 0 ) {
-            cents = charNumberOld.slice(charNumberOld.indexOf('.'));
-            charNumberOld = charNumberOld.slice( 0, charNumberOld.indexOf('.'));
-        }
-        // reverses string and adds ',' every third location
-        let c=0;
-        charNumberOld = reverseString(charNumberOld);
-        for ( c = 0; c < charNumberOld.length; c += 1 ) {
-            if (  (c != 0) && (c % 3) === 0 ) {
-            charNumberNew += (',')
-            }
-            charNumberNew += charNumberOld[c]
-        };
-        charNumberNew = reverseString(charNumberNew);
-        if ( cents === null ) cents = '.00'
-        charNumberNew += cents
-        return charNumberNew;
-    
-        function reverseString(str) {
-            return str.split("").reverse().join("");
-        }
-    }  // end of convertNumToMoneyString fn
-    
 
     render() {
         return (
@@ -62,9 +33,6 @@ class ReportItem2 extends Component {
     }
 }
 
-const putReduxStateOnProps = (reduxState) => ({
-    reduxState
-  })
 
 export default connect(mapStoreToProps)(ReportItem2);
  

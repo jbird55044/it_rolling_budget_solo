@@ -48,10 +48,10 @@ const styles = theme => ({
         float: 'left'
       },
       bcolor1: {
-          backgroundColor: '#FEFAE0',
+          backgroundColor: '#99AC5D',
       },
       bcolor2: {
-        backgroundColor: '#FDF2B0',
+        backgroundColor: '#778745',
       },
       headerClass: {
         display: 'box',
@@ -485,8 +485,8 @@ class BudgetForm extends Component {
                                         </MenuItem>
                                     ))}
                         </TextField>
-                    </form>
                     <hr/>
+                    </form>
                     {/* ----------- */}
                     
                     <form className={classes.container, classes.bcolor2} noValidate autoComplete="off">
@@ -525,8 +525,10 @@ class BudgetForm extends Component {
                             value = {this.valueManufacturer(currentBudgetRecord.manufacturer, 'manufacturer')}
                             onChange={(event)=>this.handleChange(event,'manufacturer')}  
                             ></TextField>
-                    </form>
                     <hr/>
+                    </form>
+                    {/* ----------- */}
+
                     <form className={classes.container, classes.bcolor1} noValidate autoComplete="off">
                         <TextField
                             select style = {{minWidth: 250}}

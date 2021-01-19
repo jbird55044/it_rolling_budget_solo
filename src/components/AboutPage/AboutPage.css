@@ -1,0 +1,11 @@
+.aboutPageClass {
+    margin: 40px;
+    background-image: url("../../images/about_card.png");
+    background-repeat: no-repeat;
+    background-size: 500px 234px;
+}
+
+.aboutPageClass a {
+    color: #283618;
+    margin-left: 275px;
+}

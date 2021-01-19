@@ -28,7 +28,7 @@ class ReportItem1 extends Component {
         let c=0;
         charNumberOld = reverseString(charNumberOld);
         for ( c = 0; c < charNumberOld.length; c += 1 ) {
-            if (  (c != 0) && (c % 3) === 0 ) {
+            if (  (c !== 0) && (c % 3) === 0 ) {
             charNumberNew += (',')
             }
             charNumberNew += charNumberOld[c]
@@ -68,9 +68,6 @@ class ReportItem1 extends Component {
     }
 }
 
-const putReduxStateOnProps = (reduxState) => ({
-    reduxState
-  })
 
 export default connect(mapStoreToProps)(ReportItem1);
  

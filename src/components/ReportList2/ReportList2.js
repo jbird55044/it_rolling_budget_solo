@@ -46,10 +46,10 @@ class ReportList2 extends Component {
                     <ExportReactCSV csvData={this.props.store.budgetReport.reportBudgetReport2} fileName={this.state.fileName} />
                     <ExportReactExcel csvData={this.props.store.budgetReport.reportBudgetReport2} fileName={this.state.fileName} />
                 </div>
-                <div className="report1Class">
+                <div className="report2Class">
                     <h3>Report - 'Machine to Machine'  Buget totals for: {this.props.store.budgetReport.reportSelectedYear} </h3>
                     
-                    <Table className="report1TableClass" bordered hover size="sm">
+                    <Table className="report2TableClass" bordered hover size="sm">
                         
                         <tbody>
                             {this.props.store.budgetReport.reportBudgetReport2.map((lineItem, index) => {

@@ -20,6 +20,16 @@ const reportBudgetReport2 = (state = [], action) => {
   }
 }
 
+// Used to store specific budget returned from the server
+const reportBudgetReport3 = (state = [], action) => {
+  switch (action.type) {
+      case 'SET_BUDGETREPORT3':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
 const reportRecordExpenseFill = (state = [], action) => {
   switch (action.type) {
       case 'SET_RECORD_EXPENSEFILL':
@@ -38,14 +48,7 @@ const reportSelectedYear = (state = '', action) => {
   }
 }
 
-const reportSelectedYearSpelledOut = (state = '', action) => {
-  switch (action.type) {
-      case 'SET_SPELLEDOUT_YEAR':
-          return action.payload[0].year;
-      default:
-          return state;
-  }
-}
+
 
 // make one object that has keys loginMessage, registrationMessage
 // these will be on the redux state at:
@@ -53,7 +56,7 @@ const reportSelectedYearSpelledOut = (state = '', action) => {
 export default combineReducers({
   reportBudgetReport1,
   reportBudgetReport2,
+  reportBudgetReport3,
   reportRecordExpenseFill,
   reportSelectedYear,
-  reportSelectedYearSpelledOut,
 });

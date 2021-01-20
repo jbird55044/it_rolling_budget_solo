@@ -74,10 +74,15 @@ class ReportMenu extends Component {
                     <Link className="reportSelectorClass" to="/report1">Report 1 - Human</Link>:
                     <p>Report 1 - Human (please select year first)</p>}
                     <p></p>
+                    
                     {this.props.store.budgetReport.reportSelectedYear > 0 ?  
                     <Link className="reportSelectorClass" to="/report2">Report 2 - Machine</Link>:
                     <p>Report 2 - Machine (please select year first)</p>}
-                    
+                    <p></p>
+
+                    {this.props.store.budgetReport.reportSelectedYear > 0 ?  
+                    <Link className="reportSelectorClass" to="/report3">Report 3 - Tentitive 'to do'</Link>:
+                    <p>Report 3 - Tentitive 'to do' (please select year first)</p>}
                 </div>
             </div>
         )

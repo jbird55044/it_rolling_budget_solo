@@ -44,6 +44,28 @@ function* fetchBudgetReport2( payload ) {
   }
 } 
 
+// Grab data and populate table for report (includes JOIN to expenditures) 
+function* fetchBudgetReport3( payload ) {
+  let currentRecordId = 1;  //default to department 1 to ,minimize init errors
+  console.log (`fetchBudgetReport2 Payload:`, payload);
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/report/report3', {
+          params:{
+              businessUnitId: payload.recordFinder.businessUnitId,
+              selectedYear: payload.recordFinder.selectedYear
+          }
+      })
+      yield put({ type: 'SET_BUDGETREPORT3', payload: response.data });
+      yield console.log ('after yield', response.data[0].id);
+      yield currentRecordId = response.data[0].id
+  } catch ( error ) {
+      console.log('error with fetchBudgetReport3 get request', error);
+  }
+} 
+
+
 function* fetchExpenseFill ( payload ) {
     let currentRecordId = 1;  //default to department 1 to ,minimize init errors
     console.log (`fetchExpenseFill Payload:`, payload);
@@ -84,6 +106,7 @@ function* fetchExpenseFill ( payload ) {
 function* budgetcollectionSaga() {
   yield takeLatest ('FETCH_BUDGETREPORT1', fetchBudgetReport1);
   yield takeLatest ('FETCH_BUDGETREPORT2', fetchBudgetReport2);
+  yield takeLatest ('FETCH_BUDGETREPORT3', fetchBudgetReport3);
   yield takeLatest ('FETCH_EXPENSEFILL', fetchExpenseFill);
   yield takeLatest ('FETCH_SPELLEDOUT_YEAR', fetchSpelledOutYear);
 }

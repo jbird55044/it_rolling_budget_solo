@@ -25,6 +25,7 @@ import AdminPage from '../AdminPage/AdminPage';
 import ReportMenu from '../ReportMenu/ReportMenu';
 import ReportList1 from '../ReportList1/ReportList1'
 import ReportList2 from '../ReportList2/ReportList2'
+import ReportList3 from '../ReportList3/ReportList3'
 
 import './App.css';
 
@@ -126,6 +127,12 @@ class App extends Component {
               exact
               path="/report2"
               component={ReportList2}
+            />
+            <Route
+              // shows AboutPage at all times (logged in or not)
+              exact
+              path="/report3"
+              component={ReportList3}
             />
             {/* If none of the other routes matched, we will show a 404. */}
             <Route render={() => <h1>404</h1>} />

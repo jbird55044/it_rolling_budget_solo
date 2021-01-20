@@ -67,11 +67,8 @@ router.get('/formcount', rejectUnauthenticated, (req, res) => {
 
 router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
-  const queryText = `SELECT *
-  FROM t_primary_expenditure
-  JOIN tlist_period ON tlist_period.id = t_primary_expenditure.period_fk
-  JOIN tlist_year ON tlist_year.id = t_primary_expenditure.period_fk
-  WHERE t_primary_expenditure.budget_fk = $1;`;
+  const queryText = `SELECT *  FROM t_primary_expenditure
+    WHERE t_primary_expenditure.budget_fk = $1;`;
   console.log ('in expenseFill get')
   pool.query(queryText, [budgetId])
     .then((result) => { res.send(result.rows); })

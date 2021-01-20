@@ -57,9 +57,6 @@ class ReportList1 extends Component {
     }
 }
 
-const putReduxStateOnProps = (reduxState) => ({
-    reduxState
-  })
 
 export default connect(mapStoreToProps)(withStyles(styles)(ReportList1));
 // export default connect(mapStoreToProps)(ReportList1);

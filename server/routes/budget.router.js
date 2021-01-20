@@ -7,8 +7,7 @@ const {rejectUnauthenticated,} = require('../modules/authentication-middleware')
 router.get('/formfill', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   let relitiveRecordId = req.query.relitiveRecordId
-  let budgetId = req.query.budgetId
-  // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
+  console.log (`----formfill GET - req.query.record ID:`, relitiveRecordId, 'businesUnit:', businessUnitId);
   const queryText = `WITH _t_primary_budget AS 
   ( 
   SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
@@ -67,6 +66,7 @@ router.get('/formcount', rejectUnauthenticated, (req, res) => {
 
 router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
+  console.log (`----expensefill GET - req.query.budgetId:`, budgetId);
   const queryText = `SELECT *  FROM t_primary_expenditure
     WHERE t_primary_expenditure.budget_fk = $1;`;
   console.log ('in expenseFill get')
@@ -80,7 +80,7 @@ router.get('/expensefill', rejectUnauthenticated, (req, res) => {
 
 router.put('/formfill', rejectUnauthenticated, (req, res) => {
   let payload = req.body.editForm
-  console.log (`formfill PUT Payload:`, payload);
+  // console.log (`formfill PUT Payload:`, payload);
   const queryText = `UPDATE t_primary_budget SET 
     cost_center_fk = $2,  
     point_person_fk = $3,

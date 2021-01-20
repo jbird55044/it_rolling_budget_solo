@@ -8,7 +8,7 @@ function* updateBudgetForm( action ) {
       yield axios.put('/api/budget/formfill', action.payload)
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          relitiveRecordId: action.payload.recordId
+          relitiveRecordId: action.payload.relitiveRecordId
           }
        }) 
   } catch (error) {
@@ -19,6 +19,7 @@ function* updateBudgetForm( action ) {
 // Grab data and populate the main budget form, to include the sub form (expenditures) data
 function* fetchBudgetForm( payload ) {
   let currentRecordId = 1;  //default to department 1 to ,minimize init errors
+  let countNumber = 1;  //for total number of records
   console.log (`fetchBudgetForm Payload:`, payload);
   console.log (`fetchBudgetForm Payload RecordFinder:`, payload.recordFinder);
   // Move GET request from App.js
@@ -32,14 +33,29 @@ function* fetchBudgetForm( payload ) {
           }
       })
       yield put({ type: 'SET_BUDGETFORMFILL', payload: response.data });
-      yield console.log ('after yield', response.data[0].id);
+      yield console.log ('After yield responsedata:', response.data);
       yield currentRecordId = response.data[0].id
+      yield
+            try {
+                // get data from db
+                const response = yield axios.get('/api/budget/formcount', {
+                    params:{
+                        businessUnitId: payload.recordFinder.businessUnitId,
+                    }
+                })
+                yield countNumber = response.data[0].count
+                yield console.log (`count =`, countNumber);
+                
+                yield put({ type: 'SET_BUDGETFORMCOUNT', payload: countNumber });
+            } catch ( error ) {
+                console.log('error with fetchBudgetRecordCount get request', error);
+            }
       yield 
           try {
               // get data from db
               const response = yield axios.get('/api/budget/expensefill/', {
                   params:{
-                      budgetId: currentRecordId
+                      budgetId: currentRecordId 
                   }
               })
               yield put({ type: 'SET_EXPENSEFILL', payload: response.data });
@@ -47,7 +63,7 @@ function* fetchBudgetForm( payload ) {
               console.log('error with fetchBudgetForm2 get request', error);
           }
   } catch ( error ) {
-      console.log('error with fetchBudgetForm1 get request', error);
+      console.log('error with fetchBudgetForm1 GET', error, 'payload:', payload.recordFinder);
   }
 } 
 
@@ -79,7 +95,7 @@ function* deleteBudgetForm ( action ) {
       yield axios.put('/api/budget/deleteform', action.payload)
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          relitiveRecordId: action.payload.recordId
+          relitiveRecordId: parseInt(action.payload.relitiveRecordId) - 1
           }
        }) 
   } catch (error) {
@@ -95,7 +111,7 @@ function* addNewBudgetForm ( action ) {
 
       yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
           businessUnitId: action.payload.businessUnitId,
-          relitiveRecordId: action.payload.recordId
+          relitiveRecordId: action.payload.relitiveRecordId
           }
        }) 
   } catch (error) {

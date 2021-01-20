@@ -61,7 +61,7 @@ class ReportMenu extends Component {
                     <MenuItem value="">
                         </MenuItem>
                             {this.props.store.tlist.tlistYear.map(records => (
-                                <MenuItem key={records.id} value={records.id}>
+                                <MenuItem key={records.id} value={records.year}>
                                 {records.year}
                                 </MenuItem>
                             ))}

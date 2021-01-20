@@ -27,7 +27,7 @@ FROM t_primary_budget
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
-      WHERE t_primary_budget.owner_fk = $1 AND archived = false AND t_primary_expenditure.year_fk = $2
+      WHERE t_primary_budget.owner_fk = $1 AND archived = false AND t_primary_expenditure.year = $2
       GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
         tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
 ;`;
@@ -66,7 +66,7 @@ FROM t_primary_budget
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
-      WHERE t_primary_budget.owner_fk = $1 AND archived = false AND t_primary_expenditure.year_fk = $2
+      WHERE t_primary_budget.owner_fk = $1 AND archived = false AND t_primary_expenditure.year = $2
   ;`;
   pool.query(queryText, [businessUnitId, selectedYear])
     .then((result) => { 

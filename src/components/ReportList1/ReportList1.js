@@ -20,10 +20,6 @@ class ReportList1 extends Component {
   
     async componentDidMount() {
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
-        this.props.dispatch({type: 'FETCH_SPELLEDOUT_YEAR', recordFinder: {
-            selectedYear: this.props.store.budgetReport.reportSelectedYear,
-            }
-        });
         this.props.dispatch({type: 'FETCH_BUDGETREPORT1', recordFinder: {
             businessUnitId: this.props.store.user.id,
             selectedYear: this.props.store.budgetReport.reportSelectedYear,
@@ -35,7 +31,7 @@ class ReportList1 extends Component {
     render() {
         return (
             <div className="report1Class">
-                <h3>Report - 'Human'  Buget totals for: {this.props.store.budgetReport.reportSelectedYearSpelledOut} </h3>
+                <h3>Report - 'Human'  Buget totals for: {this.props.store.budgetReport.reportSelectedYear} </h3>
                 
                 <Table className="report1TableClass" striped bordered hover size="sm">
                     <thead>

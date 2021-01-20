@@ -38,10 +38,7 @@ const styles = theme => ({
         paddingTop: theme.spacing.unit - 2,
         paddingBottom: theme.spacing.unit - 2,
       },
-      withoutLabel: {
-        marginTop: theme.spacing.unit * 3,
-      },
-      textField: {
+        textField: {
         flexBasis: 200,
       },
       buttons: {
@@ -88,7 +85,8 @@ class BudgetForm extends Component {
             credit_card_use: false,
             needs_review: false,
             notes: '',
-            last_update: ''
+            last_update: '',
+            total: 0
         },
         recordNumber: 1,
         recordEditMode: false,
@@ -106,10 +104,10 @@ class BudgetForm extends Component {
             relitiveRecordId: this.state.recordNumber,
             }
         });
-        this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            }
-        });
+        // this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
+        //     businessUnitId: this.props.store.user.id,
+        //     }
+        // });
         
         // grab tlist for pull-down populations
         this.props.dispatch({type: 'FETCH_TLIST_GLCODE'});
@@ -128,9 +126,7 @@ class BudgetForm extends Component {
             businessUnitId: this.props.store.user.id,
             }
         });
-        this.setState ({
-            recordNumber: this.props.store.budgetForm.budgetFormCount
-        })
+        
         this.updateState();
 
     }
@@ -186,6 +182,7 @@ class BudgetForm extends Component {
        
         if (this.state.recordAddMode) {
             // do a POST to move populated form to db NEW record number
+            console.log (`In Add Record, RelitiveRecordId:`, this.state.recordNumber );
             this.props.dispatch({type: 'ADD_NEW_BUDGETFORM', payload: {
                 editForm: this.state.editForm,
                 businessUnitId: this.props.store.user.id,
@@ -205,11 +202,6 @@ class BudgetForm extends Component {
                 }
             });
         }
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
-            }
-        });
     }
 
     deleteConfirm = () => {
@@ -236,13 +228,14 @@ class BudgetForm extends Component {
     }
 
     addRecord = () => {
-        console.log (`in add record`);
         this.clearState();
         this.setState ({
-            recordNumber: this.props.store.budgetForm.budgetFormCount,
+            recordNumber: parseInt(this.props.store.budgetForm.budgetFormCount) - 1,
             recordEditMode: true,
             recordAddMode: true
         })
+        console.log (`in add record - record # from store:`, this.props.store.budgetForm.budgetFormCount);
+        console.log (`in add record - record # from state:`, this.state.recordNumber);
     }
 
 
@@ -264,7 +257,8 @@ class BudgetForm extends Component {
                 credit_card_use: false,
                 needs_review: false,
                 notes: '',
-                last_update: lastUpdateGrabber
+                last_update: lastUpdateGrabber,
+                total: 0
             },
             recordEditMode: false,
             recordAddMode: false,
@@ -294,7 +288,7 @@ class BudgetForm extends Component {
         } else if (type === 'controlInt') {
             this.setState({
                     ...this.state,
-                    [name]: +event.target.value 
+                    [name]: parseInt(event.target.value) 
             });
         } else {
             this.setState({
@@ -307,7 +301,7 @@ class BudgetForm extends Component {
     }
     
     moveRecord = (recordMove) => {
-        console.log ('recordNumber type:', typeof(this.state.recordNumber))
+        console.log ('Move Reord, recordNumber type:', typeof(this.state.recordNumber), this.state.recordNumber)
         
         if (this.state.recordEditMode === true) {
             this.saveEdit();
@@ -331,7 +325,7 @@ class BudgetForm extends Component {
             })
             if (this.state.recordNumber > this.props.store.budgetForm.budgetFormCount ) {
                 this.setState ({
-                    recordNumber: this.state.recordNumber = this.props.store.budgetForm.budgetFormCount,
+                    recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
                 })
             }
         } else if (recordMove === 'last') {
@@ -374,10 +368,6 @@ class BudgetForm extends Component {
             relitiveRecordId: this.state.recordNumber,
             }
         });
-        this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            }
-        });
     }
 
     openExpense = (recordId) => {
@@ -400,6 +390,7 @@ class BudgetForm extends Component {
     };
     
     convertNumToMoneyString = (number) => {
+        console.log (`number convert:`, number);
         // convert to money format
         let charNumberNew = '';
         let charNumberOld = '';
@@ -671,8 +662,10 @@ class BudgetForm extends Component {
                             onChange={(event)=>this.handleChange(event,'notes')}  
                         ></TextField>
 
-                        
-                        <button onClick={()=>this.openExpense(this.state.recordNumber)}>Expenditure: ${this.convertNumToMoneyString(currentBudgetRecord.total)}</button>
+                        {this.state.recordEditMode?
+                            <p></p> :
+                            <button onClick={()=>this.openExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(currentBudgetRecord.total)}
+                            </button>}
                         {this.state.expenseWindowOpen?
                             <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} total={currentBudgetRecord.total}/>:
                             <p></p>}
@@ -686,7 +679,7 @@ class BudgetForm extends Component {
 
             <div className={classes.buttons}>
                 {this.state.recordEditMode?
-                <button onClick={()=>this.moveRecord(this.state.recordNumber)}>Save Record</button>:
+                <button onClick={()=>this.moveRecord(parseInt(this.props.store.budgetForm.budgetFormCount))}>Save Record</button>:
                 <button onClick={()=>this.moveRecord('back')}>Back Record</button>
                 }
                 {this.state.recordEditMode?

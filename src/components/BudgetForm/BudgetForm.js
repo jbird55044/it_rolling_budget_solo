@@ -307,30 +307,33 @@ class BudgetForm extends Component {
             this.saveEdit();
         }
         if (recordMove === 'back') {
-            this.setState ({
-                recordNumber: this.state.recordNumber -= 1,
-                recordEditMode: false,
-                recordAddMode: false
-            })
-            if (this.state.recordNumber < 1 ) {
+            if (this.state.recordNumber > 1 ) {
+                this.setState ({
+                    recordNumber: this.state.recordNumber -= 1,
+                    recordEditMode: false,
+                    recordAddMode: false
+                })
+            } else {
                 this.setState ({
                     recordNumber: this.state.recordNumber = 1,
                 })
             }
         } else if (recordMove === 'next') {
-            this.setState ({
-                recordNumber: this.state.recordNumber += 1,
-                recordEditMode: false,
-                recordAddMode: false
-            })
-            if (this.state.recordNumber > this.props.store.budgetForm.budgetFormCount ) {
+            
+            if (this.state.recordNumber < this.props.store.budgetForm.budgetFormCount ) {
                 this.setState ({
-                    recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
+                    recordNumber: this.state.recordNumber += 1,
+                    recordEditMode: false,
+                    recordAddMode: false
+                })
+            } else {
+                this.setState ({
+                    recordNumber: this.props.store.budgetForm.budgetFormCount,
                 })
             }
         } else if (recordMove === 'last') {
             this.setState ({
-                recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
+                recordNumber: this.props.store.budgetForm.budgetFormCount,
                 recordEditMode: false,
                 recordAddMode: false
             })
@@ -668,7 +671,7 @@ class BudgetForm extends Component {
                             <button onClick={()=>this.openExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
                             </button>}
                         {this.state.expenseWindowOpen?
-                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList}/>:
+                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} recordId={currentBudgetRecord.id}/>:
                             <p></p>}
 
                     </form>
@@ -680,7 +683,7 @@ class BudgetForm extends Component {
 
             <div className={classes.buttons}>
                 {this.state.recordEditMode?
-                <button onClick={()=>this.moveRecord(parseInt(this.props.store.budgetForm.budgetFormCount))}>Save Record</button>:
+                <button onClick={()=>this.moveRecord('back')}>Save Record</button>:
                 <button onClick={()=>this.moveRecord('back')}>Back Record</button>
                 }
                 {this.state.recordEditMode?

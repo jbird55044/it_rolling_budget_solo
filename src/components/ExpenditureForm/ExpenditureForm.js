@@ -7,7 +7,6 @@ import ReactDataGrid from 'react-data-grid';
 import './ExpenditureForm.css'
 const columns = [
     { key: 'id', name: 'ID', editable: false },
-    { key: 'budget_fk', name: 'budget_fk', editable: true },
     { key: 'period', name: 'period', editable: true },
     { key: 'year', name: 'year', editable: true },
     { key: 'amount', name: 'amount', editable: true },
@@ -18,17 +17,42 @@ const columns = [
 class ExpenditureForm extends Component {
     
     state = { 
-        rows: [],
+        allRows: [],
+        expenseId: 0,
+        stagedRow: {
+            id: 0,
+            period: 0,
+            year: 0,
+            amount: 0,
+            expense_note: ''
+        }
     };
     
     // Stage Redux with up to date db info
     async componentDidMount() {
+        let row = {};
+        let stagedRow = {}
+        let formattedRows = [];
+        
+        this.setState ({
+            expenseId: this.props.recordId
+          })
+        for (row of this.props.expenseList) {
+            stagedRow.id = row.id; 
+            stagedRow.period = row.period;
+            stagedRow.year = row.year;
+            stagedRow.amount = '$' + this.convertNumToMoneyString(row.amount);
+            stagedRow.expense_note= row.expense_note;
+           
+            formattedRows.push (stagedRow)
+        }
+        console.log (`Formatted Rows`, formattedRows);
 
       this.setState ({
-        rows: this.props.expenseList
+        allRows: formattedRows
       })
 
-      console.log (`In Expense Did Mount`, this.state.rows);
+      console.log (`In Expense Did Mount`, this.state.allRows);
 
     }
 
@@ -79,11 +103,11 @@ class ExpenditureForm extends Component {
     
     onGridRowsUpdated = ({ fromRow, toRow, updated }) => {
         this.setState(state => {
-            const rows = state.rows.slice();
+            const allRows = state.allRows.slice();
             for (let i = fromRow; i <= toRow; i++) {
-                rows[i] = { ...rows[i], ...updated };
+                allRows[i] = { ...allRows[i], ...updated };
             }
-            return { rows };
+            return { allRows };
         });
         console.log('')
     };
@@ -93,15 +117,15 @@ class ExpenditureForm extends Component {
     render() {
         return (
             <div className="pageDivClass">
-            <p>length: {this.state.rows.length}</p>
+            <p>length: {this.state.allRows.length}</p>
 
                 <div  className="datGridClass">
-
+                <button>Add Row</button>
                 <ReactDataGrid
                     // rows={rows}
                     columns={columns}
-                    rowGetter={i => this.state.rows[i]}
-                    rowsCount={this.state.rows.length}
+                    rowGetter={i => this.state.allRows[i]}
+                    rowsCount={this.state.allRows.length}
                     onGridRowsUpdated={this.onGridRowsUpdated}
                     enableCellSelect={true}
                  />

@@ -230,7 +230,7 @@ class BudgetForm extends Component {
     addRecord = () => {
         this.clearState();
         this.setState ({
-            recordNumber: parseInt(this.props.store.budgetForm.budgetFormCount) - 1,
+            recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
             recordEditMode: true,
             recordAddMode: true
         })
@@ -330,10 +330,11 @@ class BudgetForm extends Component {
             }
         } else if (recordMove === 'last') {
             this.setState ({
-                recordNumber: parseInt(this.props.store.budgetForm.budgetFormCount),
+                recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
                 recordEditMode: false,
                 recordAddMode: false
             })
+            console.log (`Record move last`, this.props.store.budgetForm.budgetFormCount);
         } else {
             this.setState ({
                 recordNumber: parseInt(recordMove),
@@ -664,10 +665,10 @@ class BudgetForm extends Component {
 
                         {this.state.recordEditMode?
                             <p></p> :
-                            <button onClick={()=>this.openExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(currentBudgetRecord.total)}
+                            <button onClick={()=>this.openExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
                             </button>}
                         {this.state.expenseWindowOpen?
-                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} total={currentBudgetRecord.total}/>:
+                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList}/>:
                             <p></p>}
 
                     </form>

@@ -95,15 +95,6 @@ class ExpenditureForm extends Component {
             <div className="pageDivClass">
             <p>length: {this.state.rows.length}</p>
 
-                {/* <h3>Total: ${this.props.total}</h3>
-                {this.props.expenseList.map((expenses, index) => {
-                        return (
-                            <div key={index}>
-                            {JSON.stringify(expenses)}
-                            </div>
-                        );
-                })} */}
-
                 <div  className="datGridClass">
 
                 <ReactDataGrid

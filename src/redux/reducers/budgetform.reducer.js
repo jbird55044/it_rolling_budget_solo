@@ -21,6 +21,17 @@ const expenseFillList = (state = [], action) => {
   }
 }
 
+// Used to store a specific sum of selected expenses from one budgetID
+const expenseSum = (state = 0, action) => {
+  switch (action.type) { 
+      case 'SET_EXPENSESUM':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
+// Used to determine number of records for maximum scroll on form
 const budgetFormCount = (state = 0, action) => {
   switch (action.type) {
       case 'SET_BUDGETFORMCOUNT':
@@ -36,5 +47,6 @@ const budgetFormCount = (state = 0, action) => {
 export default combineReducers({
   budgetFormFillList,
   expenseFillList,
+  expenseSum,
   budgetFormCount,
 });

@@ -374,7 +374,7 @@ class BudgetForm extends Component {
         });
     }
 
-    openExpense = (recordId) => {
+    toggleExpense = (recordId) => {
         this.setState({
             expenseWindowOpen: !this.state.expenseWindowOpen,
         })
@@ -668,10 +668,10 @@ class BudgetForm extends Component {
 
                         {this.state.recordEditMode?
                             <p></p> :
-                            <button onClick={()=>this.openExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
+                            <button onClick={()=>this.toggleExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
                             </button>}
                         {this.state.expenseWindowOpen?
-                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} recordId={currentBudgetRecord.id}/>:
+                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} recordId={currentBudgetRecord.id} toggleExpense={this.toggleExpense}/>:
                             <p></p>}
 
                     </form>

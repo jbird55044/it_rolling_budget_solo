@@ -3,13 +3,18 @@ import mapStoreToProps from '../../redux/mapStoreToProps';
 import { connect } from 'react-redux';
 import ReactDataGrid from 'react-data-grid';
 
-
 import './ExpenditureForm.css'
+
+const moneyFormatter = ({ value }) => {
+    return <p>${value}</p>;
+  };
+  
+
 const columns = [
-    { key: 'id', name: 'ID', editable: false },
-    { key: 'period', name: 'period', editable: true },
-    { key: 'year', name: 'year', editable: true },
-    { key: 'amount', name: 'amount', editable: true },
+    { key: 'id', name: 'ID', editable: false, width: 50 },
+    { key: 'period', name: 'period', editable: true , width: 75 },
+    { key: 'year', name: 'year', editable: true , width: 75},
+    { key: 'amount', name: 'amount', editable: true, formatter: moneyFormatter, width: 150 },
     { key: 'expense_note', name: 'expense_note', editable: true },
     ];
   
@@ -19,13 +24,6 @@ class ExpenditureForm extends Component {
     state = { 
         allRows: [],
         expenseId: 0,
-        stagedRow: {
-            id: 0,
-            period: 0,
-            year: 0,
-            amount: 0,
-            expense_note: ''
-        }
     };
     
     // Stage Redux with up to date db info
@@ -41,7 +39,7 @@ class ExpenditureForm extends Component {
             stagedRow.id = row.id; 
             stagedRow.period = row.period;
             stagedRow.year = row.year;
-            stagedRow.amount = '$' + this.convertNumToMoneyString(row.amount);
+            stagedRow.amount = this.convertNumToMoneyString(row.amount);
             stagedRow.expense_note= row.expense_note;
            
             formattedRows.push (stagedRow)
@@ -112,7 +110,11 @@ class ExpenditureForm extends Component {
         console.log('')
     };
       
-    
+    saveGrid = () => {
+        console.log (`In Save Grid`);
+        
+
+    }
     
     render() {
         return (
@@ -120,16 +122,19 @@ class ExpenditureForm extends Component {
             <p>length: {this.state.allRows.length}</p>
 
                 <div  className="datGridClass">
-                <button>Add Row</button>
-                <ReactDataGrid
-                    // rows={rows}
-                    columns={columns}
-                    rowGetter={i => this.state.allRows[i]}
-                    rowsCount={this.state.allRows.length}
-                    onGridRowsUpdated={this.onGridRowsUpdated}
-                    enableCellSelect={true}
-                 />
-            
+                    <button>Add Row</button>
+                    <button>Save</button>
+                    <button onClick={this.props.toggleExpense}>Close</button>
+
+                    <ReactDataGrid
+                        // rows={rows}
+                        columns={columns}
+                        rowGetter={i => this.state.allRows[i]}
+                        rowsCount={this.state.allRows.length}
+                        onGridRowsUpdated={this.onGridRowsUpdated}
+                        enableCellSelect={true}
+                    />
+                
                 </div>
                 
             </div>

@@ -23,7 +23,7 @@ class ExpenditureForm extends Component {
     
     state = { 
         allRows: [],
-        expenseId: 0,
+        budgetId: 0,
     };
     
     // Stage Redux with up to date db info
@@ -33,22 +33,22 @@ class ExpenditureForm extends Component {
         let formattedRows = [];
         
         this.setState ({
-            expenseId: this.props.recordId
+            budgetId: this.props.currentBudgetRecord
           })
         for (row of this.props.expenseList) {
             stagedRow.id = row.id; 
             stagedRow.period = row.period;
             stagedRow.year = row.year;
-            stagedRow.amount = this.convertNumToMoneyString(row.amount);
+            stagedRow.amount = row.amount;
             stagedRow.expense_note= row.expense_note;
            
-            formattedRows.push (stagedRow)
+            formattedRows.push (stagedRow);
+            stagedRow={};
         }
-        console.log (`Formatted Rows`, formattedRows);
 
-      this.setState ({
-        allRows: formattedRows
-      })
+        this.setState ({
+            allRows: formattedRows
+        })
 
       console.log (`In Expense Did Mount`, this.state.allRows);
 
@@ -75,7 +75,7 @@ class ExpenditureForm extends Component {
         };
         charNumberNew = reverseString(charNumberNew);
         if ( cents === null ) cents = '.00'
-        charNumberNew += cents
+        // charNumberNew += cents
         return charNumberNew;
     
         function reverseString(str) {
@@ -112,8 +112,12 @@ class ExpenditureForm extends Component {
       
     saveGrid = () => {
         console.log (`In Save Grid`);
-        
-
+        this.props.dispatch({type: 'REPLACE_EXPENSEGRID', payload: {
+            allRows: this.state.allRows,
+            businessUnitId: this.props.store.user.id,
+            budgetId: this.state.budgetId,
+            }
+        })
     }
     
     render() {
@@ -123,8 +127,8 @@ class ExpenditureForm extends Component {
 
                 <div  className="datGridClass">
                     <button>Add Row</button>
-                    <button>Save</button>
-                    <button onClick={this.props.toggleExpense}>Close</button>
+                    <button onClick={this.saveGrid}>Save</button>
+                    <button onClick={this.props.toggleExpense}>Cancel Changes</button>
 
                     <ReactDataGrid
                         // rows={rows}

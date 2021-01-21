@@ -13,6 +13,7 @@ const userRouter = require('./routes/user.router');
 const budgetRouter = require('./routes/budget.router.js')
 const tlistRouter = require('./routes/tlist.router.js')
 const reportRouter = require('./routes/report.router')
+const expenseRouter = require('./routes/expense.router')
 
 
 // Body parser middleware
@@ -31,6 +32,7 @@ app.use('/api/user', userRouter);
 app.use('/api/budget', budgetRouter);
 app.use('/api/tlist', tlistRouter)
 app.use('/api/report', reportRouter)
+app.use('/api/expense', expenseRouter)
 
 
 // Serve static files

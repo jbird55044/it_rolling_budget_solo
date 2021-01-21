@@ -3,6 +3,7 @@ import loginSaga from './login.saga';
 import registrationSaga from './registration.saga';
 import userSaga from './user.saga';
 import budgetformSaga from './budgetform.saga';
+import expenseformSaga from './expenseform.saga';
 import budgetreportSaga from './budgetreport.saga';
 import tlistSaga from './tlist.saga';
 
@@ -19,6 +20,7 @@ export default function* rootSaga() {
     registrationSaga(),
     userSaga(),
     budgetformSaga(),
+    expenseformSaga(),
     budgetreportSaga(),
     tlistSaga(),
   ]);

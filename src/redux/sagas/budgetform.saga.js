@@ -110,7 +110,7 @@ function* fetchExpeenseSum ( payload ) {
 function* fetchBudgetRecordCount( payload ) {
   let countNumber = 1;
   let currentRecordId = 1;  //default to department 1 to ,minimize init errors
-  console.log (`fetchBudgetRecordCount Payload:`, payload);
+  console.log (`fetchBudgetRecordCount GET Payload:`, payload);
   // Go to server, update redux store with data from server
   try {
       // get data from db
@@ -143,7 +143,7 @@ function* deleteBudgetForm ( action ) {
 }
 
 function* addNewBudgetForm ( action ) {
-  console.log('PUT update Budgetform', action.payload);
+  console.log('POST update Budgetform', action.payload);
   try { 
       console.log ('Add POST Payload:', action.payload)
       yield axios.post('/api/budget/addform', action.payload)

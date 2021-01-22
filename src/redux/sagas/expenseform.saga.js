@@ -41,11 +41,26 @@ function* addRowExpenseGrid ( action ) {
         console.log('error with Deleting via PUT BudgetForm', error);
     }
   }
+
+  function* deleteAllRows ( action ) {
+    console.log('deleteAllRows via PUT expenseForm', action.payload);
+    try { 
+        yield axios.put('/api/expense/deleterows', action.payload)
+        yield put({ type: 'FETCH_BUDGETFORM', recordFinder: {
+            businessUnitId: action.payload.businessUnitId,
+            relitiveRecordId: action.payload.relitiveRecordId
+            }
+         }) 
+    } catch (error) {
+        console.log('error with Deleting via PUT BudgetForm', error);
+    }
+  }
   
   
 function* expenseformSaga() {
   yield takeLatest('REPLACE_EXPENSEGRID', replaceExpenseGrid);
   yield takeLatest('ADD_ROW_EXPENSEGRID', addRowExpenseGrid);
+  yield takeLatest('DELETE_ALL_ROWS', deleteAllRows);
   
 }
 

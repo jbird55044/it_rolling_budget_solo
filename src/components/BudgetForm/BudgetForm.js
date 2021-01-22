@@ -675,8 +675,8 @@ class BudgetForm extends Component {
                             <button className="buttonClass" onClick={()=>this.toggleExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
                             </button>}
                         {this.state.expenseWindowOpen?
-                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} 
-                                currentBudgetRecord={currentBudgetRecord.id} relitiveRecordId={this.state.recordNumber} toggleExpense={this.toggleExpense}/>:
+                            <ExpenditureForm currentBudgetId={currentBudgetRecord.id} 
+                                relitiveRecordId={this.state.recordNumber} toggleExpense={this.toggleExpense}/>:
                             <p></p>}
 
                     </form>

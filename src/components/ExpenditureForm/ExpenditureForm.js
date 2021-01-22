@@ -25,6 +25,7 @@ class ExpenditureForm extends Component {
         allRows: [],
         budgetId: 0,
         recordCount: 0,
+        relitiveRecordId: 0,
     };
     
     // Stage Redux with up to date db info
@@ -34,14 +35,16 @@ class ExpenditureForm extends Component {
         let formattedRows = [];
         
         this.setState ({
-            budgetId: this.props.currentBudgetRecord
+            budgetId: this.props.currentBudgetId,
+            relitiveRecordId: this.props.relitiveRecordId
           })
-        for (row of this.props.expenseList) {
+        for (row of this.props.store.budgetForm.expenseFillList) {
             stagedRow.id = row.id; 
             stagedRow.period = row.period;
             stagedRow.year = row.year;
             stagedRow.amount = row.amount;
             stagedRow.expense_note= row.expense_note;
+            stagedRow.archived= row.archived;
            
             formattedRows.push (stagedRow);
             stagedRow={};
@@ -91,7 +94,8 @@ class ExpenditureForm extends Component {
             period: '',
             year: '',
             amount: 0,
-            expense_note: '<-'
+            expense_note: '<-',
+            archived: false
         }
         this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
             newRecord: newRecord,
@@ -101,7 +105,7 @@ class ExpenditureForm extends Component {
         })
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.props.relitiveRecordId,
+            relitiveRecordId: this.state.relitiveRecordId,
             }
         });
     }
@@ -143,13 +147,31 @@ class ExpenditureForm extends Component {
             allRows: this.state.allRows,
             businessUnitId: this.props.store.user.id,
             budgetId: this.state.budgetId,
+            relitiveRecordId: this.state.relitiveRecordId
             }
         })
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.props.relitiveRecordId,
+            relitiveRecordId: this.state.relitiveRecordId,
             }
         });
+        this.props.toggleExpense();
+    }
+
+    deleteAllRows = () => {
+        console.log (`in Delete All Rows`);
+        this.props.dispatch({type: 'DELETE_ALL_ROWS', payload: {
+            allRows: this.state.allRows,
+            businessUnitId: this.props.store.user.id,
+            budgetId: this.state.budgetId,
+            relitiveRecordId: this.state.relitiveRecordId
+            }
+        })
+        // this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+        //     businessUnitId: this.props.store.user.id,
+        //     relitiveRecordId: this.state.relitiveRecordId,
+        //     }
+        // });
         this.props.toggleExpense();
     }
 
@@ -158,17 +180,19 @@ class ExpenditureForm extends Component {
             period: '',
             year: '',
             amount: 0,
-            expense_note: '<-'
+            expense_note: '<-',
+            archived: false
         }
         this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
             newRecord: newRecord,
             businessUnitId: this.props.store.user.id,
             budgetId: this.state.budgetId,
+            relitiveRecordId: this.state.relitiveRecordId
             }
         })
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.props.relitiveRecordId,
+            relitiveRecordId: this.state.relitiveRecordId,
             }
         });
         this.props.toggleExpense();
@@ -183,6 +207,7 @@ class ExpenditureForm extends Component {
                     <button className="buttonClass" onClick={this.addRow}>Add Row</button>
                     <button className="buttonClass" onClick={this.refreshExpenseTable}>Refresh</button>
                     <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button> 
+                    <button className="buttonClass largeMarginClass" onClick={this.deleteAllRows}>Delete ALL</button>
                     <button className="buttonClass largeMarginClass" onClick={this.props.toggleExpense}>Cancel Changes</button>
 
                     <ReactDataGrid

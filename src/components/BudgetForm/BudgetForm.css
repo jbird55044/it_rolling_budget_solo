@@ -1,4 +1,19 @@
 .pageDivClass {
   background-color: white;
   margin-left: 30px;
+  margin-top: 1px;
+  padding: 0px;
+}
+
+.buttonClass {
+  border: 1px solid #283618;
+  background-color: #FEFAE0;
+  border-radius: 2px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 3px;
+}
+
+.largeMarginClass {
+  margin-left: 40px;
 }

@@ -11,7 +11,7 @@ const moneyFormatter = ({ value }) => {
   
 
 const columns = [
-    { key: 'id', name: 'ID', editable: false, width: 50 },
+    { key: 'id', name: 'ID', editable: false, width: 60 },
     { key: 'period', name: 'period', editable: true , width: 75 },
     { key: 'year', name: 'year', editable: true , width: 75},
     { key: 'amount', name: 'amount', editable: true, formatter: moneyFormatter, width: 150 },
@@ -24,6 +24,7 @@ class ExpenditureForm extends Component {
     state = { 
         allRows: [],
         budgetId: 0,
+        recordCount: 0,
     };
     
     // Stage Redux with up to date db info
@@ -47,7 +48,8 @@ class ExpenditureForm extends Component {
         }
 
         this.setState ({
-            allRows: formattedRows
+            allRows: formattedRows,
+            recordCount: formattedRows.length
         })
 
       console.log (`In Expense Did Mount`, this.state.allRows);
@@ -84,7 +86,25 @@ class ExpenditureForm extends Component {
     }  // end of convertNumToMoneyString fn
     
     
-    
+    addRow = () => {
+        let newRecord ={
+            period: '',
+            year: '',
+            amount: 0,
+            expense_note: '<-'
+        }
+        this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
+            newRecord: newRecord,
+            businessUnitId: this.props.store.user.id,
+            budgetId: this.state.budgetId,
+            }
+        })
+        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            relitiveRecordId: this.props.relitiveRecordId,
+            }
+        });
+    }
 
     getDate = () => {
         let today = new Date();
@@ -109,6 +129,12 @@ class ExpenditureForm extends Component {
         });
         console.log('')
     };
+
+    refreshExpenseTable = () => {
+        this.setState ({
+            allRows: this.props.store.budgetForm.expexpenseFillList
+        })
+    }
       
     saveGrid = () => {
         console.log (`In Save Grid`);
@@ -118,23 +144,51 @@ class ExpenditureForm extends Component {
             budgetId: this.state.budgetId,
             }
         })
+        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            relitiveRecordId: this.props.relitiveRecordId,
+            }
+        });
+        this.props.toggleExpense();
+    }
+
+    addRow = () => {
+        let newRecord ={
+            period: '',
+            year: '',
+            amount: 0,
+            expense_note: '<-'
+        }
+        this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
+            newRecord: newRecord,
+            businessUnitId: this.props.store.user.id,
+            budgetId: this.state.budgetId,
+            }
+        })
+        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+            businessUnitId: this.props.store.user.id,
+            relitiveRecordId: this.props.relitiveRecordId,
+            }
+        });
+        this.props.toggleExpense();
     }
     
     render() {
         return (
             <div className="pageDivClass">
-            <p>length: {this.state.allRows.length}</p>
+            {/* <p>length: {this.state.allRows.length}</p> */}
 
                 <div  className="datGridClass">
-                    <button>Add Row</button>
-                    <button onClick={this.saveGrid}>Save</button>
-                    <button onClick={this.props.toggleExpense}>Cancel Changes</button>
+                    <button className="buttonClass" onClick={this.addRow}>Add Row</button>
+                    <button className="buttonClass" onClick={this.refreshExpenseTable}>Refresh</button>
+                    <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button> 
+                    <button className="buttonClass largeMarginClass" onClick={this.props.toggleExpense}>Cancel Changes</button>
 
                     <ReactDataGrid
                         // rows={rows}
                         columns={columns}
                         rowGetter={i => this.state.allRows[i]}
-                        rowsCount={this.state.allRows.length}
+                        rowsCount={this.state.recordCount}
                         onGridRowsUpdated={this.onGridRowsUpdated}
                         enableCellSelect={true}
                     />

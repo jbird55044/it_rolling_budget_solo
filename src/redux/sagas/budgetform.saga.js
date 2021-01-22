@@ -84,7 +84,7 @@ function* fetchBudgetForm( payload ) {
 } 
 
 // Grab SUM of expenses for BudgetId on form
-function* fetchExpeenseSum ( payload ) {
+function* fetchExpenseSum ( payload ) {
     let countNumber = 1;
     let currentRecordId = 1;  //default to department 1 to ,minimize init errors
     console.log (`fetchBudgetRecordCount Payload:`, payload);

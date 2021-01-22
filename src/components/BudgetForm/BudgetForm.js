@@ -316,6 +316,8 @@ class BudgetForm extends Component {
             } else {
                 this.setState ({
                     recordNumber: this.state.recordNumber = 1,
+                    recordEditMode: false,
+                    recordAddMode: false
                 })
             }
         } else if (recordMove === 'next') {
@@ -329,6 +331,8 @@ class BudgetForm extends Component {
             } else {
                 this.setState ({
                     recordNumber: this.props.store.budgetForm.budgetFormCount,
+                    recordEditMode: false,
+                    recordAddMode: false
                 })
             }
         } else if (recordMove === 'last') {
@@ -668,10 +672,11 @@ class BudgetForm extends Component {
 
                         {this.state.recordEditMode?
                             <p></p> :
-                            <button onClick={()=>this.toggleExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
+                            <button className="buttonClass" onClick={()=>this.toggleExpense(currentBudgetRecord.id)}>Expenditure: ${this.convertNumToMoneyString(this.props.store.budgetForm.expenseSum)}
                             </button>}
                         {this.state.expenseWindowOpen?
-                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} currentBudgetRecord={currentBudgetRecord.id} toggleExpense={this.toggleExpense}/>:
+                            <ExpenditureForm expenseList={this.props.store.budgetForm.expenseFillList} 
+                                currentBudgetRecord={currentBudgetRecord.id} relitiveRecordId={this.state.recordNumber} toggleExpense={this.toggleExpense}/>:
                             <p></p>}
 
                     </form>
@@ -683,40 +688,40 @@ class BudgetForm extends Component {
 
             <div className={classes.buttons}>
                 {this.state.recordEditMode?
-                <button onClick={()=>this.moveRecord('back')}>Save Record</button>:
-                <button onClick={()=>this.moveRecord('back')}>Back Record</button>
+                <button className="buttonClass" onClick={()=>this.moveRecord('back')}>Save Record</button>:
+                <button className="buttonClass" onClick={()=>this.moveRecord('back')}>Back Record</button>
                 }
                 {this.state.recordEditMode?
                 <p></p>:
-                <button onClick={()=>this.moveRecord('next')}>Next Record</button>
+                <button className="buttonClass" onClick={()=>this.moveRecord('next')}>Next Record</button>
                 }
                  {this.state.recordEditMode?
                 <p></p>:
-                <button onClick={()=>this.moveRecord('last')}>Last Record</button>
+                <button className="buttonClass" onClick={()=>this.moveRecord('last')}>Last Record</button>
                 }
                 {this.state.recordEditMode?
                 <p></p>:
-                <button onClick={()=>this.refreshDom()}>Refresh</button>
+                <button className="buttonClass" onClick={()=>this.refreshDom()}>Refresh</button>
                 }
                 <p></p>
                 {!this.state.recordAddMode?
-                <button onClick={()=>this.editRecord()}>Edit Record</button>:
+                <button className="buttonClass" onClick={()=>this.editRecord()}>Edit Record</button>:
                 <p></p>}
 
                 {this.state.recordEditMode && !this.state.recordAddMode?
-                <button onClick={()=>this.cancelEdit()}>Cancel Edit</button>:
+                <button className="buttonClass" onClick={()=>this.cancelEdit()}>Cancel Edit</button>:
                 <p></p>}
 
                 {this.state.recordEditMode && this.state.recordAddMode?
-                <button onClick={()=>this.cancelEdit()}>Cancel Add</button>:
+                <button className="buttonClass" onClick={()=>this.cancelEdit()}>Cancel Add</button>:
                 <p></p>}
                 
                 {this.state.recordEditMode && !this.state.recordAddMode?
-                <button onClick={()=>this.deleteConfirm()}>DELETE</button>:
+                <button className="buttonClass" onClick={()=>this.deleteConfirm()}>DELETE</button>:
                 <p></p>}
 
                 {!this.state.recordAddMode && !this.state.recordEditMode?
-                <button onClick={()=>this.addRecord()}>Add New Record</button>:
+                <button className="buttonClass" onClick={()=>this.addRecord()}>Add New Record</button>:
                 <p></p>}  
 
                 <TextField

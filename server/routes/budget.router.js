@@ -64,7 +64,8 @@ router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   console.log (`--expensefill GET - req.query.budgetId:`, budgetId);
   const queryText = `SELECT *  FROM t_primary_expenditure
-    WHERE t_primary_expenditure.budget_fk = $1;`;
+  WHERE t_primary_expenditure.budget_fk  = $1
+  Order BY year, period, id ASC`;
   pool.query(queryText, [budgetId])
     .then((result) => { res.send(result.rows); })
     .catch((err) => {

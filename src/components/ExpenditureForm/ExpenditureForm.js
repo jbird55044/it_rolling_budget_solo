@@ -132,7 +132,8 @@ class ExpenditureForm extends Component {
 
     refreshExpenseTable = () => {
         this.setState ({
-            allRows: this.props.store.budgetForm.expexpenseFillList
+            allRows: this.props.store.budgetForm.expenseFillList,
+            recordCount: this.props.store.budgetForm.expenseFillList.length
         })
     }
       

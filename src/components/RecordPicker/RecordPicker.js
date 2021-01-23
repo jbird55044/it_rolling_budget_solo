@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import mapStoreToProps from '../../redux/mapStoreToProps';
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+
 
 import ReactDataGrid from 'react-data-grid';
 import { Toolbar, Data } from "react-data-grid-addons";
@@ -27,23 +29,6 @@ function RecordPicker() {
 
     const reduxStoreTaco = useSelector(store => store)
     
-    // const styles = theme => ({
-    //     container: {
-    //         display: 'flex',
-    //         flexWrap: 'wrap',
-    //     },
-    //     margin: {
-    //         margin: theme.spacing.unit,
-    //         paddingTop: theme.spacing.unit,
-    //         paddingBottom: theme.spacing.unit,
-    //     },
-    //     textField: {
-    //         flexBasis: 200,
-    //     },
-    // });
-    // const { classes } = styles;
-
-    //equivalant to Component did mount 
     let renderQuantity=[]
     useEffect(() => {
         dispatch({type: 'FETCH_TLIST_YEAR'});
@@ -66,14 +51,33 @@ function RecordPicker() {
     
 
     const columns = [
-        { key: 'id', name: 'ID', editable: false, width: 60 },
-        { key: 'cost_center', name: 'CC', editable: false, filterable: true, width: 75 },
-        { key: 'nomenclature', name: 'Nomenclature', editable: false , filterable: true, width: 150 },
-        { key: 'needs_review', name: 'Review', editable: false , filterable: true, width: 75},
+        { key: 'id', name: 'ID', editable: false, width: 60,
+            events: {onDoubleClick: function(ev, args) {
+                console.log('rowId: ', args.rowId);
+                setBudgetId(args.rowId);
+                dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                }, 
+            },
+        },    
+        { key: 'cost_center', name: 'CC', editable: false, filterable: true, width: 75, 
+            // events: {onMouseOver: function(ev) {
+            //         console.log(`Mouse over Last Name Column`); 
+            //     }
+        //   },
+        },
+        { key: 'nomenclature', name: 'Nomenclature', editable: false , filterable: true, width: 150},
+        { key: 'needs_review', name: 'Review', editable: false , filterable: true, width: 75,
+        events: {onDoubleClick: function(ev, args) {
+                console.log('rowId: ', args.rowId);
+                setBudgetId(args.rowId);
+                dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                }, 
+            },
+        },
         { key: 'gl_name', name: 'GL Name', editable: false, filterable: true, width: 125 },
         { key: 'frequency', name: 'Frequency', editable: false },
         { key: 'total', name: 'Total', editable: true, filterable: true, formatter: moneyFormatter, width: 150 },
-        { key: 'detail', name: 'Detail', editable: false },
+        // { key: 'detail', name: 'Detail', editable: false },
         ];
 
         const handleFilterChange = filter => filters => {
@@ -102,7 +106,7 @@ function RecordPicker() {
             stagedRow.gl_name= row.gl_name;
             stagedRow.frequency= row.frequency;
             stagedRow.total= row.total;
-            stagedRow.detail= 'detail';
+            // stagedRow.detail= '<button>detail</button>';
             // console.log (`stagedRow.id`, stagedRow.id ,stagedRow.needs_review);
             
             formattedRows.push (stagedRow);
@@ -127,8 +131,7 @@ function RecordPicker() {
             }
         });
     }
-     
-
+    
     function getRows(rows, filters) {
         return selectors.getRows({ rows, filters });
     }
@@ -154,6 +157,7 @@ function RecordPicker() {
                 </TextField>
 
                 <button className="buttonClass" onClick={refreshExpenseTable}>Refresh</button>
+                <Link className="budgetJumpClass" to="/budgetform" passedBudgetId={budgetId}>Detail Record: {budgetId}</Link>  
                 {/* <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button>  */}
                 {/* <p>length: {reduxStoreTaco.budgetReport.reportBudgetReport1.length}</p> */}
                 {/* <p>sum: {reduxStoreTaco.budgetReport.reportBudgetReport1Sum}</p> */}

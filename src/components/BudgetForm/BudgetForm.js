@@ -97,7 +97,7 @@ class BudgetForm extends Component {
     
     // Stage Redux with up to date db info
     async componentDidMount() {
-        console.log (` . . . Component Did Mount . . . `);
+        console.log (`Budget Form - passed RecordId`, this.props.passedBudgetId);
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
@@ -398,7 +398,6 @@ class BudgetForm extends Component {
     };
     
     convertNumToMoneyString = (number) => {
-        console.log (`number convert:`, number);
         // convert to money format
         let charNumberNew = '';
         let charNumberOld = '';

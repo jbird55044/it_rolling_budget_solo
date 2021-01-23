@@ -21,7 +21,6 @@ function RecordPicker() {
     let [allRows, setAllRows] = useState ([]);
     let [budgetId, setBudgetId] = useState (0);
     let [recordCount, setRecordCount] = useState (0);
-    let [relitiveRecordId, setRelitiveRecordId] = useState (0);
     const selectors = Data.Selectors
     const [filters, setFilters] = useState({});
     const filteredRows = getRows(allRows, filters);
@@ -130,36 +129,6 @@ function RecordPicker() {
     }
      
 
-    const convertNumToMoneyString = (number) => {
-        // convert to money format
-        if (number < 1 || number === null) return;
-        let charNumberNew = '';
-        let charNumberOld = '';
-        let cents= null;
-        charNumberOld = number.toString();
-        if ( charNumberOld.indexOf('.') > 0 ) {
-            cents = charNumberOld.slice(charNumberOld.indexOf('.'));
-            charNumberOld = charNumberOld.slice( 0, charNumberOld.indexOf('.'));
-        }
-        // reverses string and adds ',' every third location
-        let c=0;
-        charNumberOld = reverseString(charNumberOld);
-        for ( c = 0; c < charNumberOld.length; c += 1 ) {
-            if (  (c !== 0) && (c % 3) === 0 ) {
-            charNumberNew += (',')
-            }
-            charNumberNew += charNumberOld[c]
-        };
-        charNumberNew = reverseString(charNumberNew);
-        if ( cents === null ) cents = '.00'
-        // charNumberNew += cents
-        return charNumberNew;
-    
-        function reverseString(str) {
-            return str.split("").reverse().join("");
-        }
-    }  // end of convertNumToMoneyString fn
-
     function getRows(rows, filters) {
         return selectors.getRows({ rows, filters });
     }
@@ -184,20 +153,22 @@ function RecordPicker() {
                             ))}
                 </TextField>
 
+                <button className="buttonClass" onClick={refreshExpenseTable}>Refresh</button>
+                {/* <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button>  */}
                 {/* <p>length: {reduxStoreTaco.budgetReport.reportBudgetReport1.length}</p> */}
                 {/* <p>sum: {reduxStoreTaco.budgetReport.reportBudgetReport1Sum}</p> */}
                     
 
                     <div  className="datGridClass">
-                        <button className="buttonClass" onClick={refreshExpenseTable}>Refresh</button>
-                        {/* <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button>  */}
+                  
 
                         <ReactDataGrid
                             // rows={rows}
                             columns={columns}
-                            rowGetter={i => allRows[i]}
-                            rowsCount={recordCount}
+                            rowGetter={i => filteredRows[i]}
+                            rowsCount={filteredRows.length}
                             enableCellSelect={true}
+                            toolbar={<Toolbar enableFilter={true} />}
                             onAddFilter={filter => setFilters(handleFilterChange(filter))}
                             onClearFilters={() => setFilters({})}
                         />

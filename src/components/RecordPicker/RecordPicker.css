@@ -1,3 +1,17 @@
+.datGridClass {
+  margin-left: 30px;
+  margin-top: 5px;
+  padding: 5px;
+}
+
+.datGridClass input {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: small;
+}
+
 .pageDivClass {
   background-color: white;
   margin-left: 20px;

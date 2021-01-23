@@ -1,0 +1,24 @@
+.pageDivClass {
+  background-color: white;
+  margin-left: 20px;
+}
+
+.datGridClass {
+  margin: 5%;
+  margin-top: 5%;
+}
+
+.container {
+  display: 'flex';
+  flex-wrap: 'wrap';
+}
+
+.margin {
+  margin: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.textField {
+  flex-basis: 200,
+}

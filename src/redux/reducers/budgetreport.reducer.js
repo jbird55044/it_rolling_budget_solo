@@ -49,6 +49,7 @@ const reportRecordExpenseFill = (state = [], action) => {
 }
 
 const reportSelectedYear = (state = '', action) => {
+  console.log ('in reducer selected year-state:', state)
   switch (action.type) {
       case 'SET_SELECTEDYEAR':
           return action.payload;

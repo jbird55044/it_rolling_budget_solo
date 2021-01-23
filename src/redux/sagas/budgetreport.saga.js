@@ -65,6 +65,24 @@ function* fetchBudgetReport3( payload ) {
   }
 } 
 
+function* fetchBudgetReport1Sum( payload ) {
+  let report1sum = 1;  //default to department 1 to ,minimize init errors
+  console.log (`fetchBudgetReport1 Payload:`, payload);
+  // Go to server, update redux store with data from server
+  try {
+      // get data from db
+      const response = yield axios.get('/api/report/report1total', {
+          params:{
+              businessUnitId: payload.recordFinder.businessUnitId,
+              selectedYear: payload.recordFinder.selectedYear
+          }
+      })
+      yield report1sum = response.data[0].sum
+      yield put({ type: 'SET_BUDGETREPORT1SUM', payload: report1sum });
+  } catch ( error ) {
+      console.log('error with fetchBudgetReport1Sum get request', error);
+  }
+} 
 
 function* fetchExpenseFill ( payload ) {
     let currentRecordId = 1;  //default to department 1 to ,minimize init errors
@@ -105,6 +123,7 @@ function* fetchExpenseFill ( payload ) {
 
 function* budgetcollectionSaga() {
   yield takeLatest ('FETCH_BUDGETREPORT1', fetchBudgetReport1);
+  yield takeLatest ('FETCH_BUDGETREPORT1SUM', fetchBudgetReport1Sum);
   yield takeLatest ('FETCH_BUDGETREPORT2', fetchBudgetReport2);
   yield takeLatest ('FETCH_BUDGETREPORT3', fetchBudgetReport3);
   yield takeLatest ('FETCH_EXPENSEFILL', fetchExpenseFill);

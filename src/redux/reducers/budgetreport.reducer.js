@@ -10,6 +10,15 @@ const reportBudgetReport1 = (state = [], action) => {
   }
 }
 
+const reportBudgetReport1Sum = (state = 0, action) => {
+  switch (action.type) {
+      case 'SET_BUDGETREPORT1SUM':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
 // Used to store specific budget returned from the server
 const reportBudgetReport2 = (state = [], action) => {
   switch (action.type) {
@@ -55,6 +64,7 @@ const reportSelectedYear = (state = '', action) => {
 // state.errors.loginMessage and state.errors.registrationMessage
 export default combineReducers({
   reportBudgetReport1,
+  reportBudgetReport1Sum,
   reportBudgetReport2,
   reportBudgetReport3,
   reportRecordExpenseFill,

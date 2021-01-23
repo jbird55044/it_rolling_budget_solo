@@ -9,7 +9,7 @@ import RegisterForm from '../RegisterForm/RegisterForm';
 
 class LandingPage extends Component {
   state = {
-    heading: 'Class Component',
+    heading: 'Rolling Budget',
   };
 
   onLogin = (event) => {
@@ -23,36 +23,26 @@ class LandingPage extends Component {
 
         <div className="grid">
           <div className="grid-col grid-col_8">
+            <h3>Reports</h3>
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur
-              id felis metus. Vestibulum et pulvinar tortor. Morbi pharetra
-              lacus ut ex molestie blandit. Etiam et turpis sit amet risus
-              mollis interdum. Suspendisse et justo vitae metus bibendum
-              fringilla sed sed justo. Aliquam sollicitudin dapibus lectus,
-              vitae consequat odio elementum eget. Praesent efficitur eros vitae
-              nunc interdum, eu interdum justo facilisis. Sed pulvinar nulla ac
-              dignissim efficitur. Quisque eget eros metus. Vestibulum bibendum
-              fringilla nibh a luctus. Duis a sapien metus.
+              A selection of pre-established reports that allow for record
+              viewing as well as jumping into record editing.
             </p>
 
+            <h3>Expense Form</h3>
             <p>
-              Praesent consectetur orci dui, id elementum eros facilisis id. Sed
-              id dolor in augue porttitor faucibus eget sit amet ante. Nunc
-              consectetur placerat pharetra. Aenean gravida ex ut erat commodo,
-              ut finibus metus facilisis. Nullam eget lectus non urna rhoncus
-              accumsan quis id massa. Curabitur sit amet dolor nisl. Proin
-              euismod, augue at condimentum rhoncus, massa lorem semper lacus,
-              sed lobortis augue mi vel felis. Duis ultrices sapien at est
-              convallis congue.
+              The main edit page for budget items
             </p>
 
+            <h3>Admin</h3>
             <p>
-              Fusce porta diam ac tortor elementum, ut imperdiet metus volutpat.
-              Suspendisse posuere dapibus maximus. Aliquam vitae felis libero.
-              In vehicula sapien at semper ultrices. Vivamus sed feugiat libero.
-              Sed sagittis neque id diam euismod, ut egestas felis ultricies.
-              Nullam non fermentum mauris. Sed in enim ac turpis faucibus
-              pretium in sit amet nisi.
+              The area to go to administrate the application.  Here you can set associations
+              between login id's and business areas.
+            </p>
+
+            <h3>Purchase Orders</h3>
+            <p>
+              Future development of the Purchase Order system.
             </p>
           </div>
           <div className="grid-col grid-col_4">

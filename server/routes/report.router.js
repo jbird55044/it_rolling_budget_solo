@@ -30,6 +30,7 @@ FROM t_primary_budget
       WHERE t_primary_budget.owner_fk = $1 AND t_primary_budget.archived = false AND t_primary_expenditure.year = $2
       GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
         tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
+      ORDER BY t_primary_budget.id ASC  
 ;`;
   pool.query(queryText, [businessUnitId, selectedYear])
     .then((result) => { 
@@ -41,6 +42,31 @@ FROM t_primary_budget
       res.sendStatus(500);
     });
 }); 
+
+// Primary Record getter for Report 1 
+router.get('/report1total', rejectUnauthenticated, (req, res) => {
+  let businessUnitId = req.query.businessUnitId
+  let selectedYear = req.query.selectedYear
+  let budgetId = req.query.budgetId
+  console.log (`----Report1Total,  BU ID:`, businessUnitId, '   selected year:', selectedYear );
+  const queryText = `SELECT SUM(t_primary_expenditure.amount) FROM t_primary_expenditure
+  JOIN t_primary_budget ON t_primary_budget.id = t_primary_expenditure.budget_fk
+    WHERE t_primary_budget.owner_fk = $1 
+      AND t_primary_budget.archived = false 
+      AND t_primary_expenditure.archived = false
+      AND t_primary_expenditure.year = $2
+  ;`;
+  pool.query(queryText, [businessUnitId, selectedYear])
+    .then((result) => { 
+      res.send(result.rows); 
+      // console.log (`budgetForm rows:`,result.rows);
+    })
+    .catch((err) => {
+      console.log('Error completing formfill report1total query', err);
+      res.sendStatus(500);
+    });
+}); 
+
 
 // Primary Record getter for Report 2 
 router.get('/report2', rejectUnauthenticated, (req, res) => {
@@ -67,6 +93,7 @@ FROM t_primary_budget
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
       WHERE t_primary_budget.owner_fk = $1 AND t_primary_budget.archived = false AND t_primary_expenditure.year = $2
+      ORDER BY t_primary_budget.id ASC    
   ;`;
   pool.query(queryText, [businessUnitId, selectedYear])
     .then((result) => { 
@@ -107,6 +134,7 @@ FROM t_primary_budget
       WHERE t_primary_budget.owner_fk = $1 AND t_primary_budget.archived = false AND t_primary_expenditure.year = $2 AND needs_review = true
       GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
         tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
+        ORDER BY t_primary_budget.id ASC
 ;`;
   pool.query(queryText, [businessUnitId, selectedYear])
     .then((result) => { 

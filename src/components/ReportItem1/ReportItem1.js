@@ -13,6 +13,7 @@ class ReportItem1 extends Component {
         //     recordId: this.props.lineItem.id,
         //     }
         // });
+        
     }
     convertNumToMoneyString = (number) => {
         // convert to money format

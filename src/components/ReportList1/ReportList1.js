@@ -15,7 +15,7 @@ const styles = theme => ({
         flexWrap: 'wrap',
       },
     });
-
+ 
 class ReportList1 extends Component {
   
     state = {
@@ -66,7 +66,7 @@ class ReportList1 extends Component {
         }
     }  // end of convertNumToMoneyString fn
 
-    
+     
     render() {
         return (
             <div className="report1Class">

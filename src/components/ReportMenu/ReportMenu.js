@@ -42,7 +42,7 @@ class ReportMenu extends Component {
         console.log ('value 1:', event.target.value)
         this.props.dispatch({type: 'SET_SELECTEDYEAR', payload: event.target.value});
     }
-    
+     
     render() {
         const { classes } = this.props;
 

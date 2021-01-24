@@ -41,6 +41,16 @@ const budgetFormCount = (state = 0, action) => {
   }
 }
 
+// Used to determine number of records for maximum scroll on form
+const passedRecordId = (state = 0, action) => {
+  switch (action.type) {
+      case 'SET_PASSEDRECORDID':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
 // make one object that has keys loginMessage, registrationMessage
 // these will be on the redux state at:
 // state.errors.loginMessage and state.errors.registrationMessage
@@ -49,4 +59,5 @@ export default combineReducers({
   expenseFillList,
   expenseSum,
   budgetFormCount,
+  passedRecordId,
 });

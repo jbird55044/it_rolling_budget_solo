@@ -5,6 +5,18 @@ import mapStoreToProps from '../../redux/mapStoreToProps';
 import './UserPage.css'
 
 class UserPage extends Component {
+
+  async componentDidMount() {
+    // default reporting to current year
+    this.props.dispatch({type: 'SET_SELECTEDYEAR', payload: this.getYear()});
+  }
+
+  getYear = () => {
+    let today = new Date();
+    let year = today.getFullYear();
+    return year
+}  // end of getYear fn
+
   // this component doesn't do much to start, just renders some user info to the DOM
   render() {
     return (

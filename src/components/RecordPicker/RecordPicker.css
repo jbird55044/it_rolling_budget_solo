@@ -1,0 +1,61 @@
+.datGridClass {
+  margin-top: 5px;
+  margin-left: 30px;
+  padding: 5px;
+}
+
+.datGridClass input {
+  margin-top: 1px;
+  margin-bottom: 1px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  font-size: small;
+}
+
+.selectorDivClass{
+  margin-top: 15px;
+}
+
+.pageDivClass {
+  background-color: white;
+  margin-left: 20px;
+}
+
+.container {
+  display: 'flex';
+  flex-wrap: 'wrap';
+}
+
+.margin {
+  margin: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.textField {
+  flex-basis: 200,
+}
+
+.budgetJumpClass {
+  padding: 4px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: #FEFAE0;
+  color: #283618;
+  border: 1px solid black;
+  border-radius: 2px;
+  margin-left: 20px;
+}
+
+.budgetJumpClass:hover {
+  color: #DDA15E;
+}
+
+.buttonClass:hover {
+  color: #DDA15E;
+}
+
+.datGridClass table{
+  color: white;
+  background-color: #283618;
+}

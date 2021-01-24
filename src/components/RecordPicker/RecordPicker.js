@@ -16,7 +16,7 @@ import {useDispatch} from 'react-redux'
 
 import './RecordPicker.css'
 
-
+ 
 function RecordPicker() {
     const dispatch = useDispatch();
     let [selectedYear, setSelectedYear] = useState ('');

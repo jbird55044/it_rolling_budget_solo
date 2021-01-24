@@ -14,20 +14,22 @@ class AboutPage extends Component {
             <p>&nbsp;</p>
             <p>&nbsp;</p>
             <p>&nbsp;</p>
-              <a href="https://www.JamesDBird.com" target="_blank"  rel="noopener noreferrer">https://www.JamesDBird.com</a>
             <h3>Technology Stack:</h3>
             <ul>
-              <li>React</li>
-              <li>Redux and Saga</li>
+              <li>Full Stack React</li>
+              <li>Redux &amp; Node.js</li>
               <li>Node.js - Express</li>
-              <li>Postgres</li>
-              <li>Material-UI</li>
-              <li>Bootstrap</li>
-              <li>Special mention to: React Data Grid</li>
+              <li>PostgreSQL</li>
+              <li>Material-UI &amp; Bootstrap</li>
+              <li>Special mention to: React Data Grid v5</li>
               <li>Special mention to: Github: bbachi for Excel and CSV Exports</li>
             </ul>
-            
-
+            <h3>Special Thanks!</h3>
+            <ul>
+              <li>The one and only Incredible Vatti cohort</li>
+              <li>Prime Academy</li>
+              <li>The amazing Mary!</li>
+            </ul>
           </div>
       )
   }

@@ -88,7 +88,7 @@ class BudgetForm extends Component {
             last_update: '',
             total: 0
         },
-        recordNumber: 1,
+        relitiveRecordId: this.props.store.budgetForm.passedRecordId || 1,
         recordEditMode: false,
         recordAddMode: false,
         deleteConfirmDialog: false,
@@ -97,13 +97,18 @@ class BudgetForm extends Component {
     
     // Stage Redux with up to date db info
     async componentDidMount() {
-        if (this.props.store.budgetForm.passedRecordId > 0) {
-            console.log ('We have a passed record number:', this.props.store.budgetForm.passedRecordId)
-        }
+        //refresh relative record number w/ correct row based on passed Record ID (if passed)
+    //     if (this.props.store.budgetForm.passedRecordId > 0) {
+    //         this.props.dispatch({type: 'FETCH_RECORD_CORRELATION_ROW', recordFinder: {
+    //                 recordId: this.props.store.budgetForm.passedRecordId
+    //             }
+    //         });    
+    //    }
+       
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
+            relitiveRecordId: this.state.relitiveRecordId,
             recordId: this.props.store.budgetForm.passedRecordId
             }
         });
@@ -129,7 +134,10 @@ class BudgetForm extends Component {
             businessUnitId: this.props.store.user.id,
             }
         });
-        
+
+        // clear incoming record ID if passed for first record start next time in
+        this.props.dispatch({type: 'SET_PASSEDRECORDID', payload: 0 });
+
         this.updateState();
 
     }
@@ -185,11 +193,11 @@ class BudgetForm extends Component {
        
         if (this.state.recordAddMode) {
             // do a POST to move populated form to db NEW record number
-            console.log (`In Add Record, RelitiveRecordId:`, this.state.recordNumber );
+            console.log (`In Add Record, RelitiveRecordId:`, this.state.relitiveRecordId );
             this.props.dispatch({type: 'ADD_NEW_BUDGETFORM', payload: {
                 editForm: this.state.editForm,
                 businessUnitId: this.props.store.user.id,
-                relitiveRecordId: this.state.recordNumber,
+                relitiveRecordId: this.state.relitiveRecordId,
                 }
             });
             this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
@@ -201,7 +209,7 @@ class BudgetForm extends Component {
             this.props.dispatch({type: 'UPDATE_BUDGETFORM', payload: {
                 editForm: this.state.editForm,
                 businessUnitId: this.props.store.user.id,
-                relitiveRecordId: this.state.recordNumber,
+                relitiveRecordId: this.state.relitiveRecordId,
                 }
             });
         }
@@ -224,7 +232,7 @@ class BudgetForm extends Component {
         this.props.dispatch({type: 'DELETE_BUDGETFORM', payload: {
             deleteRecordId : this.state.editForm.id,
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
+            relitiveRecordId: this.state.relitiveRecordId,
             }
         });
         this.clearState();
@@ -233,12 +241,12 @@ class BudgetForm extends Component {
     addRecord = () => {
         this.clearState();
         this.setState ({
-            recordNumber: this.props.store.budgetForm.budgetFormCount - 1,
+            relitiveRecordId: this.props.store.budgetForm.budgetFormCount - 1,
             recordEditMode: true,
             recordAddMode: true
         })
         console.log (`in add record - record # from store:`, this.props.store.budgetForm.budgetFormCount);
-        console.log (`in add record - record # from state:`, this.state.recordNumber);
+        console.log (`in add record - record # from state:`, this.state.relitiveRecordId);
     }
 
 
@@ -304,50 +312,50 @@ class BudgetForm extends Component {
     }
     
     moveRecord = (recordMove) => {
-        console.log ('Move Reord, recordNumber type:', typeof(this.state.recordNumber), this.state.recordNumber)
+        console.log ('Move Reord, relitiveRecordId type:', typeof(this.state.relitiveRecordId), this.state.relitiveRecordId)
         
         if (this.state.recordEditMode === true) {
             this.saveEdit();
         }
         if (recordMove === 'back') {
-            if (this.state.recordNumber > 1 ) {
+            if (this.state.relitiveRecordId > 1 ) {
                 this.setState ({
-                    recordNumber: this.state.recordNumber -= 1,
+                    relitiveRecordId: this.state.relitiveRecordId -= 1,
                     recordEditMode: false,
                     recordAddMode: false
                 })
             } else {
                 this.setState ({
-                    recordNumber: this.state.recordNumber = 1,
+                    relitiveRecordId: this.state.relitiveRecordId = 1,
                     recordEditMode: false,
                     recordAddMode: false
                 })
             }
         } else if (recordMove === 'next') {
             
-            if (this.state.recordNumber < this.props.store.budgetForm.budgetFormCount ) {
+            if (this.state.relitiveRecordId < this.props.store.budgetForm.budgetFormCount ) {
                 this.setState ({
-                    recordNumber: this.state.recordNumber += 1,
+                    relitiveRecordId: this.state.relitiveRecordId += 1,
                     recordEditMode: false,
                     recordAddMode: false
                 })
             } else {
                 this.setState ({
-                    recordNumber: this.props.store.budgetForm.budgetFormCount,
+                    relitiveRecordId: this.props.store.budgetForm.budgetFormCount,
                     recordEditMode: false,
                     recordAddMode: false
                 })
             }
         } else if (recordMove === 'last') {
             this.setState ({
-                recordNumber: this.props.store.budgetForm.budgetFormCount,
+                relitiveRecordId: this.props.store.budgetForm.budgetFormCount,
                 recordEditMode: false,
                 recordAddMode: false
             })
             console.log (`Record move last`, this.props.store.budgetForm.budgetFormCount);
         } else {
             this.setState ({
-                recordNumber: parseInt(recordMove),
+                relitiveRecordId: parseInt(recordMove),
                 recordEditMode: false,
                 recordAddMode: false
             })
@@ -373,10 +381,9 @@ class BudgetForm extends Component {
 
 
     refreshDom = () => {
-         //refresh
-         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.recordNumber,
+            relitiveRecordId: this.state.relitiveRecordId,
             }
         });
     }
@@ -482,7 +489,7 @@ class BudgetForm extends Component {
                     </div>
                     <div  className={classes.headerClass} noValidate autoComplete="off">
                         {/* <p>Budget Information STATE: {this.state.editForm.id} </p> */}
-                        {/* <p>Relative Record ID {this.state.recordNumber}</p> */}
+                        {/* <p>Relative Record ID {this.state.relitiveRecordId}</p> */}
                         {/* <p>Budget Raw Info: {currentBudgetRecord.cost_center_fk} </p> */}
                         {/* <p>Budget State Info: {this.state.editForm.cost_center_fk} </p> */}
                         <p>-------------------------------------------</p>
@@ -678,7 +685,7 @@ class BudgetForm extends Component {
                             </button>}
                         {this.state.expenseWindowOpen?
                             <ExpenditureForm currentBudgetId={currentBudgetRecord.id} 
-                                relitiveRecordId={this.state.recordNumber} toggleExpense={this.toggleExpense}/>:
+                                relitiveRecordId={this.state.relitiveRecordId} toggleExpense={this.toggleExpense}/>:
                             <p></p>}
 
                     </form>
@@ -731,8 +738,8 @@ class BudgetForm extends Component {
                     variant="outlined"
                     style = {{width: 80}}
                     className={classNames(classes.margin, classes.intField)}
-                    value = {this.state.recordNumber}
-                    onChange={(event)=>this.handleChange(event,'recordNumber', 'controlInt')}  
+                    value = {this.state.relitiveRecordId}
+                    onChange={(event)=>this.handleChange(event,'relitiveRecordId', 'controlInt')}  
                 ></TextField>
 
             </div>

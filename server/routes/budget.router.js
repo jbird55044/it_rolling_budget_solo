@@ -4,6 +4,7 @@ const pool = require('../modules/pool')
 const {rejectUnauthenticated,} = require('../modules/authentication-middleware');
  
 // Primary Record getter using SQL CTE and Partitioning
+// two different SQLs pull from either a specific record ID, or relitive row in partitioned table
 router.get('/formfill', rejectUnauthenticated, (req, res) => {
   let queryText = ''
   let businessUnitId = req.query.businessUnitId
@@ -59,8 +60,6 @@ router.get('/formfill', rejectUnauthenticated, (req, res) => {
         SELECT * FROM _t_primary_budget WHERE row_number = $2;`;
   } 
   console.log (`----formfill GET - req.query.record ID:`, relitiveRecordId, ' businesUnit:', businessUnitId, ' recordId:', recordId);
-  
-  console.log ('in budgetForm get')
   pool.query(queryText, [businessUnitId, recordFinder])
   // pool.query(queryText, [businessUnitId, relitiveRecordId])
     .then((result) => { 
@@ -73,7 +72,7 @@ router.get('/formfill', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
-// get max record number for form management
+// get max number of rows for form management in relitive table 
 router.get('/formcount', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
@@ -90,7 +89,7 @@ router.get('/formcount', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
-
+// get the expense info for the budget entry
 router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   console.log (`--expensefill GET - req.query.budgetId:`, budgetId);
@@ -105,6 +104,7 @@ router.get('/expensefill', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
+// get the sum of the one or more expense items associated to the budget (for button indicator)
 router.get('/expensesum', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   console.log (`--expensesum GET - req.query.budgetId:`, budgetId);
@@ -119,7 +119,30 @@ router.get('/expensesum', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
+// get the relative 'row number' for specific record ID
+router.get('/recordcorrelation', rejectUnauthenticated, (req, res) => {
+  let recordId = req.query.recordId
+  console.log (`--recordcorrelation GET - req.query.recordId:`, recordId);
+  const queryText = `WITH _t_primary_budget AS 
+        ( 
+        SELECT t_primary_budget.id, 
+        row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
+      FROM t_primary_budget
+        JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
+        WHERE t_primary_budget.owner_fk = 1 AND archived = false
+      )
+        SELECT * FROM _t_primary_budget WHERE id=$1;`;
+  console.log ('in expenseFill get')
+  pool.query(queryText, [recordId])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing recordcorrelation query', err);
+      res.sendStatus(500);
+    });
+}); 
 
+
+// update the budget record
 router.put('/formfill', rejectUnauthenticated, (req, res) => {
   let payload = req.body.editForm
   // console.log (`formfill PUT Payload:`, payload);
@@ -155,7 +178,6 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
     payload.notes,
     payload.last_update
   ];
-
   pool.query(queryText, queryValues)
     .then(() => { res.sendStatus(200); })
     .catch((err) => {
@@ -164,6 +186,7 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
     });
   });
   
+  // 'delete' the form by setting a archive bit to hide from all future queries
   router.put('/deleteform', rejectUnauthenticated, (req, res) => {
     let payload = req.body
     console.log (`formfill DELETE PUT Payload:`, payload);
@@ -177,6 +200,7 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
       });
     });
 
+    // POST (add) new budget record from scratch - archive bit set by default to false @ db
     router.post('/addform', rejectUnauthenticated, (req, res) => {
       let payload = req.body.editForm
       console.log('incoming POST req.body:', payload);
@@ -193,7 +217,6 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
          $10, $11, $12,
          $13, $14
          ) RETURNING "id";`;
-
       const queryValues = [
         payload.id,                 payload.gl_code_fk,          payload.cost_center_fk,
         payload.point_person_fk,    payload.nomenclature,        payload.manufacturer,
@@ -212,81 +235,5 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
       })
   });
 
-
-//  ------------ old code for examples -------------------
-// File Post
-router.post('/uploadposter', (req, res) => {
-  console.log (`in poster: req-files:`, req.files);
-  console.log (`in poster: req-filesfld:`, req.filesfld);
-  console.log (`in poster: body:`, req.body);
-  let images = new Array();
-  if(req.file === !null) {
-      let arr;
-      if(Array.isArray(req.files.filesfld)) {
-        console.log (`Yes an array`);
-          arr = req.files.filesfld;
-      }
-      else {
-          console.log (`Not an array, but making one`);
-          arr = new Array(1);
-          arr[0] = req.files.filesfld;
-      }
-      for(var i = 0; i < arr.length; i++) {
-          var file = arr[i];
-          if(file.mimetype.substring(0,5).toLowerCase() == "image") {
-              console.log (`creating file . . . `);
-              images[i] = "/" + file.name;
-              file.mv(`${__dirname}/public/images` + images[i], function (err) {
-                  if(err) {
-                      console.log('path does not exist', err);
-                  }
-                  res.json({ fileName: images[i]});
-              }); 
-          }
-      }
-  } else { console.log (`Not Seeing req.files (false)`); }
-  // give the server a second to write the files
-  setTimeout(function(){res.json(images);}, 1000);
-  console.log (`End of file POST:`);
-});
-
-//Movie and Genre Post
-router.post('/', (req, res) => {
-  // console.log('incoming req.body:',req.body);
-  // RETURNING "id" will give us back the id of the created movie
-  const insertMovieQuery = `
-  INSERT INTO "movies" ("title", "poster", "description")
-  VALUES ($1, $2, $3)
-  RETURNING "id";`
-
-  // FIRST QUERY MAKES MOVIE
-  pool.query(insertMovieQuery, [req.body.title, 'images/toy-story.jpg', req.body.description])
-  // pool.query(insertMovieQuery, [req.body.title, req.body.poster, req.body.description])
-  .then(result => {
-    console.log('New Movie Id:', result.rows[0].id); //ID IS HERE!
-    
-    const createdMovieId = result.rows[0].id
-
-    // Loop Genre Array     
-    for (eachGenre of req.body.genre_objects) {
-        const insertMovieGenreQuery = `
-        INSERT INTO "movies_genres" ("movie_id", "genre_id")
-        VALUES  ($1, $2);
-        `
-        // SECOND QUERY MAKES GENRE FOR THAT NEW MOVIE
-        pool.query(insertMovieGenreQuery, [createdMovieId, eachGenre.id]).then(result => {
-            // res.sendStatus(201);
-        }).catch(err => {
-          // catch for second query
-          console.log(err);
-          res.sendStatus(500)
-        }) 
-    } // end of loop genre
-// Catch for first query
-  }).catch(err => {
-    console.log(err);
-    res.sendStatus(500)
-  })
-})
 
 module.exports = router;

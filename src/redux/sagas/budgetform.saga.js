@@ -31,6 +31,7 @@ function* fetchBudgetForm( payload ) {
         params:{
             businessUnitId: payload.recordFinder.businessUnitId,
             relitiveRecordId: payload.recordFinder.relitiveRecordId,
+            recordId: payload.recordFinder.recordId,
         }
     })
     yield put({ type: 'SET_BUDGETFORMFILL', payload: response.data });

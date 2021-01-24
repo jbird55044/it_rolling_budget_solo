@@ -199,8 +199,6 @@ function RecordPicker() {
                 </div>
 
                     <div  className="datGridClass">
-                  
-
                         <ReactDataGrid
                             // rows={rows}
                             columns={columns}
@@ -211,7 +209,6 @@ function RecordPicker() {
                             onAddFilter={filter => setFilters(handleFilterChange(filter))}
                             onClearFilters={() => setFilters({})}
                         />
-                    
                     </div>
                 
             </div>

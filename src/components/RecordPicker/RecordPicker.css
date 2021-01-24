@@ -54,3 +54,8 @@
 .buttonClass:hover {
   color: #DDA15E;
 }
+
+.datGridClass table{
+  color: white;
+  background-color: #283618;
+}

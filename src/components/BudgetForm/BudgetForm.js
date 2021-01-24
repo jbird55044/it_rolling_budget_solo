@@ -97,11 +97,14 @@ class BudgetForm extends Component {
     
     // Stage Redux with up to date db info
     async componentDidMount() {
-        console.log (`Budget Form - passed RecordId`, this.props.passedBudgetId);
+        if (this.props.store.budgetForm.passedRecordId > 0) {
+            console.log ('We have a passed record number:', this.props.store.budgetForm.passedRecordId)
+        }
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
             relitiveRecordId: this.state.recordNumber,
+            recordId: this.props.store.budgetForm.passedRecordId
             }
         });
         // this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {

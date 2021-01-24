@@ -4,6 +4,7 @@ const pool = require('../modules/pool')
 const {rejectUnauthenticated,} = require('../modules/authentication-middleware');
  
 // Primary Record getter using SQL CTE and Partitioning
+// two different SQLs pull from either a specific record ID, or relitive row in partitioned table
 router.get('/formfill', rejectUnauthenticated, (req, res) => {
   let queryText = ''
   let businessUnitId = req.query.businessUnitId
@@ -71,7 +72,7 @@ router.get('/formfill', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
-// get max record number for form management
+// get max number of rows for form management in relitive table 
 router.get('/formcount', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
   // console.log (`----req.query.record ID:`, recordId, 'businesUnit:', businessUnitId , 'budgetId:', budgetId);
@@ -234,81 +235,5 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
       })
   });
 
-
-//  ------------ old code for examples -------------------
-// File Post
-router.post('/uploadposter', (req, res) => {
-  console.log (`in poster: req-files:`, req.files);
-  console.log (`in poster: req-filesfld:`, req.filesfld);
-  console.log (`in poster: body:`, req.body);
-  let images = new Array();
-  if(req.file === !null) {
-      let arr;
-      if(Array.isArray(req.files.filesfld)) {
-        console.log (`Yes an array`);
-          arr = req.files.filesfld;
-      }
-      else {
-          console.log (`Not an array, but making one`);
-          arr = new Array(1);
-          arr[0] = req.files.filesfld;
-      }
-      for(var i = 0; i < arr.length; i++) {
-          var file = arr[i];
-          if(file.mimetype.substring(0,5).toLowerCase() == "image") {
-              console.log (`creating file . . . `);
-              images[i] = "/" + file.name;
-              file.mv(`${__dirname}/public/images` + images[i], function (err) {
-                  if(err) {
-                      console.log('path does not exist', err);
-                  }
-                  res.json({ fileName: images[i]});
-              }); 
-          }
-      }
-  } else { console.log (`Not Seeing req.files (false)`); }
-  // give the server a second to write the files
-  setTimeout(function(){res.json(images);}, 1000);
-  console.log (`End of file POST:`);
-});
-
-//Movie and Genre Post
-router.post('/', (req, res) => {
-  // console.log('incoming req.body:',req.body);
-  // RETURNING "id" will give us back the id of the created movie
-  const insertMovieQuery = `
-  INSERT INTO "movies" ("title", "poster", "description")
-  VALUES ($1, $2, $3)
-  RETURNING "id";`
-
-  // FIRST QUERY MAKES MOVIE
-  pool.query(insertMovieQuery, [req.body.title, 'images/toy-story.jpg', req.body.description])
-  // pool.query(insertMovieQuery, [req.body.title, req.body.poster, req.body.description])
-  .then(result => {
-    console.log('New Movie Id:', result.rows[0].id); //ID IS HERE!
-    
-    const createdMovieId = result.rows[0].id
-
-    // Loop Genre Array     
-    for (eachGenre of req.body.genre_objects) {
-        const insertMovieGenreQuery = `
-        INSERT INTO "movies_genres" ("movie_id", "genre_id")
-        VALUES  ($1, $2);
-        `
-        // SECOND QUERY MAKES GENRE FOR THAT NEW MOVIE
-        pool.query(insertMovieGenreQuery, [createdMovieId, eachGenre.id]).then(result => {
-            // res.sendStatus(201);
-        }).catch(err => {
-          // catch for second query
-          console.log(err);
-          res.sendStatus(500)
-        }) 
-    } // end of loop genre
-// Catch for first query
-  }).catch(err => {
-    console.log(err);
-    res.sendStatus(500)
-  })
-})
 
 module.exports = router;

@@ -98,12 +98,12 @@ class BudgetForm extends Component {
     // Stage Redux with up to date db info
     async componentDidMount() {
         //refresh relative record number w/ correct row based on passed Record ID (if passed)
-        if (this.props.store.budgetForm.passedRecordId > 0) {
-            this.props.dispatch({type: 'FETCH_RECORD_CORRELATION_ROW', recordFinder: {
-                    recordId: this.props.store.budgetForm.passedRecordId
-                }
-            });    
-       }
+    //     if (this.props.store.budgetForm.passedRecordId > 0) {
+    //         this.props.dispatch({type: 'FETCH_RECORD_CORRELATION_ROW', recordFinder: {
+    //                 recordId: this.props.store.budgetForm.passedRecordId
+    //             }
+    //         });    
+    //    }
        
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
@@ -135,8 +135,8 @@ class BudgetForm extends Component {
             }
         });
 
-        // clear incoming record ID if passed
-        this.props.dispatch({type: 'SET_RECORDCORRELATIONROW', payload: 0 });
+        // clear incoming record ID if passed for first record start next time in
+        this.props.dispatch({type: 'SET_PASSEDRECORDID', payload: 0 });
 
         this.updateState();
 
@@ -381,18 +381,6 @@ class BudgetForm extends Component {
 
 
     refreshDom = () => {
-        // if (this.props.store.budgetForm.passedRecordId > 0) {
-        //     this.setState ({
-        //         relitiveRecordId: this.props.store.budgetForm.recordCorrelationRow
-        //     })
-        //     // console.log ('We have a passed record number - passedRecordId:', this.props.store.budgetForm.passedRecordId)
-        //     // console.log ('We have a passed record number -relitiveRecordId:', this.state.relitiveRecordId)
-        //     // console.log ('We have a passed record number - store recordCorrelationRow:', this.props.store.budgetForm.recordCorrelationRow)
-
-        //     // reset record lock to allow surfing of records
-        //     this.props.dispatch({type: 'SET_RECORDCORRELATIONROW', payload: 0 });
-        // }    
-
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
             relitiveRecordId: this.state.relitiveRecordId,

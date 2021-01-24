@@ -4,7 +4,8 @@ const pool = require('../modules/pool')
 const {rejectUnauthenticated,} = require('../modules/authentication-middleware');
  
 
-  
+  // two part - delete all rows, then recreate rows
+  // TODO - add transaction management to ensure full transaction or back out
   router.post('/replacegrid', rejectUnauthenticated, (req, res) => {
     let payload = req.body
     console.log (`replacegrid-DELETE Payload:`, payload);
@@ -27,7 +28,7 @@ const {rejectUnauthenticated,} = require('../modules/authentication-middleware')
         
   });
 
-    
+    // adds a relitively blank row to be updated in seperate transaction
   router.post('/addrow', rejectUnauthenticated, (req, res) => {
     let payload = req.body
     console.log (`addrow  PUT Payload:`, payload);
@@ -47,6 +48,7 @@ const {rejectUnauthenticated,} = require('../modules/authentication-middleware')
       });
     });
 
+    // 'deletes' data by setting archive flags to true
     router.put('/deleterows', rejectUnauthenticated, (req, res) => {
       let payload = req.body
       console.log (`deleteRows via archive bit-DELETE Payload:`, payload);

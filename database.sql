@@ -1,10 +1,3 @@
-CREATE TABLE "user" (
-    "id" SERIAL PRIMARY KEY,
-    "username" VARCHAR (80) UNIQUE NOT NULL,
-    "password" VARCHAR (1000) NOT NULL
-);
-
--- Jim's 
 CREATE TABLE "t_user_owner" (
    "id" SERIAL PRIMARY KEY,
    "username" VARCHAR (60) UNIQUE NOT NULL,
@@ -92,16 +85,15 @@ CREATE TABLE "t_primary_budget" (
    "archived" BOOLEAN DEFAULT false 
 );
 
-
 CREATE TABLE "t_primary_expenditure" (
    "id" SERIAL PRIMARY KEY,
    "budget_fk" INT REFERENCES "t_primary_budget",
-   "period" VARCHAR(2) NOT NULL,
-   "year" VARCHAR(4) NOT NULL,
+   "period" VARCHAR(2),
+   "year" VARCHAR(4),
    "amount" INT NOT NULL,
-   "expense_note" VARCHAR(80)
+   "expense_note" VARCHAR(80),
+   "archived" BOOLEAN DEFAULT false
 );
-
 
 
 --  Update
@@ -109,49 +101,19 @@ UPDATE t_primary_budget SET nomenclature = 'test', manufacturer = 'test', capita
 
 
 --  Formfill Select
-SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes,
-t_user_owner.username, t_user_owner.business_unit, 
-tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
-tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
-tlist_point_person.point_person, tlist_point_person.pp_email_address,
-tlist_frequency.frequency, tlist_frequency.description, 
-tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
-tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature 
-FROM t_primary_budget
-JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
-JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
-JOIN tlist_cost_center ON tlist_cost_center.id = t_primary_budget.cost_center_fk
-JOIN tlist_frequency ON tlist_frequency.id = t_primary_budget.frequency_fk
-JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
-JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
-JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
-WHERE t_primary_budget.owner_fk = 1 AND t_primary_budget.id = 128;
-;
 
-SELECT * FROM t_primary_budget
-JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
-JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
-JOIN tlist_cost_center ON tlist_cost_center.id = t_primary_budget.cost_center_fk
-JOIN tlist_frequency ON tlist_frequency.id = t_primary_budget.frequency_fk
-JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
-JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
-JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
-WHERE t_primary_budget.owner_fk = 1 AND t_primary_budget.id = 128
-ORDER BY t_primary_budget.id;
-
--- Primary Form Query using CTE and Partitioning
 WITH _t_primary_budget AS 
   ( 
-  SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes,
+  SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
   t_user_owner.business_unit, 
   tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
   tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
   tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
   tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
-  tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
-  tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
+  tlist_expenditure_type.id AS expenditure_type_fk, tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
+  tlist_capitalized_life.id AS capitalize_life_fk, tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
   row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
-  FROM t_primary_budget
+FROM t_primary_budget
   JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
   JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
   JOIN tlist_cost_center ON tlist_cost_center.id = t_primary_budget.cost_center_fk
@@ -159,11 +121,33 @@ WITH _t_primary_budget AS
   JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
-    WHERE t_primary_budget.owner_fk = $1 
-  )
-  SELECT * FROM _t_primary_budget WHERE row_number = $2;
+  WHERE t_primary_budget.owner_fk = 1 AND archived = false
+)
+  SELECT * FROM _t_primary_budget WHERE row_number = 2;
+  
 
--- Reporting Query
+	DELETE FROM t_primary_expenditure WHERE id=10;
+
+
+
+
+
+  SELECT COUNT (t_primary_budget.*) FROM t_primary_budget WHERE owner_fk = 1 AND archived = false;
+  
+  SELECT SUM(t_primary_expenditure.amount) FROM t_primary_expenditure
+  JOIN t_primary_budget ON t_primary_budget.id = t_primary_expenditure.budget_fk
+  WHERE t_primary_budget.owner_fk = 1 AND archived = false AND t_primary_budget.id = 28;
+  
+ SELECT SUM(t_primary_expenditure.amount) FROM t_primary_expenditure
+  WHERE t_primary_expenditure.budget_fk = 28;
+
+  
+SELECT *  FROM t_primary_expenditure
+    WHERE t_primary_expenditure.budget_fk  = 28
+    ORDER BY year, period, id ASC;
+   
+  
+-- Report 1 Query
 SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
   t_user_owner.business_unit, 
   tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
@@ -182,9 +166,85 @@ FROM t_primary_budget
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
-      WHERE t_primary_budget.owner_fk = 1 AND archived = false AND t_primary_expenditure.year_fk = 2
-      GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
+      WHERE t_primary_budget.owner_fk = 1 AND t_primary_budget.archived = false AND t_primary_expenditure.year = '2021'
+      GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
+        tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
+      ORDER BY t_primary_budget.id ASC
 ;
+
+
+-- report 2
+SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
+  t_user_owner.business_unit, 
+  tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
+  tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
+  tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
+  tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
+  tlist_expenditure_type.id AS expenditure_type_fk, tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
+  tlist_capitalized_life.id AS capitalize_life_fk, tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
+  t_primary_expenditure.amount
+FROM t_primary_budget
+  JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
+  JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
+  JOIN tlist_cost_center ON tlist_cost_center.id = t_primary_budget.cost_center_fk
+  JOIN tlist_frequency ON tlist_frequency.id = t_primary_budget.frequency_fk
+  JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
+  JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
+  JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
+  JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
+      WHERE t_primary_budget.owner_fk = 2 AND t_primary_budget.archived = false AND t_primary_expenditure.year = '2021'
+      ORDER BY t_primary_budget.id ASC
+  ;
+  
+  
+--   Report 3 ----
+SELECT SUM(t_primary_expenditure.amount) as total
+FROM t_primary_budget
+  JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
+  JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
+  JOIN tlist_cost_center ON tlist_cost_center.id = t_primary_budget.cost_center_fk
+  JOIN tlist_frequency ON tlist_frequency.id = t_primary_budget.frequency_fk
+  JOIN tlist_point_person ON tlist_point_person.id = t_primary_budget.point_person_fk
+  JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
+  JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
+  JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
+      WHERE t_primary_budget.owner_fk = 2 AND t_primary_budget.archived = false AND t_primary_expenditure.year = '2021' AND needs_review = true
+      GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
+        tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
+      ORDER BY t_primary_budget.id ASC  
+;    
+
+
+SELECT SUM(t_primary_expenditure.amount) FROM t_primary_expenditure
+JOIN t_primary_budget ON t_primary_budget.id = t_primary_expenditure.budget_fk
+  WHERE t_primary_budget.owner_fk = 2 
+    AND t_primary_budget.archived = false 
+    AND t_primary_expenditure.archived = false
+    AND t_primary_expenditure.year = '2021'
+  ;
+
+
+--  provides relative row to actual record ID
+WITH _t_primary_budget AS 
+  ( 
+  SELECT t_primary_budget.id, 
+  row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
+FROM t_primary_budget
+  JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
+  WHERE t_primary_budget.owner_fk = 1 AND archived = false
+)
+  SELECT * FROM _t_primary_budget WHERE id=128;
+
+
+
+-- experiment --
+
+
+
+  
+  
+
+-- end of experiment --
 
 
 SELECT *
@@ -226,9 +286,9 @@ INSERT INTO "tlist_expenditure_type" ("owner_fk", "expenditure_type", "expenditu
 (1,'Subscription','Monthly - No End in Sight'),
 (1,'Software Maintenance','Typically Annual, Maintenance for Software Platforms'),
 (1,'Hardware Maintenance','Typically Annual, Maintnenace for Hardware Platforms'),
-(1,'Headcount Salary','For Full Time Employees'),
-(1,'SOW Contract','Specific Deliverable Contract'),
-(1,'Supplement Headcount','Contract to Suppliment, Operational Centric'),
+(1,'Headcount Salary','Salary and Employee paid expenses'),
+(1,'Supplement Headcount','Contract to Suppliment, SOW'),
+(1,'Inside Money','Intra-Department Cash Flow'),
 (1,'Managed Service','Typically Monthly for operational maintenance of platforms'),
 (1,'Project SWAG','Placeholder for an all encompassing project'),
 (2,'Internal Costs','Software, CODB, KTLO'),
@@ -236,6 +296,7 @@ INSERT INTO "tlist_expenditure_type" ("owner_fk", "expenditure_type", "expenditu
 (2,'Design Firms','Dedidacated and Commited Outside Services'),
 (2,'SOW Headcount','Project Specific Headcount'),
 (2,'Internal Headcount','Internal Headcount, Full &Part');
+
 
 INSERT INTO "tlist_frequency" ("frequency", "description") VALUES
 ('OneTime','Once - Non Repeating'),
@@ -318,184 +379,181 @@ INSERT INTO "tlist_period" ("period", "period_description") VALUES
 (12, 'Period 12'),
 (13, 'Period 13');
 
-INSERT INTO "t_primary_budget" 
-("owner_fk","gl_code_fk", "cost_center_fk", "point_person_fk", "nomenclature", "manufacturer",
-   "frequency_fk", "expenditure_type_fk", "capitalizable_candidate", "capitalize_life_fk",
-   "credit_card_use", "needs_review", "notes", "last_update", "archived") VALUES
- (1,18,1,1,'Jim Office Visit to Dallas Area - 5 Days',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2018-10-01 11:03:29',FALSE)
-,(1,17,1,1,'Jim Office Visit to Dallas Area - 5 Days',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2018-10-01 11:03:24',FALSE)
-,(1,19,1,1,'Jim Office Visit to Dallas Area -5 Days',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2018-10-01 11:02:28',FALSE)
-,(1,21,5,2,'BT Service Desk Office Visits Mileage Per Period',NULL,3,1,FALSE,1,FALSE,FALSE,NULL,'2017-09-05 14:53:06',FALSE)
-,(1,17,5,2,'All Company Meeting Assistance - Airfare',NULL,1,1,FALSE,1,TRUE,FALSE,'Estimated two air flights for Gabe or similar','2017-10-17 11:04:50',FALSE)
-,(1,18,5,2,'All Company Meeting Assistance - Hotel',NULL,1,1,FALSE,1,TRUE,FALSE,'Estimated 2 trips (one w/ flights)','2017-09-05 14:00:49',FALSE)
-,(1,18,2,5,'AX User Group in Fargo (5 people x 3 nights) - Hotel',NULL,1,1,FALSE,1,TRUE,FALSE,'Ravi+Developers + Stina','2017-10-19 13:47:46',FALSE)
-,(1,21,2,5,'AX User Group in Fargo (5 people) - Mileage Travel',NULL,1,1,FALSE,1,FALSE,FALSE,'Ravi+Developers + Stina','2017-10-19 13:47:54',FALSE)
-,(1,20,2,5,'AX User Group in Fargo (5 people) - Meals',NULL,1,1,FALSE,1,TRUE,FALSE,'Ravi+Developers + Stina','2017-10-19 13:48:01',FALSE)
-,(1,18,1,1,'AX User Group in Fargo (1 people) - Hotel',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 13:58:43',FALSE)
-,(1,20,1,1,'AX User Group in Fargo (1 people) - Meals',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 13:58:40',FALSE)
-,(1,17,1,1,'Microsoft Envision - CIO Summit, Orlando Airfare',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 13:58:03',FALSE)
-,(1,18,1,1,'Microsoft Envision - CIO Summit, Orlando Airfare',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 13:56:51',FALSE)
-,(1,19,1,1,'Microsoft Envision - CIO Summit, Orlando Rental Car',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 13:57:39',FALSE)
-,(1,20,5,2,'All Company Meeting Assistance - Meals',NULL,1,1,FALSE,1,TRUE,FALSE,'Two Trips Planned','2017-09-05 14:02:46',FALSE)
-,(1,18,5,2,'Texas Office Visits - Hotel',NULL,1,1,FALSE,1,TRUE,FALSE,'Trip to TX to install, update WAN in offices','2019-09-18 12:55:47',FALSE)
-,(1,17,5,2,'Texas Office WAN Installs - Airfare',NULL,1,1,FALSE,1,TRUE,FALSE,'For Engineer to install office gear','2017-10-17 11:05:43',FALSE)
-,(1,17,2,5,'Data  Conference (Shyam)',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2019-09-20 10:51:38',FALSE)
-,(1,18,2,5,'Data  Conference (Shyam)',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2019-09-20 10:51:19',FALSE)
-,(1,20,2,5,'Data  Conference (Shyam)',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2019-09-20 10:50:59',FALSE)
-,(1,19,2,5,'Data  Conference (Shyam)',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2019-09-20 10:50:37',FALSE)
-,(1,8,2,5,'Data  Conference (Shyam)',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2019-09-20 10:50:20',FALSE)
-,(1,9,4,7,'Training for PM and BA skillset (1 person)','New Horizons',1,1,FALSE,1,FALSE,FALSE,NULL,'2017-09-05 14:51:41',FALSE)
-,(1,6,1,1,'Two BT events Annually',NULL,1,1,FALSE,1,TRUE,FALSE,NULL,'2017-09-05 14:53:39',FALSE)
-,(1,28,5,2,'CommVault 24/7 Maintenance of CV Library','CommVault',6,3,FALSE,1,FALSE,FALSE,NULL,'2017-09-05 16:14:08',FALSE)
-,(1,28,2,5,'OnBase Annual Maintenance - 59 simultaneous seats (Canceled)','OnBase',6,3,FALSE,1,FALSE,FALSE,NULL,'2017-10-19 08:08:05',FALSE)
-,(1,28,5,2,'vmWare Horizon View & vSphere Maintenance Renewal','VMWare',6,3,FALSE,1,FALSE,FALSE,'11/20/17- Moved to P10 to be more accurate. Production Support Coverage Vmware Horizon Enterprise Edition, VMware Horizon 7 Enterprise','2019-10-02 08:33:25',FALSE)
-,(1,28,5,2,'VMWare vSphere for Hosts','VMWare',6,3,FALSE,1,FALSE,FALSE,'11/21/17- Cotermed agreement with other VMWare.  Thus zeroed out this one.  2017P10 saw $55k, in 2018 it will be about $63k (due to prorating of 2017 by 3 months of vsphere product.','2017-11-20 14:35:13',FALSE)
-,(1,28,5,2,'Bomgar Remote Access tool Maintenance','Bomgar',6,3,FALSE,1,FALSE,FALSE,NULL,'2017-09-06 16:20:21',FALSE)
-,(1,29,2,5,'DAX Managed Services (old)','OneNeck',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-09-20 10:14:55',FALSE)
-,(1,4,5,2,'Bomgar License - 1 additional user','Bomgar',1,1,TRUE,2,FALSE,FALSE,NULL,'2017-10-17 11:16:33',FALSE)
-,(1,28,2,5,'Resharper pluging for vStudio, C#','JetBrains',1,3,FALSE,1,FALSE,FALSE,'From Dan Leahy','2018-10-19 10:28:14',FALSE)
-,(1,28,5,2,'OpenDNS Umbrella content filtering Subscription','Cisco',6,3,FALSE,1,FALSE,FALSE,NULL,'2018-01-29 09:10:01',FALSE)
-,(1,27,5,2,'Security RFID Door System Maintenance','Pro-Watch',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-01 15:53:29',FALSE)
-,(1,35,5,2,'New RFID Door Server and Software','Pro-Tech',1,1,TRUE,4,FALSE,FALSE,'Needed to allow for additional door locks.','2018-10-01 15:53:57',FALSE)
-,(1,28,5,2,'ASA Management Software Maintenance','Firesight',6,3,FALSE,1,FALSE,FALSE,NULL,'2019-09-18 13:09:44',FALSE)
-,(1,28,5,2,'Softrack License Monitoring for gINT','SofTrack',6,3,FALSE,1,FALSE,TRUE,NULL,'2018-10-01 11:21:39',FALSE)
-,(1,28,2,5,'Pragmatic Works Task Factory','Pragmatic Works',6,1,FALSE,1,FALSE,FALSE,'Task manager to move Power BI data to/fro','2018-10-19 14:20:35',FALSE)
-,(1,29,5,2,'Marco Mitel Managed Service and Support','Marco/Loffler',6,4,FALSE,1,FALSE,FALSE,'Moved to Service Agreement GL','2019-09-30 09:58:19',FALSE)
-,(1,27,5,2,'Riverbed WAN Optimizers','Riverbed',6,4,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 13:44:12',FALSE)
-,(1,27,5,2,'ASA Firewalls - 4 total','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 13:45:09',FALSE)
-,(1,27,5,2,'WAN Switch Block in DC1 - WS-C3650','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 13:46:42',FALSE)
-,(1,27,5,2,'Maintenance for Backup Server in BL2 - DL380G7','HP',6,4,FALSE,1,FALSE,TRUE,NULL,'2019-09-30 10:04:08',FALSE)
-,(1,3,5,2,'Aruba WAPs in BL1','Aruba/HP',1,1,TRUE,4,FALSE,FALSE,NULL,'2017-09-08 13:50:09',FALSE)
-,(1,27,5,2,'WLAN controller for BL1 - MSM760 WLAN','HP',6,4,FALSE,1,FALSE,TRUE,NULL,'2018-10-01 13:36:45',FALSE)
-,(1,4,5,2,'Nimble SAN - 2 expansion chassises','Nimble',6,1,FALSE,1,FALSE,FALSE,'Expansion for current drives.  Maintenance will be co-term with original purchase (18-months later).  Units for DC1 and DC2','2017-10-19 08:27:28',FALSE)
-,(1,27,5,2,'F5 Load Balancers','APM',6,4,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 14:13:26',FALSE)
-,(1,27,5,2,'Batteries for Smart-UPS (renewal self maintenance)','APC',6,1,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:03:32',FALSE)
-,(2,22,7,8,'Coffee Press Publishing Agency','CPPA',2,14,FALSE,1,TRUE,FALSE,'Managed Service Agency (on demand)','2021-01-18 00:00:00',FALSE)
-,(2,25,6,8,'Webforms Page Development For new Website','3rd Party Smith',2,14,TRUE,4,FALSE,FALSE,'Development Assistance already approved','2021-01-18 00:00:00',FALSE)
-,(2,3,8,6,'Wordpress Upgrade','Wordpress',1,11,TRUE,2,FALSE,FALSE,NULL,'2021-01-18 00:00:00',FALSE)
-,(1,27,5,2,'HP Blade Chassis for DC2 DRP - C7000','HP',6,4,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 14:28:10',FALSE)
-,(1,27,5,2,'Blades Servers for DC2 DRP (8 total)','HP',6,8,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 14:29:00',FALSE)
-,(1,3,5,2,'Magnetic Tapes for Archive and Storage','Quantum',1,1,FALSE,1,FALSE,FALSE,NULL,'2017-09-08 14:35:08',FALSE)
-,(1,3,5,2,'PC /Laptop Refresh EverGreening (25% Lifecycle)','Dell',3,1,TRUE,2,FALSE,FALSE,NULL,'2019-09-19 11:44:02',FALSE)
-,(1,25,5,2,'End Point Security - Client Side','Dell Treat Defense or similar',2,2,FALSE,1,FALSE,FALSE,NULL,'2018-10-15 16:02:46',FALSE)
-,(1,4,5,2,'Application Performance Monitoring System','TBD',1,1,TRUE,2,FALSE,FALSE,NULL,'2017-09-15 12:52:40',FALSE)
-,(1,30,5,2,'Last Pass Subscription - Password Management','LastPass',2,2,FALSE,1,TRUE,FALSE,NULL,'2019-09-30 09:25:30',FALSE)
-,(1,25,1,1,'Information Security Assessment / Testing','FRSecure',1,6,FALSE,1,FALSE,FALSE,NULL,'2019-10-21 14:40:41',FALSE)
-,(1,4,5,2,'Site Recovery DRP for VMWare','VMWare',1,1,TRUE,2,FALSE,FALSE,NULL,'2017-09-15 15:47:24',FALSE)
-,(1,35,2,5,'1 FTE - Data Achitect for SOA',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2017-10-20 12:53:36',FALSE)
-,(1,23,2,5,'1 Contractor- Report Writer (BI Project)',NULL,2,6,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 14:27:27',FALSE)
-,(1,35,1,1,'1 FTE - Security Analyst',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-10-21 14:41:59',FALSE)
-,(1,35,5,2,'1 FTE - Technical Trainer',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2017-10-20 14:26:53',FALSE)
-,(1,35,5,2,'Summer Interns - 1 HC total (1of2), 4 mos',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:15:01',FALSE)
-,(1,35,2,5,'SOA and Data Warehouse Foundation Buildout','BIC',1,1,TRUE,4,FALSE,FALSE,NULL,'2018-10-19 14:23:05',FALSE)
-,(1,23,2,5,'ECM / OnBase Replacement Buy/Build','BIC',2,1,TRUE,4,FALSE,FALSE,'6 month project ending in Q3-2018','2018-10-15 16:09:02',FALSE)
-,(1,3,5,2,'Access Layer Switch in BL1','HP',1,1,TRUE,4,FALSE,FALSE,NULL,'2017-10-12 07:01:13',FALSE)
-,(1,30,5,2,'Headsets for Skype Users','Jabra',3,1,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 09:46:21',FALSE)
-,(1,23,5,2,'Integration of Mitel to O365','Marco',1,1,TRUE,4,FALSE,FALSE,'SOW Work by Marco','2017-10-12 07:10:20',FALSE)
-,(1,35,2,5,'Replace Wire w/ SharePoint Project','OnDemand',3,6,TRUE,4,FALSE,FALSE,NULL,'2018-10-19 11:04:02',FALSE)
-,(1,7,1,1,'InfoTech Renewal Subscription- 3-year Term','InfoTech',6,1,FALSE,1,FALSE,FALSE,NULL,'2020-12-26 18:06:06',FALSE)
-,(1,29,5,2,'Server Managed Services DC1','Insight',2,8,FALSE,1,FALSE,FALSE,'Server Managed Services, does not include Block Hours, Co-Location, Power, or DAX /SQL managed Services','2019-09-18 16:13:05',FALSE)
-,(1,29,5,2,'Managed Block Hours for Network','OneNeck / Insight',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-09-18 16:05:41',FALSE)
-,(1,29,5,2,'OneNeck Internet 200M Access','OneNeck',2,8,FALSE,1,FALSE,FALSE,NULL,'2017-10-12 07:49:09',FALSE)
-,(1,29,5,2,'Co-Location Power (metered)','OneNeck',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-09-18 16:08:25',FALSE)
-,(1,29,5,2,'Co-Location Racks (four)','OneNeck',2,8,FALSE,1,FALSE,FALSE,'4 Racks at $750 each - Power not included','2019-09-18 16:09:11',FALSE)
-,(1,25,2,5,'MSDN Subscription (Development Tools)','MicroSoft',6,1,FALSE,1,FALSE,FALSE,NULL,'2017-10-12 07:54:40',FALSE)
-,(1,29,5,2,'Mobile Solutions Cell Phone Management','Mobile Solutions',2,8,FALSE,1,FALSE,FALSE,NULL,'2017-10-19 07:20:29',FALSE)
-,(1,9,1,1,'PluralSight Web training - Annual License','Pluralsight',6,1,FALSE,1,TRUE,FALSE,'Annual Fee','2018-10-19 14:19:52',FALSE)
-,(1,29,2,5,'StoneRidge Managed Service - Block Hours','StoneRidge',2,8,FALSE,1,FALSE,FALSE,NULL,'2017-10-16 14:25:17',FALSE)
-,(1,20,1,1,'Jims Monthly Meals with Team and Meetings',NULL,3,1,FALSE,1,TRUE,FALSE,NULL,'2017-10-19 10:18:56',FALSE)
-,(1,4,1,1,'Dark Trace (or Similar) Behavioral Security Monitor','Dark Trace',2,2,FALSE,1,FALSE,FALSE,NULL,'2019-10-21 14:41:52',FALSE)
-,(1,30,5,2,'All Company Audio/Video Gear, Mixer, Camera',NULL,1,1,FALSE,1,FALSE,FALSE,NULL,'2017-10-17 11:03:30',FALSE)
-,(1,3,5,2,'Conference Room Updates','Tierney / Self',1,1,TRUE,3,FALSE,FALSE,NULL,'2019-10-01 08:25:41',FALSE)
-,(1,29,5,2,'Tierney Brothers Conf Room Management','Tierney',6,8,FALSE,1,FALSE,FALSE,NULL,'2019-10-01 18:18:00',FALSE)
-,(1,4,2,5,'Sharegate SharePoint File Management Tool','Sharegate',1,1,FALSE,1,FALSE,FALSE,NULL,'2017-10-17 15:37:12',FALSE)
-,(1,35,5,2,'Add RFID Card Swipe to IT Service Desk Area','Pro-Watch',1,1,TRUE,4,FALSE,FALSE,NULL,'2018-10-01 15:26:26',FALSE)
-,(1,9,2,5,'BA Training for 1 person','New Horizons',1,1,FALSE,1,FALSE,FALSE,'Local training','2019-09-30 13:57:48',FALSE)
-,(1,9,5,2,'Client Tech/O365 training for 1 person','New Horizon',1,1,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 13:57:19',FALSE)
-,(1,35,5,2,'SOW work for O365 Optimization/AD','Microsoft Partner',1,6,TRUE,2,FALSE,FALSE,NULL,'2018-10-18 10:58:58',FALSE)
-,(1,30,5,2,'Small Supplies for Business Use (Benchstock)',NULL,3,1,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 09:21:45',FALSE)
-,(1,3,2,5,'Developer Desktops / Computers x2','Dell',1,1,TRUE,2,FALSE,FALSE,NULL,'2018-10-18 10:01:38',FALSE)
-,(1,3,5,2,'Test Computers and Gear for R&D','Dell',1,1,TRUE,2,FALSE,FALSE,NULL,'2017-10-19 07:24:02',FALSE)
-,(1,35,5,2,'Summer Interns - 1 HC total (2of2), 4 mos',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:19:17',FALSE)
-,(1,31,5,2,'Clientside Backup and Recovery','Cloud',2,1,FALSE,1,FALSE,FALSE,'Moved to DC3.0 and Backup Solution ($175k)','2019-10-21 14:42:22',FALSE)
-,(1,12,2,5,'AIIM Professional Membership - Danielle','AIIM',6,1,FALSE,1,TRUE,FALSE,NULL,'2017-10-20 10:28:26',FALSE)
-,(1,12,2,5,'ARMA Professional Membership - Danielle','ARMA',6,1,FALSE,1,TRUE,FALSE,NULL,'2017-10-20 10:29:33',FALSE)
-,(1,29,5,2,'Insight ServiceDesk Managed Service','Insight',2,8,FALSE,1,FALSE,FALSE,NULL,'2017-10-20 12:46:17',FALSE)
-,(1,35,4,7,'Junior Project Manager (Chidi to FTE)',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:19:10',FALSE)
-,(1,35,5,2,'Jr. Network Engineer (Ivan 3.0)',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:19:03',FALSE)
-,(1,4,5,2,'Service Now - Cancelled!','ServiceNow',6,2,FALSE,1,FALSE,FALSE,'Contract cancelled.  Investigate Capitalized Implimentation costs.','2017-10-20 12:58:17',FALSE)
-,(1,28,2,5,'OnBase Maintenance - 1 yr','OnBase',6,3,FALSE,1,FALSE,FALSE,NULL,'2019-10-01 08:23:39',FALSE)
-,(1,13,2,5,'Recuiting Payment for Shristi','Maritz',1,5,FALSE,1,FALSE,FALSE,NULL,'2018-09-27 14:09:09',FALSE)
-,(1,35,4,7,'Conversion of Shami to FTE - $60k',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2018-09-27 15:27:44',FALSE)
-,(1,4,1,1,'E-Mail Scanner/Link Security Management','CheckPoint',6,2,FALSE,1,FALSE,FALSE,NULL,'2019-10-21 14:40:23',FALSE)
-,(1,25,5,2,'SharePoint Backup for Discovery/Retention','Avepoint',4,2,FALSE,1,FALSE,FALSE,NULL,'2018-10-18 10:56:20',FALSE)
-,(1,25,5,2,'Deployment of Remote Control Field Servers','Dell',1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-15 15:42:34',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Backup System Replacement','Veeam or similar',1,1,TRUE,3,FALSE,FALSE,NULL,'2019-10-01 08:13:04',FALSE)
-,(1,3,5,2,'Storage Switch','Cisco',1,1,TRUE,4,FALSE,FALSE,NULL,'2018-10-15 15:55:24',FALSE)
-,(1,15,5,2,'Cell Phone Allocations','None',2,5,FALSE,1,FALSE,FALSE,NULL,'2018-10-15 16:12:45',FALSE)
-,(1,16,1,1,'Cell Allowances','None',2,5,FALSE,1,FALSE,FALSE,NULL,'2018-10-15 16:28:35',FALSE)
-,(1,16,4,7,'Cell Allowance','None',2,5,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 11:33:00',FALSE)
-,(1,4,4,7,'PM Portfolio / Resource Management Subscription','Wrike',4,2,FALSE,1,FALSE,FALSE,NULL,'2019-12-23 09:06:09',FALSE)
-,(1,35,5,2,'Convert Jerry (TX) to FTE','None',3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:17:14',FALSE)
-,(1,35,2,5,'BI and Reporting Developer','None',3,5,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 13:11:20',FALSE)
-,(1,12,4,7,'PMI Membership for Aradhana','PMI',6,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 13:36:26',FALSE)
-,(1,27,5,2,'DC1 Nexis Core Switch Maintenance','OneNeck',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:16:06',FALSE)
-,(1,27,5,2,'Catalyst 3650 WAN maintenance','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:17:59',FALSE)
-,(1,27,5,2,'F5 Load Balancers','F5',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:18:53',FALSE)
-,(1,27,5,2,'Fabric Interconnects 6248 Maintenance','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:20:15',FALSE)
-,(1,27,5,2,'UCS Chassis Maintenance','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:21:20',FALSE)
-,(1,27,5,2,'Horizon View, Production, SQL Blades','Cisco',6,4,FALSE,1,FALSE,FALSE,NULL,'2018-10-16 14:22:25',FALSE)
-,(1,27,5,2,'Nimble Storage Maintenance','Nimble',6,4,FALSE,1,FALSE,FALSE,'Quoted at $21,510 on 12/20/19 payable 3/9/2020 for first chassis.','2019-12-20 16:16:16',FALSE)
-,(1,30,2,5,'iPad for Development Testing','Apple',1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-18 10:03:45',FALSE)
-,(1,5,2,5,'SharePoint Consultant - Brenda Backup (leave)','OnDemand',2,7,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 10:41:04',FALSE)
-,(1,10,4,7,'Masters Degree Assistance - (Chidi)','St. Thomas',1,1,FALSE,1,FALSE,FALSE,NULL,'2019-10-03 08:35:37',FALSE)
-,(1,19,2,5,'BTAD Office Visit',NULL,1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 11:05:34',FALSE)
-,(1,20,2,5,'BTAD Office Visit',NULL,1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 11:08:57',FALSE)
-,(1,18,2,5,'BTAD Office Visit',NULL,1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 11:09:44',FALSE)
-,(1,17,2,5,'BTAD Office Visit',NULL,1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-19 11:10:20',FALSE)
-,(1,9,2,5,'Workday Training Class (local)','Workday',1,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-23 14:06:19',FALSE)
-,(1,29,5,2,'Advantix Invoice Servicing-both TEM and Utilities','Advantix',2,8,FALSE,1,FALSE,FALSE,NULL,'2018-10-22 10:52:55',FALSE)
-,(1,12,2,5,'AXUG Dynamics Communities Inc User Group','AXUG',6,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-22 10:54:43',FALSE)
-,(1,30,5,2,'Monitors for Deployment - Distributed to business','Dell',3,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-22 10:59:48',FALSE)
-,(1,30,5,2,'Docking Stations for New Laptops','Dell',3,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-22 11:01:41',FALSE)
-,(1,4,5,2,'Asset Explorer Manageengine - 1 Year License','ZOHO',6,2,FALSE,1,FALSE,FALSE,NULL,'2019-09-20 10:21:47',FALSE)
-,(1,14,2,5,'Employment Lawyer for Ravi Processing','Lawyers R Us',4,1,FALSE,1,FALSE,FALSE,NULL,'2018-10-22 11:09:58',FALSE)
-,(1,4,5,2,'Knowbe4 Phishing Testing and Education','Knowbe4',6,1,FALSE,1,FALSE,TRUE,NULL,'2018-10-22 11:16:21',FALSE)
-,(1,4,5,2,'Cirasync - Replacement for Commlink','cirasync',6,2,FALSE,1,FALSE,FALSE,'https://cirasync.com/','2019-09-20 09:14:09',FALSE)
-,(1,28,5,2,'Uniflow Printer Maintenance (3-year)','Marco Uniflow',6,3,FALSE,1,FALSE,FALSE,'Unbudgetted for 2019 - Added once received the Invoice','2019-03-13 11:00:45',FALSE)
-,(1,29,2,5,'DAX Platform Managed Service (Server hardware)','OneNeck',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-09-18 16:44:34',FALSE)
-,(1,29,2,5,'DAX Platform Managed Service (Application/SQL)','OneNeck',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-09-18 16:44:41',FALSE)
-,(1,4,5,2,'Manage Engine ITSM','ZOHO',6,2,FALSE,1,FALSE,FALSE,NULL,'2019-09-20 10:12:59',FALSE)
-,(1,35,2,5,'Upgrade OnBase 2020','Kiriworks',1,6,TRUE,2,FALSE,FALSE,NULL,'2019-10-15 08:53:07',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Servers','Various',1,9,TRUE,2,FALSE,FALSE,NULL,'2019-09-20 12:00:38',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Nexus Primary Switch','Cisco',1,1,TRUE,4,FALSE,FALSE,NULL,'2019-09-20 14:46:41',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Fabric for SAN (2)','Cisco',1,1,TRUE,2,FALSE,FALSE,NULL,'2019-09-20 14:48:19',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Storage SAN (2)','Unk',1,1,TRUE,3,FALSE,FALSE,NULL,'2019-09-20 14:50:49',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - SQL Server Hardware','Cisco',1,1,TRUE,2,FALSE,FALSE,NULL,'2019-09-20 14:53:53',FALSE)
-,(1,35,5,2,'Datacenter 3.0 - Pro Services','TBD',1,6,TRUE,2,FALSE,FALSE,NULL,'2019-09-20 14:54:55',FALSE)
-,(1,35,2,5,'Data Warehouse - ETL Tool (Boomi or similar)','Dell',6,2,FALSE,1,FALSE,FALSE,NULL,'2019-09-20 15:56:18',FALSE)
-,(1,3,5,2,'Meraki Routers for BIC Cloud','Cisco',1,1,TRUE,4,FALSE,FALSE,NULL,'2019-09-23 08:10:03',FALSE)
-,(1,28,5,2,'Meraki Cloud Licensing','Cisco',6,2,FALSE,1,FALSE,FALSE,NULL,'2019-09-23 08:11:08',FALSE)
-,(1,35,5,2,'FTE - Convert Will to Full Time (TX)',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:18:10',FALSE)
-,(1,35,4,7,'FTE - Barriers to Entry PM (start P5)','York',2,1,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:21:12',FALSE)
-,(1,35,5,2,'FTE - Boots on the Ground Tech Bloomington (Contract Convert)',NULL,3,5,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 10:24:32',FALSE)
-,(1,9,2,5,'PluralSight Web training - Enterprise Annual License','PluralSight',6,1,FALSE,1,FALSE,FALSE,NULL,'2019-10-03 14:27:01',FALSE)
-,(1,31,5,2,'SCCM Gateway Service','MS Azure',2,2,FALSE,1,FALSE,FALSE,NULL,'2019-09-30 13:46:23',FALSE)
-,(1,9,5,2,'PluralSight Web training - Enterprise Annual License','PluralSight',6,1,FALSE,1,FALSE,FALSE,NULL,'2019-10-03 14:27:19',FALSE)
-,(1,30,5,2,'Loaner Video Projector','Sharp/InFocus',1,1,FALSE,1,FALSE,FALSE,'Prvious projector went down to Arlington TX and was not returned.','2019-09-30 15:01:26',FALSE)
-,(1,3,5,2,'Engineering Laptop/Desktop (Bryan Steger)','Dell',1,1,TRUE,2,FALSE,FALSE,NULL,'2019-09-30 15:03:22',FALSE)
-,(1,29,1,1,'SOC Monitoring 24x7x365','TBD',2,8,FALSE,1,FALSE,FALSE,NULL,'2019-10-21 14:39:55',FALSE)
-,(2,23,6,6,'Business Development Consulting Agency','Kiriworks',1,11,FALSE,1,FALSE,FALSE,NULL,'2021-01-18 00:00:00',FALSE)
-,(2,6,6,7,'UX Training  (Level 1)','New Horizons',5,14,FALSE,1,FALSE,FALSE,'Training of team','2021-01-18 00:00:00',FALSE)
-,(2,9,6,7,'UX Training (Level 2)','New Horizons',5,14,FALSE,1,FALSE,FALSE,'Training x 2','2021-01-18 00:00:00',FALSE)
-,(2,19,6,8,'Mark Travel to TX for office visit','Delta',1,10,FALSE,1,TRUE,TRUE,'Travel to meet new leader','2021-01-18 00:00:00',FALSE)
-,(2,20,7,6,'Dave Travel to North Dakota','National',1,10,FALSE,1,FALSE,FALSE,'Lead Generation of new business opportunities','2021-01-18 00:00:00',FALSE)
-,(2,9,7,6,'Redgate Dynamic Page Builder Training','Redgate',2,10,FALSE,1,FALSE,TRUE,'Monthly Training','2021-01-18 00:00:00',FALSE)
-,(2,7,7,8,'Local Confrance Fee (Ravi)','Local',1,14,FALSE,1,FALSE,FALSE,'Conf. pre approved','2021-01-18 00:00:00',FALSE)
-,(2,24,8,9,'New Laptop for Designer','Lenovo',1,10,TRUE,2,FALSE,FALSE,'High Priority','2021-01-18 00:00:00',FALSE);
+INSERT INTO t_primary_budget(owner_fk,gl_code_fk,cost_center_fk,point_person_fk,nomenclature,manufacturer,frequency_fk,expenditure_type_fk,capitalizable_candidate,capitalize_life_fk,credit_card_use,needs_review,notes,last_update,archived) VALUES
+ (1,21,2,5,'AX User Group in Fargo (5 people) - Mileage Travel',NULL,1,1,'FALSE',1,'FALSE','FALSE','Ravi+Developers + Stina','2017-10-19 13:47:54','FALSE')
+,(1,20,2,5,'AX User Group in Fargo (5 people) - Meals',NULL,1,1,'FALSE',1,'TRUE','FALSE','Ravi+Developers + Stina','2017-10-19 13:48:01','FALSE')
+,(1,18,1,1,'AX User Group in Fargo (1 people) - Hotel',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-09-05 13:58:43','FALSE')
+,(1,20,1,1,'AX User Group in Fargo (1 people) - Meals',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-09-05 13:58:40','FALSE')
+,(1,17,5,2,'Texas Office WAN Installs - Airfare',NULL,1,1,'FALSE',1,'TRUE','FALSE','For Engineer to install office gear','2017-10-17 11:05:43','FALSE')
+,(1,17,2,5,'Data  Conference (Shyam)',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-20 10:51:38','FALSE')
+,(1,18,2,5,'Data  Conference (Shyam)',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-20 10:51:19','FALSE')
+,(1,20,2,5,'Data  Conference (Shyam)',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-20 10:50:59','FALSE')
+,(1,19,2,5,'Data  Conference (Shyam)',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-20 10:50:37','FALSE')
+,(1,8,2,5,'Data  Conference (Shyam)',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-20 10:50:20','FALSE')
+,(1,6,1,1,'Two BT events Annually',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-09-05 14:53:39','FALSE')
+,(1,28,5,2,'CommVault 24/7 Maintenance of CV Library','CommVault',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-05 16:14:08','FALSE')
+,(1,28,5,2,'vmWare Horizon View & vSphere Maintenance Renewal','VMWare',6,3,'FALSE',1,'FALSE','FALSE','11/20/17- Moved to P10 to be more accurate. Production Support Coverage Vmware Horizon Enterprise Edition, VMware Horizon 7 Enterprise','2019-10-02 08:33:25','FALSE')
+,(1,28,5,2,'VMWare vSphere for Hosts','VMWare',6,3,'FALSE',1,'FALSE','FALSE','11/21/17- Cotermed agreement with other VMWare.  Thus zeroed out this one.  2017P10 saw $55k, in 2018 it will be about $63k (due to prorating of 2017 by 3 months of vsphere product.','2017-11-20 14:35:13','FALSE')
+,(1,28,5,2,'Bomgar Remote Access tool Maintenance','Bomgar',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-06 16:20:21','FALSE')
+,(1,29,2,5,'DAX Managed Services (old)','OneNeck',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-20 10:14:55','FALSE')
+,(1,4,5,2,'Bomgar License - 1 additional user','Bomgar',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2017-10-17 11:16:33','FALSE')
+,(1,28,5,2,'OpenDNS Umbrella content filtering Subscription','Cisco',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2018-01-29 09:10:01','FALSE')
+,(1,28,5,2,'ASA Management Software Maintenance','Firesight',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-18 13:09:44','FALSE')
+,(1,28,2,5,'Pragmatic Works Task Factory','Pragmatic Works',6,1,'FALSE',1,'FALSE','FALSE','Task manager to move Power BI data to/fro','2018-10-19 14:20:35','FALSE')
+,(1,29,5,2,'Marco Mitel Managed Service and Support','Marco/Loffler',6,4,'FALSE',1,'FALSE','FALSE','Moved to Service Agreement GL','2019-09-30 09:58:19','FALSE')
+,(1,27,5,2,'Riverbed WAN Optimizers','Riverbed',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 13:44:12','FALSE')
+,(1,27,5,2,'ASA Firewalls - 4 total','Cisco',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 13:45:09','FALSE')
+,(1,27,5,2,'WAN Switch Block in DC1 - WS-C3650','Cisco',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 13:46:42','FALSE')
+,(1,3,5,2,'Aruba WAPs in BL1','Aruba/HP',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2017-09-08 13:50:09','FALSE')
+,(1,4,5,2,'Nimble SAN - 2 expansion chassises','Nimble',6,1,'FALSE',1,'FALSE','FALSE','Expansion for current drives.  Maintenance will be co-term with original purchase (18-months later).  Units for DC1 and DC2','2017-10-19 08:27:28','FALSE')
+,(1,27,5,2,'F5 Load Balancers','APM',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 14:13:26','FALSE')
+,(1,27,5,2,'Batteries for Smart-UPS (renewal self maintenance)','APC',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:03:32','FALSE')
+,(2,22,7,8,'Coffee Press Publishing Agency','CPPA',2,14,'FALSE',1,'TRUE','FALSE','Managed Service Agency (on demand)','2021-01-18 00:00:00','FALSE')
+,(2,25,6,8,'Webforms Page Development For new Website','3rd Party Smith',2,14,'TRUE',4,'FALSE','FALSE','Development Assistance already approved','2021-01-18 00:00:00','FALSE')
+,(2,3,8,6,'Wordpress Upgrade','Wordpress',1,11,'TRUE',2,'FALSE','FALSE',NULL,'2021-01-18 00:00:00','FALSE')
+,(1,27,5,2,'HP Blade Chassis for DC2 DRP - C7000','HP',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 14:28:10','FALSE')
+,(1,27,5,2,'Blades Servers for DC2 DRP (8 total)','HP',6,8,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 14:29:00','FALSE')
+,(1,9,4,3,'Training for PM and BA skillset (1 person)','New Horizons',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2021-01-24 00:00:00','FALSE')
+,(1,3,2,5,'Resharper pluging for vStudio, C#','JetBrains',1,3,'FALSE',1,'FALSE','FALSE','From Dan Leahy','2021-01-22 00:00:00','FALSE')
+,(1,17,1,1,'Jim Office Visit to Dallas Area - 3 Days',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,27,5,2,'Maintenance for Backup Server in BL2 - DL380G7','HP',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:04:08','FALSE')
+,(1,17,5,2,'BT Service Desk Office Visits Mileage Per Period',NULL,3,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,18,1,1,'Microsoft Envision - CIO Summit, Rental Car','National',1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,17,1,1,'Microsoft Envision - CIO Summit, Orlando Airfare','Delta',1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,19,5,2,'All Company Meeting Assistance - Meals',NULL,1,1,'FALSE',1,'TRUE','FALSE','Two Trips Planned','2021-01-22 00:00:00','FALSE')
+,(1,19,1,1,'Microsoft Envision - CIO Summit, Food',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,17,5,2,'Texas Office Visits - Hotel',NULL,1,1,'FALSE',1,'TRUE','FALSE','Trip to TX to install, update WAN in offices','2021-01-22 00:00:00','FALSE')
+,(1,17,2,5,'AX User Group in Fargo (5 people x 3 nights) - Hotel','Comfort Inn',1,1,'FALSE',1,'TRUE','TRUE','Ravi+Developers + Stina - waiting for approval','2021-01-24 00:00:00','FALSE')
+,(1,27,5,2,'WLAN controller for BL1 - MSM760 WLAN','HP',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-01 13:36:45','FALSE')
+,(1,18,5,2,'All Company Meeting Assistance - Hotel',NULL,1,1,'FALSE',1,'TRUE','FALSE','Estimated 2 trips (one w/ flights) - Rec 6','2021-01-24 00:00:00','FALSE')
+,(1,28,5,2,'Softrack License Monitoring for gINT','SofTrack',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-01 11:21:39','FALSE')
+,(1,27,5,2,'Security RFID Door System Maintenance','Pro-Watch',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-01 15:53:29','FALSE')
+,(1,28,2,5,'OnBase Annual Maintenance - 59 simultaneous seats (Canceled)','OnBase',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(1,3,5,2,'Magnetic Tapes for Archive and Storage','Quantum',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2017-09-08 14:35:08','FALSE')
+,(1,3,5,2,'PC /Laptop Refresh EverGreening (25% Lifecycle)','Dell',3,1,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-19 11:44:02','FALSE')
+,(1,25,5,2,'End Point Security - Client Side','Dell Treat Defense or similar',2,2,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-15 16:02:46','FALSE')
+,(1,4,5,2,'Application Performance Monitoring System','TBD',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2017-09-15 12:52:40','FALSE')
+,(1,30,5,2,'Last Pass Subscription - Password Management','LastPass',2,2,'FALSE',1,'TRUE','FALSE',NULL,'2019-09-30 09:25:30','FALSE')
+,(1,25,1,1,'Information Security Assessment / Testing','FRSecure',1,6,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-21 14:40:41','FALSE')
+,(1,4,5,2,'Site Recovery DRP for VMWare','VMWare',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2017-09-15 15:47:24','FALSE')
+,(1,35,2,5,'1 FTE - Data Achitect for SOA',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-20 12:53:36','FALSE')
+,(1,23,2,5,'1 Contractor- Report Writer (BI Project)',NULL,2,6,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 14:27:27','FALSE')
+,(1,35,1,1,'1 FTE - Security Analyst',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-21 14:41:59','FALSE')
+,(1,35,5,2,'1 FTE - Technical Trainer',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-20 14:26:53','FALSE')
+,(1,35,5,2,'Summer Interns - 1 HC total (1of2), 4 mos',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:15:01','FALSE')
+,(1,35,2,5,'SOA and Data Warehouse Foundation Buildout','BIC',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2018-10-19 14:23:05','FALSE')
+,(1,23,2,5,'ECM / OnBase Replacement Buy/Build','BIC',2,1,'TRUE',4,'FALSE','FALSE','6 month project ending in Q3-2018','2018-10-15 16:09:02','FALSE')
+,(1,3,5,2,'Access Layer Switch in BL1','HP',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2017-10-12 07:01:13','FALSE')
+,(1,30,5,2,'Headsets for Skype Users','Jabra',3,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 09:46:21','FALSE')
+,(1,23,5,2,'Integration of Mitel to O365','Marco',1,1,'TRUE',4,'FALSE','FALSE','SOW Work by Marco','2017-10-12 07:10:20','FALSE')
+,(1,35,2,5,'Replace Wire w/ SharePoint Project','OnDemand',3,6,'TRUE',4,'FALSE','FALSE',NULL,'2018-10-19 11:04:02','FALSE')
+,(1,7,1,1,'InfoTech Renewal Subscription- 3-year Term','InfoTech',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2020-12-26 18:06:06','FALSE')
+,(1,29,5,2,'Server Managed Services DC1','Insight',2,8,'FALSE',1,'FALSE','FALSE','Server Managed Services, does not include Block Hours, Co-Location, Power, or DAX /SQL managed Services','2019-09-18 16:13:05','FALSE')
+,(1,29,5,2,'Managed Block Hours for Network','OneNeck / Insight',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-18 16:05:41','FALSE')
+,(1,29,5,2,'OneNeck Internet 200M Access','OneNeck',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-12 07:49:09','FALSE')
+,(1,29,5,2,'Co-Location Power (metered)','OneNeck',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-18 16:08:25','FALSE')
+,(1,29,5,2,'Co-Location Racks (four)','OneNeck',2,8,'FALSE',1,'FALSE','FALSE','4 Racks at $750 each - Power not included','2019-09-18 16:09:11','FALSE')
+,(1,25,2,5,'MSDN Subscription (Development Tools)','MicroSoft',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-12 07:54:40','FALSE')
+,(1,29,5,2,'Mobile Solutions Cell Phone Management','Mobile Solutions',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-19 07:20:29','FALSE')
+,(1,9,1,1,'PluralSight Web training - Annual License','Pluralsight',6,1,'FALSE',1,'TRUE','FALSE','Annual Fee','2018-10-19 14:19:52','FALSE')
+,(1,29,2,5,'StoneRidge Managed Service - Block Hours','StoneRidge',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-16 14:25:17','FALSE')
+,(1,20,1,1,'Jims Monthly Meals with Team and Meetings',NULL,3,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-10-19 10:18:56','FALSE')
+,(1,4,1,1,'Dark Trace (or Similar) Behavioral Security Monitor','Dark Trace',2,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-21 14:41:52','FALSE')
+,(1,30,5,2,'All Company Audio/Video Gear, Mixer, Camera',NULL,1,1,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-17 11:03:30','FALSE')
+,(1,3,5,2,'Conference Room Updates','Tierney / Self',1,1,'TRUE',3,'FALSE','FALSE',NULL,'2019-10-01 08:25:41','FALSE')
+,(1,29,5,2,'Tierney Brothers Conf Room Management','Tierney',6,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-01 18:18:00','FALSE')
+,(1,4,2,5,'Sharegate SharePoint File Management Tool','Sharegate',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-17 15:37:12','FALSE')
+,(1,35,5,2,'Add RFID Card Swipe to IT Service Desk Area','Pro-Watch',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2018-10-01 15:26:26','FALSE')
+,(1,9,2,5,'BA Training for 1 person','New Horizons',1,1,'FALSE',1,'FALSE','FALSE','Local training','2019-09-30 13:57:48','FALSE')
+,(1,9,5,2,'Client Tech/O365 training for 1 person','New Horizon',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 13:57:19','FALSE')
+,(1,35,5,2,'SOW work for O365 Optimization/AD','Microsoft Partner',1,6,'TRUE',2,'FALSE','FALSE',NULL,'2018-10-18 10:58:58','FALSE')
+,(1,30,5,2,'Small Supplies for Business Use (Benchstock)',NULL,3,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 09:21:45','FALSE')
+,(1,3,5,2,'Test Computers for Developer R&D','Lenovo',1,1,'TRUE',2,'FALSE','TRUE',NULL,'2017-10-19 07:24:02','FALSE')
+,(1,35,5,2,'Summer Interns - 1 HC total (2of2), 4 mos',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:19:17','FALSE')
+,(1,31,5,2,'Clientside Backup and Recovery','Cloud',2,1,'FALSE',1,'FALSE','FALSE','Moved to DC3.0 and Backup Solution ($175k)','2019-10-21 14:42:22','FALSE')
+,(1,12,2,5,'AIIM Professional Membership - Danielle','AIIM',6,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-10-20 10:28:26','FALSE')
+,(1,12,2,5,'ARMA Professional Membership - Danielle','ARMA',6,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-10-20 10:29:33','FALSE')
+,(1,29,5,2,'Insight ServiceDesk Managed Service','Insight',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2017-10-20 12:46:17','FALSE')
+,(1,35,4,7,'Junior Project Manager (Chidi to FTE)',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:19:10','FALSE')
+,(1,35,5,2,'Jr. Network Engineer (Ivan 3.0)',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:19:03','FALSE')
+,(1,4,5,2,'Service Now - Cancelled!','ServiceNow',6,2,'FALSE',1,'FALSE','FALSE','Contract cancelled.  Investigate Capitalized Implimentation costs.','2017-10-20 12:58:17','FALSE')
+,(1,28,2,5,'OnBase Maintenance - 1 yr','OnBase',6,3,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-01 08:23:39','FALSE')
+,(1,13,2,5,'Recuiting Payment for Shristi','Maritz',1,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-09-27 14:09:09','FALSE')
+,(1,35,4,7,'Conversion of Shami to FTE - $60k',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-09-27 15:27:44','FALSE')
+,(1,4,1,1,'E-Mail Scanner/Link Security Management','CheckPoint',6,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-21 14:40:23','FALSE')
+,(1,25,5,2,'SharePoint Backup for Discovery/Retention','Avepoint',4,2,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-18 10:56:20','FALSE')
+,(1,25,5,2,'Deployment of Remote Control Field Servers','Dell',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-15 15:42:34','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Backup System Replacement','Veeam or similar',1,1,'TRUE',3,'FALSE','FALSE',NULL,'2019-10-01 08:13:04','FALSE')
+,(1,3,5,2,'Storage Switch','Cisco',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2018-10-15 15:55:24','FALSE')
+,(1,15,5,2,'Cell Phone Allocations','None',2,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-15 16:12:45','FALSE')
+,(1,16,1,1,'Cell Allowances','None',2,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-15 16:28:35','FALSE')
+,(1,16,4,7,'Cell Allowance','None',2,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 11:33:00','FALSE')
+,(1,4,4,7,'PM Portfolio / Resource Management Subscription','Wrike',4,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-12-23 09:06:09','FALSE')
+,(1,35,5,2,'Convert Jerry (TX) to FTE','None',3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:17:14','FALSE')
+,(1,35,2,5,'BI and Reporting Developer','None',3,5,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 13:11:20','FALSE')
+,(1,12,4,7,'PMI Membership for Aradhana','PMI',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 13:36:26','FALSE')
+,(1,27,5,2,'DC1 Nexis Core Switch Maintenance','OneNeck',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 14:16:06','FALSE')
+,(1,27,5,2,'Catalyst 3650 WAN maintenance','Cisco',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 14:17:59','FALSE')
+,(1,27,5,2,'Fabric Interconnects 6248 Maintenance','Cisco',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 14:20:15','FALSE')
+,(1,27,5,2,'UCS Chassis Maintenance','Cisco',6,4,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-16 14:21:20','FALSE')
+,(1,30,2,5,'iPad for Development Testing','Apple',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-18 10:03:45','FALSE')
+,(1,5,2,5,'SharePoint Consultant - Brenda Backup (leave)','OnDemand',2,7,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 10:41:04','FALSE')
+,(1,10,4,7,'Masters Degree Assistance - (Chidi)','St. Thomas',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-03 08:35:37','FALSE')
+,(1,19,2,5,'BTAD Office Visit',NULL,1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 11:05:34','FALSE')
+,(1,20,2,5,'BTAD Office Visit',NULL,1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 11:08:57','FALSE')
+,(1,18,2,5,'BTAD Office Visit',NULL,1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 11:09:44','FALSE')
+,(1,17,2,5,'BTAD Office Visit',NULL,1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-19 11:10:20','FALSE')
+,(1,9,2,5,'Workday Training Class (local)','Workday',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-23 14:06:19','FALSE')
+,(1,29,5,2,'Advantix Invoice Servicing-both TEM and Utilities','Advantix',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 10:52:55','FALSE')
+,(1,12,2,5,'AXUG Dynamics Communities Inc User Group','AXUG',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 10:54:43','FALSE')
+,(1,30,5,2,'Monitors for Deployment - Distributed to business','Dell',3,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 10:59:48','FALSE')
+,(1,30,5,2,'Docking Stations for New Laptops','Dell',3,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 11:01:41','FALSE')
+,(1,4,5,2,'Asset Explorer Manageengine - 1 Year License','ZOHO',6,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-20 10:21:47','FALSE')
+,(1,14,2,5,'Employment Lawyer for Ravi Processing','Lawyers R Us',4,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 11:09:58','FALSE')
+,(1,4,5,2,'Cirasync - Replacement for Commlink','cirasync',6,2,'FALSE',1,'FALSE','FALSE','https://cirasync.com/','2019-09-20 09:14:09','FALSE')
+,(1,28,5,2,'Uniflow Printer Maintenance (3-year)','Marco Uniflow',6,3,'FALSE',1,'FALSE','FALSE','Unbudgetted for 2019 - Added once received the Invoice','2019-03-13 11:00:45','FALSE')
+,(1,29,2,5,'DAX Platform Managed Service (Server hardware)','OneNeck',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-18 16:44:34','FALSE')
+,(1,29,2,5,'DAX Platform Managed Service (Application/SQL)','OneNeck',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-18 16:44:41','FALSE')
+,(1,4,5,2,'Manage Engine ITSM','ZOHO',6,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-20 10:12:59','FALSE')
+,(1,35,2,5,'Upgrade OnBase 2020','Kiriworks',1,6,'TRUE',2,'FALSE','FALSE',NULL,'2019-10-15 08:53:07','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Servers','Various',1,9,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-20 12:00:38','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Nexus Primary Switch','Cisco',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2019-09-20 14:46:41','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Fabric for SAN (2)','Cisco',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-20 14:48:19','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Storage SAN (2)','Unk',1,1,'TRUE',3,'FALSE','FALSE',NULL,'2019-09-20 14:50:49','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - SQL Server Hardware','Cisco',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-20 14:53:53','FALSE')
+,(1,35,5,2,'Datacenter 3.0 - Pro Services','TBD',1,6,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-20 14:54:55','FALSE')
+,(1,35,2,5,'Data Warehouse - ETL Tool (Boomi or similar)','Dell',6,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-20 15:56:18','FALSE')
+,(1,3,5,2,'Meraki Routers for BIC Cloud','Cisco',1,1,'TRUE',4,'FALSE','FALSE',NULL,'2019-09-23 08:10:03','FALSE')
+,(1,28,5,2,'Meraki Cloud Licensing','Cisco',6,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-23 08:11:08','FALSE')
+,(1,35,5,2,'FTE - Convert Will to Full Time (TX)',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:18:10','FALSE')
+,(1,35,4,7,'FTE - Barriers to Entry PM (start P5)','York',2,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:21:12','FALSE')
+,(1,35,5,2,'FTE - Boots on the Ground Tech Bloomington (Contract Convert)',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:24:32','FALSE')
+,(1,9,2,5,'PluralSight Web training - Enterprise Annual License','PluralSight',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-03 14:27:01','FALSE')
+,(1,31,5,2,'SCCM Gateway Service','MS Azure',2,2,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 13:46:23','FALSE')
+,(1,9,5,2,'PluralSight Web training - Enterprise Annual License','PluralSight',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-03 14:27:19','FALSE')
+,(1,30,5,2,'Loaner Video Projector','Sharp/InFocus',1,1,'FALSE',1,'FALSE','FALSE','Prvious projector went down to Arlington TX and was not returned.','2019-09-30 15:01:26','FALSE')
+,(1,3,5,2,'Engineering Laptop/Desktop (Bryan Steger)','Dell',1,1,'TRUE',2,'FALSE','FALSE',NULL,'2019-09-30 15:03:22','FALSE')
+,(1,29,1,1,'SOC Monitoring 24x7x365','TBD',2,8,'FALSE',1,'FALSE','FALSE',NULL,'2019-10-21 14:39:55','FALSE')
+,(2,23,6,6,'Business Development Consulting Agency','Kiriworks',1,11,'FALSE',1,'FALSE','FALSE',NULL,'2021-01-18 00:00:00','FALSE')
+,(2,6,6,7,'UX Training  (Level 1)','New Horizons',5,14,'FALSE',1,'FALSE','FALSE','Training of team','2021-01-18 00:00:00','FALSE')
+,(2,9,6,7,'UX Training (Level 2)','New Horizons',5,14,'FALSE',1,'FALSE','FALSE','Training x 2','2021-01-18 00:00:00','FALSE')
+,(2,20,7,6,'Dave Travel to North Dakota','National',1,10,'FALSE',1,'FALSE','FALSE','Lead Generation of new business opportunities','2021-01-18 00:00:00','FALSE')
+,(1,4,5,2,'Knowbe4 Phishing Testing and Education','Knowbe4',6,1,'FALSE',1,'FALSE','FALSE',NULL,'2018-10-22 11:16:21','FALSE')
+,(1,35,3,2,'F5 Load Balancers','F5',1,4,'TRUE',2,'FALSE','TRUE','Confirm Cap Life Recommendation','2021-01-24 00:00:00','FALSE')
+,(1,26,5,2,'Nimble Storage Maintenance','Nimble',6,4,'FALSE',1,'FALSE','FALSE','Quoted at $21,510 on 12/20/20 payable 3/9/2021 for first chassis.','2021-01-24 00:00:00','FALSE')
+,(1,26,5,2,'Horizon View, Production, SQL Blades Support','Cisco',6,4,'FALSE',1,'FALSE','TRUE','Confirm if still needed!','2021-01-24 00:00:00','FALSE')
+,(2,7,7,8,'Local Confrance Fee (Ravi)','Local',1,14,'FALSE',1,'FALSE','FALSE','Conf. pre approved','2021-01-18 00:00:00','FALSE')
+,(1,18,1,1,'Jim Office Visit to Dallas Area - 5 Days',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(2,19,6,8,'Mark Travel to TX for office visit','Delta',1,10,'FALSE',1,'TRUE','FALSE','Travel to meet new leader - I am the boss','2021-01-22 00:00:00','FALSE')
+,(1,35,5,2,'New RFID Door Server and Software','Pro-Tech',1,1,'TRUE',4,'FALSE','FALSE','Needed to allow for additional door locks.','2018-10-01 15:53:57','FALSE')
+,(1,19,1,1,'Jim Office Visit to North Dakota -5 Days',NULL,1,1,'FALSE',1,'TRUE','FALSE',NULL,'2021-01-22 00:00:00','FALSE')
+,(2,9,7,6,'Redgate Dynamic Page Builder Training','Redgate',2,10,'FALSE',1,'FALSE','FALSE','Monthly Training - Not yet approved','2021-01-22 00:00:00','FALSE')
+,(1,17,5,2,'All Company Meeting Assistance - Airfare','Delta',1,1,'FALSE',1,'TRUE','FALSE','Estimated two air flights - update pricing of flights','2021-01-24 00:00:00','FALSE')
+,(1,3,2,5,'Developer Desktops / Computers x2','Dell',1,1,'TRUE',2,'FALSE','FALSE','Confirm Quantity','2018-10-18 10:01:38','FALSE');
+
+
 
 -- --------------------
-
 INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "expense_note", "archived") VALUES
  (59,9,2019,0,'Without Office 2016 add-on','FALSE')
 ,(62,12,2019,55250,'includes prorated vSphere','FALSE')
@@ -518,8 +576,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(41,9,2020,600,'Airfare','FALSE')
 ,(42,9,2020,600,'Hotel Stay','FALSE')
 ,(43,9,2020,400,'Rental Car','FALSE')
-,(44,4,2020,200,NULL,'FALSE')
-,(44,10,2020,200,NULL,'FALSE')
 ,(45,3,2020,650,'5 days','FALSE')
 ,(46,3,2020,600,'1 person','FALSE')
 ,(55,5,2020,2500,'1 training class','FALSE')
@@ -556,12 +612,9 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(80,1,2020,750,NULL,'FALSE')
 ,(82,1,2020,890,NULL,'FALSE')
 ,(84,1,2020,65000,'New Purchase','FALSE')
-,(85,5,2020,19000,'autoinject','FALSE')
 ,(86,4,2020,3500,'SWAG','FALSE')
 ,(87,1,2020,1090,NULL,'FALSE')
 ,(88,1,2020,6220,NULL,'FALSE')
-,(90,1,2020,1000,'autoinject','FALSE')
-,(90,3,2020,1000,'autoinject','FALSE')
 ,(90,5,2020,1000,'autoinject','FALSE')
 ,(90,7,2020,1000,'autoinject','FALSE')
 ,(90,9,2020,1000,'autoinject','FALSE')
@@ -631,6 +684,8 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(102,1,2020,5385,'autoinject','FALSE')
 ,(102,2,2020,5385,'autoinject','FALSE')
 ,(102,3,2020,5385,'autoinject','FALSE')
+,(89,6,2021,2350,'Mary','FALSE')
+,(89,2,2021,2350,'John','FALSE')
 ,(102,4,2020,5385,'autoinject','FALSE')
 ,(102,5,2020,5385,'autoinject','FALSE')
 ,(102,6,2020,5385,'autoinject','FALSE')
@@ -728,19 +783,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(118,12,2020,3000,'autoinject','FALSE')
 ,(118,13,2020,3000,'autoinject','FALSE')
 ,(119,13,2020,0,'Part of EA','FALSE')
-,(120,1,2020,3700,'autoinject','FALSE')
-,(120,2,2020,3700,'autoinject','FALSE')
-,(120,3,2020,3700,'autoinject','FALSE')
-,(120,4,2020,3700,'autoinject','FALSE')
-,(120,5,2020,3700,'autoinject','FALSE')
-,(120,6,2020,3700,'autoinject','FALSE')
-,(120,7,2020,3700,'autoinject','FALSE')
-,(120,8,2020,3700,'autoinject','FALSE')
-,(120,9,2020,3700,'autoinject','FALSE')
-,(120,10,2020,3700,'autoinject','FALSE')
-,(120,11,2020,3700,'autoinject','FALSE')
-,(120,12,2020,3700,'autoinject','FALSE')
-,(120,13,2020,3700,'autoinject','FALSE')
 ,(121,1,2020,600,'300x2 users','FALSE')
 ,(122,1,2020,700,'autoinject','FALSE')
 ,(122,2,2020,700,'autoinject','FALSE')
@@ -755,32 +797,13 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(122,11,2020,700,'autoinject','FALSE')
 ,(122,12,2020,700,'autoinject','FALSE')
 ,(122,13,2020,700,'autoinject','FALSE')
-,(123,1,2020,200,'autoinject','FALSE')
-,(123,2,2020,200,'autoinject','FALSE')
-,(123,3,2020,450,'Plus Qtrly Meeting','FALSE')
-,(123,4,2020,200,'autoinject','FALSE')
-,(123,5,2020,200,'autoinject','FALSE')
-,(123,6,2020,450,'Plus Qtrly Meeting','FALSE')
-,(123,7,2020,200,'autoinject','FALSE')
-,(123,8,2020,200,'autoinject','FALSE')
-,(123,9,2020,450,'Plus Fargo Trip','FALSE')
-,(123,10,2020,450,'Plus Qtrly Meeting','FALSE')
-,(123,11,2020,200,'autoinject','FALSE')
-,(123,12,2020,200,'autoinject','FALSE')
-,(123,13,2020,450,'Plus Qtrly Meeting','FALSE')
-,(124,1,2020,4000,'autoinject','FALSE')
-,(124,2,2020,4000,'autoinject','FALSE')
-,(124,3,2020,4000,'autoinject','FALSE')
-,(124,4,2020,4000,'autoinject','FALSE')
-,(124,5,2020,4000,'autoinject','FALSE')
-,(124,6,2020,4000,'autoinject','FALSE')
-,(124,7,2020,4000,'autoinject','FALSE')
-,(124,8,2020,4000,'autoinject','FALSE')
-,(124,9,2020,4000,'autoinject','FALSE')
-,(124,10,2020,4000,'autoinject','FALSE')
-,(124,11,2020,4000,'autoinject','FALSE')
-,(124,12,2020,4000,'autoinject','FALSE')
-,(124,13,2020,4000,'autoinject','FALSE')
+,(120,6,2021,65000,'Secondary','FALSE')
+,(120,4,2021,65000,'Primary','FALSE')
+,(123,5,2020,8900,'Maintenance','FALSE')
+,(123,5,2019,8750,'Maintenance','FALSE')
+,(123,5,2018,8750,'Maintenance','FALSE')
+,(123,5,2021,8900,'year 4 ?','FALSE')
+,(123,5,2022,9000,NULL,'FALSE')
 ,(125,2,2020,3000,'Sum of small parts','FALSE')
 ,(126,6,2020,18000,'Based on prior Quotes','FALSE')
 ,(127,1,2020,5000,NULL,'FALSE')
@@ -890,7 +913,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(42,10,2021,600,NULL,'FALSE')
 ,(43,10,2021,400,'Rental Car','FALSE')
 ,(44,4,2021,200,NULL,'FALSE')
-,(44,10,2021,200,NULL,'FALSE')
 ,(50,4,2021,750,NULL,'FALSE')
 ,(51,4,2021,600,'3 nights','FALSE')
 ,(52,4,2021,300,'Conf Meals','FALSE')
@@ -901,6 +923,9 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(56,11,2021,600,'Fall Event (lawn bowling)','FALSE')
 ,(57,9,2021,13500,'updated 10/18/18','FALSE')
 ,(62,12,2021,70000,'Updated 10/18/18','FALSE')
+,(124,3,2020,52800,'autoinject','FALSE')
+,(124,3,2022,53000,'autoinject','FALSE')
+,(124,3,2021,52900,'autoinject','FALSE')
 ,(65,13,2021,5000,'2018 Rate (3 Headcount)','FALSE')
 ,(65,13,2021,1750,'Up 1 License','FALSE')
 ,(66,1,2021,4000,'autoinject','FALSE')
@@ -926,7 +951,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(79,1,2021,1500,'autoinject','FALSE')
 ,(80,1,2021,750,NULL,'FALSE')
 ,(82,1,2021,890,NULL,'FALSE')
-,(85,5,2021,6500,'Adjusted due to change in qty','FALSE')
 ,(86,4,2021,3500,'SWAG','FALSE')
 ,(87,1,2021,1090,NULL,'FALSE')
 ,(88,1,2021,6220,NULL,'FALSE')
@@ -1075,15 +1099,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(118,10,2021,3000,'autoinject','FALSE')
 ,(118,12,2021,3000,'autoinject','FALSE')
 ,(118,13,2021,3000,'autoinject','FALSE')
-,(120,1,2021,3700,'autoinject','FALSE')
-,(120,2,2021,3700,'autoinject','FALSE')
-,(120,3,2021,3700,'autoinject','FALSE')
-,(120,4,2021,3700,'autoinject','FALSE')
-,(120,5,2021,3700,'autoinject','FALSE')
-,(120,6,2021,3700,'autoinject','FALSE')
-,(120,7,2021,3700,'autoinject','FALSE')
-,(120,8,2021,3700,'autoinject','FALSE')
-,(120,9,2021,3700,NULL,'FALSE')
 ,(121,1,2021,900,'$449 x 2 users','FALSE')
 ,(122,1,2021,700,'autoinject','FALSE')
 ,(122,2,2021,700,NULL,'FALSE')
@@ -1097,31 +1112,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(122,10,2021,700,NULL,'FALSE')
 ,(122,12,2021,700,NULL,'FALSE')
 ,(122,13,2021,700,NULL,'FALSE')
-,(123,1,2021,200,'autoinject','FALSE')
-,(123,2,2021,200,'autoinject','FALSE')
-,(123,3,2021,450,'Plus Qtrly Meeting','FALSE')
-,(123,4,2021,200,'autoinject','FALSE')
-,(123,5,2021,200,'autoinject','FALSE')
-,(123,6,2021,450,'Plus Qtrly Meeting','FALSE')
-,(123,7,2021,200,'autoinject','FALSE')
-,(123,8,2021,200,'autoinject','FALSE')
-,(123,9,2021,450,'Plus Fargo Trip','FALSE')
-,(123,10,2021,450,'Plus Qtrly Meeting','FALSE')
-,(123,11,2021,200,'autoinject','FALSE')
-,(123,12,2021,200,'autoinject','FALSE')
-,(123,13,2021,450,'Plus Qtrly Meeting','FALSE')
-,(124,1,2021,5500,'autoinject','FALSE')
-,(124,2,2021,5500,'autoinject','FALSE')
-,(124,3,2021,5500,'autoinject','FALSE')
-,(124,4,2021,5500,'autoinject','FALSE')
-,(124,5,2021,5500,'autoinject','FALSE')
-,(124,6,2021,5500,'autoinject','FALSE')
-,(124,7,2021,5500,'autoinject','FALSE')
-,(124,8,2021,5500,'autoinject','FALSE')
-,(124,9,2021,5500,'autoinject','FALSE')
-,(124,10,2021,5500,'autoinject','FALSE')
-,(124,12,2021,5500,'autoinject','FALSE')
-,(124,13,2021,5500,'autoinject','FALSE')
 ,(127,1,2021,5000,NULL,'FALSE')
 ,(128,1,2021,3995,NULL,'FALSE')
 ,(130,2,2021,6000,NULL,'FALSE')
@@ -1273,14 +1263,11 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(159,10,2021,6153,'autoinject','FALSE')
 ,(159,11,2021,6153,'autoinject','FALSE')
 ,(159,12,2021,6153,'$80k Assumed','FALSE')
-,(160,3,2021,129,'I yr membership','FALSE')
-,(161,3,2021,15000,'Based on $75k purchase','FALSE')
-,(162,3,2021,2400,'Based on $12k Purchase','FALSE')
-,(163,6,2021,8500,'Updated 10/18/18 OneNeck','FALSE')
+,(162,3,2022,7500,'Still Required?','FALSE')
+,(162,3,2021,7500,'Still Required?','FALSE')
 ,(164,3,2021,3600,'Based on $18k purchase','FALSE')
 ,(165,3,2021,3600,'Based on $18k Purchase','FALSE')
 ,(166,3,2021,45000,'Based on $225k Purchase','FALSE')
-,(167,3,2021,56000,'Based on $280k Purchase','FALSE')
 ,(168,3,2021,700,'1 unit WiFi','FALSE')
 ,(169,4,2021,6600,'2 weeks 20hours each','FALSE')
 ,(169,5,2021,13200,'4 weeks 20 hours each','FALSE')
@@ -1289,8 +1276,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(170,8,2021,5250,'Not yet approved','FALSE')
 ,(121,6,2021,450,'Office Visit Rental Car','FALSE')
 ,(122,6,2021,350,'Office Visit Meals','FALSE')
-,(123,6,2021,550,'Office Visit Hotel','FALSE')
-,(124,6,2021,600,'Office Visit Airfare','FALSE')
 ,(125,4,2021,2500,'1 Workday Class','FALSE')
 ,(125,8,2021,2500,'1 Workday Class','FALSE')
 ,(126,1,2021,4200,NULL,'FALSE')
@@ -1354,8 +1339,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(41,10,2022,600,'Airfare','FALSE')
 ,(42,10,2022,600,NULL,'FALSE')
 ,(43,10,2022,400,'Rental Car','FALSE')
-,(44,4,2022,200,NULL,'FALSE')
-,(44,10,2022,200,NULL,'FALSE')
 ,(45,3,2022,650,'5 days','FALSE')
 ,(45,11,2022,650,'5 days','FALSE')
 ,(46,3,2022,600,'1 person','FALSE')
@@ -1368,6 +1351,8 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(69,2,2022,15500,NULL,'FALSE')
 ,(70,1,2022,3000,'autoinject','FALSE')
 ,(71,3,2022,9000,'Quotes from Protech','FALSE')
+,(161,9,2021,1500,'Install Kit','FALSE')
+,(163,3,2020,8500,'additional blade','FALSE')
 ,(73,10,2022,1000,'autoinject','FALSE')
 ,(75,1,2022,400,'autoinject','FALSE')
 ,(76,12,2022,32000,'Changed to Loffler','FALSE')
@@ -1376,7 +1361,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(79,1,2022,1500,'autoinject','FALSE')
 ,(80,1,2022,750,NULL,'FALSE')
 ,(82,1,2022,890,NULL,'FALSE')
-,(85,3,2022,6500,'Moved to P3 based on Invoicing','FALSE')
 ,(86,4,2022,3500,'SWAG for BL1','FALSE')
 ,(87,1,2022,1090,NULL,'FALSE')
 ,(88,1,2022,6220,NULL,'FALSE')
@@ -1499,18 +1483,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(118,10,2022,3000,'autoinject','FALSE')
 ,(118,12,2022,3000,'autoinject','FALSE')
 ,(118,13,2022,3000,'autoinject','FALSE')
-,(120,1,2022,2950,'Estimate','FALSE')
-,(120,2,2022,2950,'Estimate','FALSE')
-,(120,3,2022,2950,'Estimate','FALSE')
-,(120,4,2022,2950,'Estimate','FALSE')
-,(120,5,2022,2950,'Estimate','FALSE')
-,(120,6,2022,2950,'Estimate','FALSE')
-,(120,7,2022,2950,'Estimate','FALSE')
-,(120,8,2022,2950,'Estimate','FALSE')
-,(120,9,2022,2950,'Estimate','FALSE')
-,(120,10,2022,2950,'Estimate','FALSE')
-,(120,12,2022,2950,'Estimate','FALSE')
-,(120,13,2022,2950,'Estimate','FALSE')
 ,(121,1,2022,449,'$449 x 1 user','FALSE')
 ,(122,1,2022,700,'autoinject','FALSE')
 ,(122,2,2022,700,'autoinject','FALSE')
@@ -1524,19 +1496,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(122,10,2022,700,'autoinject','FALSE')
 ,(122,12,2022,700,'autoinject','FALSE')
 ,(122,13,2022,700,'autoinject','FALSE')
-,(123,1,2022,200,'autoinject','FALSE')
-,(123,2,2022,200,'autoinject','FALSE')
-,(123,3,2022,450,'Plus Qtrly Meeting','FALSE')
-,(123,4,2022,200,'autoinject','FALSE')
-,(123,5,2022,200,'autoinject','FALSE')
-,(123,6,2022,450,'Plus Qtrly Meeting','FALSE')
-,(123,7,2022,200,'autoinject','FALSE')
-,(123,8,2022,200,'autoinject','FALSE')
-,(123,9,2022,450,'Plus Fargo Trip','FALSE')
-,(123,10,2022,450,'Plus Qtrly Meeting','FALSE')
-,(123,11,2022,200,'autoinject','FALSE')
-,(123,12,2022,200,'autoinject','FALSE')
-,(123,13,2022,450,'Plus Qtrly Meeting','FALSE')
 ,(125,2,2022,3000,'All Company Parts','FALSE')
 ,(126,4,2022,15000,'BL1 Foundations +SOW','FALSE')
 ,(126,6,2022,6500,'BL1 x 3 small','FALSE')
@@ -1634,20 +1593,15 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(157,5,2022,1000,'Quarterly Pmt','FALSE')
 ,(157,9,2022,1000,'Quarterly Pmt','FALSE')
 ,(157,12,2022,1000,'Quarterly Pmt','FALSE')
-,(160,3,2022,129,'I yr membership','FALSE')
-,(161,3,2022,15000,'Based on $75k purchase','FALSE')
-,(162,3,2022,2400,'Based on $12k Purchase','FALSE')
-,(163,6,2022,8500,'Updated 10/18/18 OneNeck','FALSE')
+,(157,3,2022,129,'1 yr membership','FALSE')
+,(158,3,2022,2400,'Based on $12k Purchase','FALSE')
 ,(164,3,2022,3600,'Based on $18k purchase','FALSE')
 ,(165,3,2022,3600,'Based on $18k Purchase','FALSE')
 ,(166,3,2022,45000,'Based on $225k Purchase','FALSE')
-,(167,3,2022,56000,'Based on $280k Purchase','FALSE')
 ,(168,3,2022,700,'1 unit WiFi','FALSE')
 ,(170,8,2022,5250,'Not yet approved','FALSE')
 ,(121,6,2022,450,'Office Visit Rental Car','FALSE')
 ,(122,6,2022,350,'Office Visit Meals','FALSE')
-,(123,6,2022,550,'Office Visit Hotel','FALSE')
-,(124,6,2022,600,'Office Visit Airfare','FALSE')
 ,(125,8,2022,2500,'1 Workday Class','FALSE')
 ,(126,1,2022,4200,NULL,'FALSE')
 ,(126,2,2022,4200,NULL,'FALSE')
@@ -1657,6 +1611,7 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(126,6,2022,4200,NULL,'FALSE')
 ,(126,7,2022,4200,NULL,'FALSE')
 ,(126,8,2022,4200,NULL,'FALSE')
+,(163,3,2019,7500,'Increase cost','FALSE')
 ,(126,9,2022,4200,NULL,'FALSE')
 ,(126,10,2022,4200,NULL,'FALSE')
 ,(126,12,2022,4200,NULL,'FALSE')
@@ -1790,10 +1745,7 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(156,12,2022,4000,NULL,'FALSE')
 ,(156,13,2022,4000,NULL,'FALSE')
 ,(158,11,2022,10500,'Prem Support','FALSE')
-,(160,5,2022,3000,'5-day class','FALSE')
-,(161,9,2022,3000,'5 day class','FALSE')
-,(162,3,2022,1250,'Conf Fee','FALSE')
-,(163,7,2022,3000,'Lloyd or similar','FALSE')
+,(55,5,2022,3000,'5-day class','FALSE')
 ,(28,3,2023,2018,'autoinject','FALSE')
 ,(28,4,2023,2018,'autoinject','FALSE')
 ,(28,5,2023,2018,'autoinject','FALSE')
@@ -1807,19 +1759,6 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(78,1,2023,1100,'autoinject','FALSE')
 ,(79,1,2023,1500,'autoinject','FALSE')
 ,(113,1,2023,30000,'guess at new agreement','FALSE')
-,(124,1,2023,5500,'autoinject','FALSE')
-,(124,2,2023,5500,'autoinject','FALSE')
-,(124,3,2023,5500,'autoinject','FALSE')
-,(124,4,2023,5500,'autoinject','FALSE')
-,(124,5,2023,5500,'autoinject','FALSE')
-,(124,6,2023,5500,'autoinject','FALSE')
-,(124,7,2023,5500,'autoinject','FALSE')
-,(124,8,2023,5500,'autoinject','FALSE')
-,(124,9,2023,5500,'autoinject','FALSE')
-,(124,10,2023,5500,'autoinject','FALSE')
-,(124,11,2023,5500,'autoinject','FALSE')
-,(124,12,2023,5500,'autoinject','FALSE')
-,(124,13,2023,5500,'autoinject','FALSE')
 ,(127,1,2023,1500,'1 year','FALSE')
 ,(129,1,2023,231,'autoinject','FALSE')
 ,(129,2,2023,231,'autoinject','FALSE')
@@ -1848,24 +1787,19 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(159,11,2024,500,NULL,'FALSE')
 ,(113,1,2025,30000,NULL,'FALSE')
 ,(9,6,2021,750,'Mileage','FALSE')
-,(5,4,2021,325,'2 nights','FALSE')
 ,(7,6,2021,1250,'3 x 3 night hotel rooms Fargo','FALSE')
 ,(6,5,2021,600,'3 nights hotel and food','FALSE')
 ,(10,6,2021,350,'1 x 3 hotel nights Fargo','FALSE')
-,(5,2,2021,325,'2 nights','FALSE')
 ,(24,7,2021,1500,'1x1 class (5 day)','FALSE')
 ,(12,9,2021,750,'Jims Trip to Orlando!','FALSE')
 ,(26,6,2021,64250,'autoinject','FALSE')
 ,(25,11,2021,45500,'Annual Maintenance','FALSE')
 ,(8,6,2021,750,'3 cars mileage to Fargo','FALSE')
-,(4,3,2021,400,NULL,'FALSE')
 ,(24,3,2021,1250,'1 x1 class (3 day)','FALSE')
-,(4,4,2021,600,'Additional trip','FALSE')
 ,(6,12,2021,600,'3 nights hotel and food','FALSE')
 ,(26,6,2021,63520,'autoinject','FALSE')
 ,(23,2,2021,1250,'1 person class','FALSE')
 ,(11,6,2021,500,'Meals for Jim','FALSE')
-,(4,2,2021,400,NULL,'FALSE')
 ,(29,9,2021,2055,'autoinject','FALSE')
 ,(27,5,2021,38000,'autoinject','FALSE')
 ,(29,9,2022,2600,'+1 license','FALSE')
@@ -1876,21 +1810,40 @@ INSERT INTO "t_primary_expenditure" ("budget_fk", "period", "year", "amount", "e
 ,(33,2,2021,27500,'autoinject','FALSE')
 ,(33,2,2023,28000,'autoinject','FALSE')
 ,(28,5,2021,12200,'autoinject','FALSE')
-,(55,9,2020,450,'autoinject','FALSE')
-,(55,11,2020,450,'autoinject','FALSE')
-,(55,5,2021,450,'autoinject','FALSE')
-,(55,9,2021,450,'autoinject','FALSE')
-,(55,13,2021,450,'autoinject','FALSE')
+,(162,3,2019,6850,'1 year','FALSE')
+,(162,3,2020,7200,'1 year','FALSE')
+,(55,3,2022,7200,' ','FALSE')
+,(160,9,2021,1250,'Install Kit','FALSE')
+,(160,9,2021,450,'Cables','FALSE')
 ,(55,1,2022,450,'autoinject','FALSE')
 ,(55,5,2022,450,'autoinject','FALSE')
 ,(55,9,2022,450,'autoinject','FALSE')
 ,(55,13,2022,450,'autoinject','FALSE')
 ,(33,2,2022,27500,'autoinject','FALSE')
-,(2,12,2021,850,'Jim Test','FALSE')
-,(1,7,2020,1750,'Not so fancy resturants','FALSE')
-,(3,1,2021,1500,NULL,'FALSE')
 ,(16,1,2021,700,'Hotel Stay','FALSE')
 ,(15,2,2021,600,'Food','FALSE')
 ,(15,2,2020,550,'Food','FALSE')
 ,(15,8,2021,600,'Food','FALSE')
-,(15,8,2020,550,'Food','FALSE');
+,(15,8,2020,550,'Food','FALSE')
+,(2,NULL,NULL,0,'<-','FALSE')
+,(4,2,2021,1400,'this is a test','FALSE')
+,(4,3,2021,2400,NULL,'FALSE')
+,(4,4,2021,600,'Additional trip','FALSE')
+,(167,3,2022,580,'adjusted Price','FALSE')
+,(167,3,2021,560,'adjusted Price','FALSE')
+,(85,6,2021,1500,'added for testing','FALSE')
+,(85,5,2020,19000,'autoinject','FALSE')
+,(85,3,2022,6500,'Moved to P3 based on Invoicing','FALSE')
+,(85,5,2021,6500,'Adjusted due to change in qty','FALSE')
+,(1,7,2020,1750,'Not so fancy resturants','TRUE')
+,(5,2,2021,325,'Tentative Cost - Review','FALSE')
+,(5,6,2021,325,'Tentative Cost - Review','FALSE')
+,(45,10,2022,200,NULL,'FALSE')
+,(44,4,2021,200,NULL,'FALSE')
+,(44,4,2021,200,NULL,'FALSE')
+,(44,4,2021,200,NULL,'FALSE')
+,(44,4,2021,200,NULL,'FALSE')
+,(160,9,2021,75000,'Primary Box','FALSE')
+,(160,11,2021,75000,'Secondary Box','FALSE')
+,(162,3,2018,6250,'1 year','FALSE')
+,(55,3,2021,8500,'? still required??','FALSE');

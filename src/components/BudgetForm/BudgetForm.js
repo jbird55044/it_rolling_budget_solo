@@ -98,12 +98,12 @@ class BudgetForm extends Component {
     // Stage Redux with up to date db info
     async componentDidMount() {
         //refresh relative record number w/ correct row based on passed Record ID (if passed)
-    //     if (this.props.store.budgetForm.passedRecordId > 0) {
-    //         this.props.dispatch({type: 'FETCH_RECORD_CORRELATION_ROW', recordFinder: {
-    //                 recordId: this.props.store.budgetForm.passedRecordId
-    //             }
-    //         });    
-    //    }
+        if (this.props.store.budgetForm.passedRecordId > 0) {
+            this.props.dispatch({type: 'FETCH_RECORD_CORRELATION_ROW', recordFinder: {
+                    recordId: this.props.store.budgetForm.passedRecordId
+                }
+            });    
+       }
        
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
@@ -112,11 +112,7 @@ class BudgetForm extends Component {
             recordId: this.props.store.budgetForm.passedRecordId
             }
         });
-        // this.props.dispatch({type: 'FETCH_BUDGET_RECORD_COUNT', recordFinder: {
-        //     businessUnitId: this.props.store.user.id,
-        //     }
-        // });
-        
+     
         // grab tlist for pull-down populations
         this.props.dispatch({type: 'FETCH_TLIST_GLCODE'});
         this.props.dispatch({type: 'FETCH_TLIST_BUSINESSUNIT'});

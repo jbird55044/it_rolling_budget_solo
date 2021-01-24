@@ -15,7 +15,7 @@ router.get('/businessunit', rejectUnauthenticated, (req, res) => {
 }); 
 
 router.get('/glcode', rejectUnauthenticated, (req, res) => {
-  const queryText = 'SELECT * FROM tlist_gl_code WHERE show_in_list = true';
+  const queryText = 'SELECT * FROM tlist_gl_code WHERE show_in_list = true ORDER BY id ASC';
   console.log ('in tlist_gl_code get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })
@@ -26,7 +26,7 @@ router.get('/glcode', rejectUnauthenticated, (req, res) => {
 }); 
 
 router.get('/frequency', rejectUnauthenticated, (req, res) => {
-  const queryText = 'SELECT * FROM tlist_frequency';
+  const queryText = 'SELECT * FROM tlist_frequency ORDER BY id ASC';
   console.log ('in tlist_frequency get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })
@@ -38,7 +38,7 @@ router.get('/frequency', rejectUnauthenticated, (req, res) => {
 
 router.get('/costcenter', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
-  const queryText = 'SELECT * FROM tlist_cost_center WHERE owner_fk = $1';
+  const queryText = 'SELECT * FROM tlist_cost_center WHERE owner_fk = $1 ORDER BY id ASC';
   console.log ('in tlist_cost_center get, BU ID:', businessUnitId)
   pool.query(queryText, [businessUnitId])
     .then((result) => { res.send(result.rows); })
@@ -50,7 +50,7 @@ router.get('/costcenter', rejectUnauthenticated, (req, res) => {
 
 router.get('/pointperson', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
-  const queryText = 'SELECT * FROM tlist_point_person WHERE owner_fk = $1';
+  const queryText = 'SELECT * FROM tlist_point_person WHERE owner_fk = $1 ORDER BY id ASC';
   console.log ('in tlist_point_person get, BU ID:', businessUnitId)
   pool.query(queryText, [businessUnitId])
     .then((result) => { res.send(result.rows); })
@@ -61,7 +61,7 @@ router.get('/pointperson', rejectUnauthenticated, (req, res) => {
 }); 
 
 router.get('/capitalizedlife', rejectUnauthenticated, (req, res) => {
-  const queryText = 'SELECT * FROM tlist_capitalized_life';
+  const queryText = 'SELECT * FROM tlist_capitalized_life ORDER BY id ASC';
   console.log ('in tlist_capitalized_life get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })
@@ -73,7 +73,7 @@ router.get('/capitalizedlife', rejectUnauthenticated, (req, res) => {
 
 router.get('/expendituretype', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
-  const queryText = 'SELECT * FROM tlist_expenditure_type WHERE owner_fk = $1';
+  const queryText = 'SELECT * FROM tlist_expenditure_type WHERE owner_fk = $1 ORDER BY id ASC';
   console.log ('in tlist_expenditure_type get, BU ID:', businessUnitId)
   pool.query(queryText, [businessUnitId])
     .then((result) => { res.send(result.rows); })
@@ -85,7 +85,7 @@ router.get('/expendituretype', rejectUnauthenticated, (req, res) => {
 
 router.get('/year', rejectUnauthenticated, (req, res) => {
   let businessUnitId = req.query.businessUnitId
-  const queryText = 'SELECT * FROM tlist_year';
+  const queryText = 'SELECT * FROM tlist_year ORDER BY id ASC';
   console.log ('in tlist_year get')
   pool.query(queryText)
     .then((result) => { res.send(result.rows); })

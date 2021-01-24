@@ -51,7 +51,7 @@ function RecordPicker() {
     
 
     const columns = [
-        { key: 'id', name: 'ID', editable: false, width: 60,
+        { key: 'id', name: 'ID', editable: false, filterable: true, width: 70,
             events: {onDoubleClick: function(ev, args) {
                 console.log('rowId: ', args.rowId);
                 setBudgetId(args.rowId);

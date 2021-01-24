@@ -129,6 +129,29 @@ function* fetchBudgetRecordCount( payload ) {
   }
 } 
 
+// Grab Relitive row number for specific record ID (good for one form)
+function* fetchRecordCorrelation ( payload ) {
+    let rowNumber = 1;
+    let returnedRecordID = 0;
+    console.log (`fetchRecordCorrelation GET Payload:`, payload);
+    // Go to server, update redux store with data from server
+    try {
+        // get data from db
+        const response = yield axios.get('/api/budget/recordcorrelation', {
+            params:{
+                recordId: payload.recordFinder.recordId,
+            }
+        })
+        yield rowNumber = response.data[0].row_number
+        yield returnedRecordID = response.data[0].id
+        yield console.log (`rowNumber =`, rowNumber, 'returned Record ID', returnedRecordID);
+        
+        yield put({ type: 'SET_RECORDCORRELATIONROW', payload: rowNumber });
+    } catch ( error ) {
+        console.log('error with fetchRecordCorrelation get request', error);
+    }
+  } 
+
 function* deleteBudgetForm ( action ) {
   console.log('Delete via PUT Budgetform', action.payload);
   try { 
@@ -167,6 +190,7 @@ function* budgetformSaga() {
   yield takeLatest('DELETE_BUDGETFORM', deleteBudgetForm);
   yield takeLatest('ADD_NEW_BUDGETFORM', addNewBudgetForm);
   yield takeLatest('FETCH_BUDGET_RECORD_COUNT', fetchBudgetRecordCount);
+  yield takeLatest('FETCH_RECORD_CORRELATION_ROW', fetchRecordCorrelation);
 }
 
 export default budgetformSaga;

@@ -41,10 +41,20 @@ const budgetFormCount = (state = 0, action) => {
   }
 }
 
-// Used to determine number of records for maximum scroll on form
+// Used to pass specific record ID between forms to auto open on next form 
 const passedRecordId = (state = 0, action) => {
   switch (action.type) {
       case 'SET_PASSEDRECORDID':
+          return action.payload;
+      default:
+          return state;
+  }
+}
+
+// correlates specific record id to relitive row number for one form
+const recordCorrelationRow = (state = 0, action) => {
+  switch (action.type) {
+      case 'SET_RECORDCORRELATIONROW':
           return action.payload;
       default:
           return state;
@@ -60,4 +70,5 @@ export default combineReducers({
   expenseSum,
   budgetFormCount,
   passedRecordId,
+  recordCorrelationRow,
 });

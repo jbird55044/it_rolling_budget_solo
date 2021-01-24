@@ -59,8 +59,6 @@ router.get('/formfill', rejectUnauthenticated, (req, res) => {
         SELECT * FROM _t_primary_budget WHERE row_number = $2;`;
   } 
   console.log (`----formfill GET - req.query.record ID:`, relitiveRecordId, ' businesUnit:', businessUnitId, ' recordId:', recordId);
-  
-  console.log ('in budgetForm get')
   pool.query(queryText, [businessUnitId, recordFinder])
   // pool.query(queryText, [businessUnitId, relitiveRecordId])
     .then((result) => { 
@@ -90,7 +88,7 @@ router.get('/formcount', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
-
+// get the expense info for the budget entry
 router.get('/expensefill', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   console.log (`--expensefill GET - req.query.budgetId:`, budgetId);
@@ -105,6 +103,7 @@ router.get('/expensefill', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
+// get the sum of the one or more expense items associated to the budget (for button indicator)
 router.get('/expensesum', rejectUnauthenticated, (req, res) => {
   let budgetId = req.query.budgetId
   console.log (`--expensesum GET - req.query.budgetId:`, budgetId);
@@ -119,7 +118,30 @@ router.get('/expensesum', rejectUnauthenticated, (req, res) => {
     });
 }); 
 
+// get the relative 'row number' for specific record ID
+router.get('/recordcorrelation', rejectUnauthenticated, (req, res) => {
+  let recordId = req.query.recordId
+  console.log (`--recordcorrelation GET - req.query.recordId:`, recordId);
+  const queryText = `WITH _t_primary_budget AS 
+        ( 
+        SELECT t_primary_budget.id, 
+        row_number() over (PARTITION BY t_primary_budget.owner_fk ORDER BY t_primary_budget.id ASC) AS row_number
+      FROM t_primary_budget
+        JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
+        WHERE t_primary_budget.owner_fk = 1 AND archived = false
+      )
+        SELECT * FROM _t_primary_budget WHERE id=$1;`;
+  console.log ('in expenseFill get')
+  pool.query(queryText, [recordId])
+    .then((result) => { res.send(result.rows); })
+    .catch((err) => {
+      console.log('Error completing recordcorrelation query', err);
+      res.sendStatus(500);
+    });
+}); 
 
+
+// update the budget record
 router.put('/formfill', rejectUnauthenticated, (req, res) => {
   let payload = req.body.editForm
   // console.log (`formfill PUT Payload:`, payload);
@@ -155,7 +177,6 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
     payload.notes,
     payload.last_update
   ];
-
   pool.query(queryText, queryValues)
     .then(() => { res.sendStatus(200); })
     .catch((err) => {
@@ -164,6 +185,7 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
     });
   });
   
+  // 'delete' the form by setting a archive bit to hide from all future queries
   router.put('/deleteform', rejectUnauthenticated, (req, res) => {
     let payload = req.body
     console.log (`formfill DELETE PUT Payload:`, payload);
@@ -177,6 +199,7 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
       });
     });
 
+    // POST (add) new budget record from scratch - archive bit set by default to false @ db
     router.post('/addform', rejectUnauthenticated, (req, res) => {
       let payload = req.body.editForm
       console.log('incoming POST req.body:', payload);
@@ -193,7 +216,6 @@ router.put('/formfill', rejectUnauthenticated, (req, res) => {
          $10, $11, $12,
          $13, $14
          ) RETURNING "id";`;
-
       const queryValues = [
         payload.id,                 payload.gl_code_fk,          payload.cost_center_fk,
         payload.point_person_fk,    payload.nomenclature,        payload.manufacturer,

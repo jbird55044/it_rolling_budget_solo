@@ -60,36 +60,71 @@ function RecordPicker() {
             },
         },    
         { key: 'cost_center', name: 'CC', editable: false, filterable: true, width: 75, 
-            // events: {onMouseOver: function(ev) {
-            //         console.log(`Mouse over Last Name Column`); 
-            //     }
-        //   },
+            events: {onDoubleClick: function(ev, args) {
+                console.log('rowId: ', args.rowId);
+                setBudgetId(args.rowId);
+                dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                }, 
         },
-        { key: 'nomenclature', name: 'Nomenclature', editable: false , filterable: true, width: 150},
-        { key: 'needs_review', name: 'Review', editable: false , filterable: true, width: 75,
-        events: {onDoubleClick: function(ev, args) {
+        },
+        { key: 'nomenclature', name: 'Nomenclature', editable: false , filterable: true, width: 255, 
+            events: {onDoubleClick: function(ev, args) {
                 console.log('rowId: ', args.rowId);
                 setBudgetId(args.rowId);
                 dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
                 }, 
             },
         },
-        { key: 'gl_name', name: 'GL Name', editable: false, filterable: true, width: 125 },
-        { key: 'frequency', name: 'Frequency', editable: false },
-        { key: 'total', name: 'Total', editable: true, filterable: true, formatter: moneyFormatter, width: 150 },
-        // { key: 'detail', name: 'Detail', editable: false },
+        { key: 'needs_review', name: 'Review', editable: false , filterable: true, width: 75,
+            events: {onDoubleClick: function(ev, args) {
+                    console.log('rowId: ', args.rowId);
+                    setBudgetId(args.rowId);
+                    dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                    }, 
+                },
+        },
+        { key: 'gl_name', name: 'GL Name', editable: false, filterable: true, width: 175,
+            events: {onDoubleClick: function(ev, args) {
+                    console.log('rowId: ', args.rowId);
+                    setBudgetId(args.rowId);
+                    dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                    }, 
+                }, 
+        },
+        { key: 'last_update', name: 'Last Update', editable: false, filterable: true, width: 125,
+            events: {onDoubleClick: function(ev, args) {
+                    console.log('rowId: ', args.rowId);
+                    setBudgetId(args.rowId);
+                    dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                    }, 
+                },   
+        },
+        { key: 'total', name: 'Total', editable: true, filterable: true, formatter: moneyFormatter, width: 90,
+            events: {onDoubleClick: function(ev, args) {
+                    console.log('rowId: ', args.rowId);
+                    setBudgetId(args.rowId);
+                    dispatch({type: 'SET_PASSEDRECORDID', payload: args.rowId});
+                    }, 
+                },  
+        },
         ];
 
-        const handleFilterChange = filter => filters => {
-            const newFilters = { ...filters };
-            if (filter.filterTerm) {
-              newFilters[filter.column.key] = filter;
-            } else {
-              delete newFilters[filter.column.key];
-            }
-            return newFilters;
-          };
-          
+    const handleFilterChange = filter => filters => {
+        const newFilters = { ...filters };
+        if (filter.filterTerm) {
+            newFilters[filter.column.key] = filter;
+        } else {
+            delete newFilters[filter.column.key];
+        }
+        return newFilters;
+        };
+    
+    const cleanSqlDate = (fieldValue) => {
+        let year = fieldValue.slice(0, 4);
+        let month = fieldValue.slice(5, 7);
+        let day = fieldValue.slice(8, 10);
+        return `${month}/${day}/${year}`
+    };
 
 
     const refreshExpenseTable = () => {
@@ -104,7 +139,7 @@ function RecordPicker() {
             stagedRow.nomenclature = row.nomenclature;
             if (row.needs_review) {stagedRow.needs_review = 'Review'}
             stagedRow.gl_name= row.gl_name;
-            stagedRow.frequency= row.frequency;
+            stagedRow.last_update= cleanSqlDate(row.last_update);
             stagedRow.total= row.total;
             // stagedRow.detail= '<button>detail</button>';
             // console.log (`stagedRow.id`, stagedRow.id ,stagedRow.needs_review);
@@ -138,30 +173,30 @@ function RecordPicker() {
 
         return (
             <div className="pageDivClass">
-                <TextField
-                    select style = {{minWidth: 100}}
-                    variant="outlined"
-                    label=""
-                    // className={{margin, textField}}
-                    value={reduxStoreTaco.budgetReport.reportSelectedYear}
-                    onChange={(event)=>handleChange(event, 'selectedYear')}
-                    InputProps={{startAdornment: <InputAdornment position="start">Budget Year:</InputAdornment>,}}
-                    >
-                    <MenuItem value="">
-                        </MenuItem>
-                            {reduxStoreTaco.tlist.tlistYear.map(records => (
-                                <MenuItem key={records.id} value={records.year}>
-                                {records.year}
-                                </MenuItem>
-                            ))}
-                </TextField>
+                <div className="selectorDivClass">
+                    <TextField
+                        select style = {{minWidth: 100}}
+                        variant="outlined"
+                        label=""
+                        // className={{margin, textField}}
+                        value={reduxStoreTaco.budgetReport.reportSelectedYear}
+                        onChange={(event)=>handleChange(event, 'selectedYear')}
+                        InputProps={{startAdornment: <InputAdornment position="start">Budget Year:</InputAdornment>,}}
+                        >
+                        <MenuItem value="">
+                            </MenuItem>
+                                {reduxStoreTaco.tlist.tlistYear.map(records => (
+                                    <MenuItem key={records.id} value={records.year}>
+                                    {records.year}
+                                    </MenuItem>
+                                ))}
+                    </TextField>
 
-                <button className="buttonClass" onClick={refreshExpenseTable}>Refresh</button>
-                <Link className="budgetJumpClass" to="/budgetform" passedBudgetId={budgetId}>Detail Record: {budgetId}</Link>  
-                {/* <button className="buttonClass" onClick={this.saveGrid}>Save and Close</button>  */}
-                {/* <p>length: {reduxStoreTaco.budgetReport.reportBudgetReport1.length}</p> */}
-                {/* <p>sum: {reduxStoreTaco.budgetReport.reportBudgetReport1Sum}</p> */}
-                    
+                    <button className="buttonClass" onClick={refreshExpenseTable}>Refresh</button>
+                    <Link className="budgetJumpClass" to="/budgetform" passedBudgetId={budgetId}>Jump to Detail Record: {budgetId}</Link>  
+                    <p>Double click row below to select record . . . </p>
+                   
+                </div>
 
                     <div  className="datGridClass">
                   

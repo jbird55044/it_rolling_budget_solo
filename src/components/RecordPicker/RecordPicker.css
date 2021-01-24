@@ -12,6 +12,10 @@
   font-size: small;
 }
 
+.selectorDivClass{
+  margin-top: 15px;
+}
+
 .pageDivClass {
   background-color: white;
   margin-left: 20px;
@@ -33,5 +37,20 @@
 }
 
 .budgetJumpClass {
-  background-color: violet;
+  padding: 4px;
+  padding-left: 15px;
+  padding-right: 15px;
+  background-color: #FEFAE0;
+  color: #283618;
+  border: 1px solid black;
+  border-radius: 2px;
+  margin-left: 20px;
+}
+
+.budgetJumpClass:hover {
+  color: #DDA15E;
+}
+
+.buttonClass:hover {
+  color: #DDA15E;
 }

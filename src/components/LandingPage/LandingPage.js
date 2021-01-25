@@ -31,7 +31,7 @@ class LandingPage extends Component {
 
             <h3>Expense Form</h3>
             <p>
-              The main edit page for budget items
+              The main edit page for budget items with the ability to scroll left and right on records.
             </p>
 
             <h3>Admin</h3>

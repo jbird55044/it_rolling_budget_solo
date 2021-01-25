@@ -89,27 +89,28 @@ class ExpenditureForm extends Component {
     }  // end of convertNumToMoneyString fn
     
     
-    addRow = () => {
-        let newRecord ={
-            period: '',
-            year: '',
-            amount: 0,
-            expense_note: '<-',
-            archived: false
-        }
-        this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
-            newRecord: newRecord,
-            businessUnitId: this.props.store.user.id,
-            budgetId: this.state.budgetId,
-            }
-        })
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.relitiveRecordId,
-            }
-        });
-    }
-
+    // addRow = () => {
+    //     let newRecord ={
+    //         period: '',
+    //         year: '',
+    //         amount: 0,
+    //         expense_note: '<-',
+    //         archived: false
+    //     }
+    //     this.props.dispatch({type: 'ADD_ROW_EXPENSEGRID', payload: {
+    //         newRecord: newRecord,
+    //         businessUnitId: this.props.store.user.id,
+    //         budgetId: this.state.budgetId,
+    //         relitiveRecordId: this.state.relitiveRecordId // added 1/25
+    //         }
+    //     })
+    //     // this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+    //     //     businessUnitId: this.props.store.user.id,
+    //     //     relitiveRecordId: this.state.relitiveRecordId,
+    //     //     }
+    //     // });
+    // }
+ 
     getDate = () => {
         let today = new Date();
         let date = (today.getMonth()+1)+'/'+today.getDate()+'/'+today.getFullYear();
@@ -190,12 +191,12 @@ class ExpenditureForm extends Component {
             relitiveRecordId: this.state.relitiveRecordId
             }
         })
-        this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
-            businessUnitId: this.props.store.user.id,
-            relitiveRecordId: this.state.relitiveRecordId,
-            }
-        });
-        this.props.toggleExpense();
+        // this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
+        //     businessUnitId: this.props.store.user.id,
+        //     relitiveRecordId: this.state.relitiveRecordId,
+        //     }
+        // });
+        // this.props.toggleExpense();
     }
     
     render() {

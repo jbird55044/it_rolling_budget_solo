@@ -123,7 +123,7 @@ FROM t_primary_budget
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   WHERE t_primary_budget.owner_fk = 1 AND archived = false
 )
-  SELECT * FROM _t_primary_budget WHERE row_number = 2;
+  SELECT * FROM _t_primary_budget WHERE row_number > 0;
   
 
 	DELETE FROM t_primary_expenditure WHERE id=10;
@@ -198,7 +198,15 @@ FROM t_primary_budget
   
   
 --   Report 3 ----
-SELECT SUM(t_primary_expenditure.amount) as total
+SELECT t_primary_budget.id, nomenclature, manufacturer, capitalizable_candidate, credit_card_use, needs_review, notes, last_update,
+  t_user_owner.business_unit, 
+  tlist_gl_code.id AS gl_code_fk, tlist_gl_code.gl_account, tlist_gl_code.gl_name, tlist_gl_code.gl_type, tlist_gl_code.gl_examples,  
+  tlist_cost_center.id AS cost_center_fk, tlist_cost_center.cost_center, tlist_cost_center.cost_center_description,
+  tlist_point_person.id AS point_person_fk,tlist_point_person.point_person, tlist_point_person.pp_email_address,
+  tlist_frequency.id AS frequency_fk,tlist_frequency.frequency, tlist_frequency.description, 
+  tlist_expenditure_type.id AS expenditure_type_fk, tlist_expenditure_type.expenditure_type, tlist_expenditure_type.expenditure_description, 
+  tlist_capitalized_life.id AS capitalize_life_fk, tlist_capitalized_life.life, tlist_capitalized_life.life_nominclature,
+  SUM(t_primary_expenditure.amount) as total
 FROM t_primary_budget
   JOIN t_user_owner ON t_user_owner.id = t_primary_budget.owner_fk
   JOIN tlist_gl_code ON tlist_gl_code.id = t_primary_budget.gl_code_fk
@@ -208,12 +216,11 @@ FROM t_primary_budget
   JOIN tlist_expenditure_type ON tlist_expenditure_type.id = t_primary_budget.expenditure_type_fk
   JOIN tlist_capitalized_life ON tlist_capitalized_life.id = t_primary_budget.capitalize_life_fk
   JOIN t_primary_expenditure ON t_primary_budget.id = t_primary_expenditure.budget_fk 
-      WHERE t_primary_budget.owner_fk = 2 AND t_primary_budget.archived = false AND t_primary_expenditure.year = '2021' AND needs_review = true
+      WHERE t_primary_budget.owner_fk = 1 AND t_primary_budget.archived = false AND t_primary_expenditure.year = '2021' AND needs_review = true
       GROUP BY t_primary_budget.id, t_primary_expenditure.budget_fk, t_user_owner.business_unit, tlist_gl_code.id, 
         tlist_cost_center.id, tlist_point_person.id, tlist_frequency.id, tlist_expenditure_type.id, tlist_capitalized_life.id
-      ORDER BY t_primary_budget.id ASC  
-;    
-
+        ORDER BY t_primary_budget.id ASC
+;
 
 SELECT SUM(t_primary_expenditure.amount) FROM t_primary_expenditure
 JOIN t_primary_budget ON t_primary_budget.id = t_primary_expenditure.budget_fk
@@ -468,7 +475,7 @@ INSERT INTO t_primary_budget(owner_fk,gl_code_fk,cost_center_fk,point_person_fk,
 ,(1,9,5,2,'Client Tech/O365 training for 1 person','New Horizon',1,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 13:57:19','FALSE')
 ,(1,35,5,2,'SOW work for O365 Optimization/AD','Microsoft Partner',1,6,'TRUE',2,'FALSE','FALSE',NULL,'2018-10-18 10:58:58','FALSE')
 ,(1,30,5,2,'Small Supplies for Business Use (Benchstock)',NULL,3,1,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 09:21:45','FALSE')
-,(1,3,5,2,'Test Computers for Developer R&D','Lenovo',1,1,'TRUE',2,'FALSE','TRUE',NULL,'2017-10-19 07:24:02','FALSE')
+,(1,3,5,2,'Test Computers for Developer R&D','Lenovo',1,1,'TRUE',2,'FALSE','FALSE','Confirm Qty','2017-10-19 07:24:02','FALSE')
 ,(1,35,5,2,'Summer Interns - 1 HC total (2of2), 4 mos',NULL,3,5,'FALSE',1,'FALSE','FALSE',NULL,'2019-09-30 10:19:17','FALSE')
 ,(1,31,5,2,'Clientside Backup and Recovery','Cloud',2,1,'FALSE',1,'FALSE','FALSE','Moved to DC3.0 and Backup Solution ($175k)','2019-10-21 14:42:22','FALSE')
 ,(1,12,2,5,'AIIM Professional Membership - Danielle','AIIM',6,1,'FALSE',1,'TRUE','FALSE',NULL,'2017-10-20 10:28:26','FALSE')

@@ -7,6 +7,7 @@
 .datGridClass input {
   margin-top: 1px;
   margin-bottom: 1px;
+  margin-left: 0px;
   padding-top: 0px;
   padding-bottom: 0px;
   font-size: small;

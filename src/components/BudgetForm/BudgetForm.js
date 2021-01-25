@@ -88,7 +88,8 @@ class BudgetForm extends Component {
             last_update: '',
             total: 0
         },
-        relitiveRecordId: this.props.store.budgetForm.passedRecordId || 1,
+        relitiveRecordId: 1,
+        comingFromPicker: false,
         recordEditMode: false,
         recordAddMode: false,
         deleteConfirmDialog: false,
@@ -103,6 +104,9 @@ class BudgetForm extends Component {
                     recordId: this.props.store.budgetForm.passedRecordId
                 }
             });    
+            this.setState ({
+                comingFromPicker: true
+            })
        }
        
         // Get's data to fill form, both Budget and Expense (prefills for ID grab)
@@ -377,6 +381,14 @@ class BudgetForm extends Component {
 
 
     refreshDom = () => {
+        if (this.state.comingFromPicker) {
+            this.setState ({
+                relitiveRecordId: this.props.store.budgetForm.recordCorrelationRow
+            });
+            this.setState ({
+                comingFromPicker: false
+            });
+        };
         this.props.dispatch({type: 'FETCH_BUDGETFORM', recordFinder: {
             businessUnitId: this.props.store.user.id,
             relitiveRecordId: this.state.relitiveRecordId,

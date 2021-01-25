@@ -35,7 +35,7 @@ class ReportList3 extends Component {
                 
                 <Table className="report3TableClass" striped bordered hover size="sm">
                     <thead>
-                        <tr><th>ID</th><th>Nomenclature</th><th>GL Account</th><th>GL Name</th><th>Cost Center</th><th>Description</th></tr>
+                        <tr><th>ID</th><th>Nomenclature</th><th>GL Account</th><th>GL Name</th><th>Cost Center</th><th>Notes</th></tr>
                     </thead>
                     <tbody>
                         {this.props.store.budgetReport.reportBudgetReport3.map((lineItem) => {

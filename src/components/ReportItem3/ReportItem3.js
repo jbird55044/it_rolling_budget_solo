@@ -54,7 +54,7 @@ class ReportItem3 extends Component {
                 <td>{this.props.lineItem.gl_account}</td>
                 <td>{this.props.lineItem.gl_name}</td>
                 <td>{this.props.lineItem.cost_center}</td>
-                <td>{this.props.lineItem.description}</td>
+                <td>{this.props.lineItem.notes}</td>
             </tr>
             <tr>
                 <td>&nbsp;</td>

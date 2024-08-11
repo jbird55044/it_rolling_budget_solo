@@ -263,12 +263,13 @@ WHERE t_primary_expenditure.budget_fk = 128;
 
 
 --  VALUES. -------------
+-- password for all accounts are 'password' by default
 
 INSERT INTO "t_user_owner" ("username", "password", "full_name", "business_unit", "bu_description") VALUES 
-('jbird', '$2a$10$PufhYFNDbvZ3J3r3QFisEus/4g1eHfzRt3dGO6G5AZBEsVWu3RAWW', 'James Bird','BT', 'Business Technology'),
-('mark', '$2a$10$Bbb4bTrubvcdi1cqlppA1edoDgwueYYUA.T1b9ssqDSpmYEp9Q2wS', 'Marketing Leader','BD', 'Business Development'),
-('jbird3', '$2a$10$C1Ncu2PD2g1R9Osa4.9sSeqh4bd5iq39SaGcVqmWrk./UNHpw9qs.', 'James Bird3','GO', 'Geo-Spacial Design'), 
-('jbird4', '$2a$10$Pepq9EyqYNL/AXG2paSKNeBAuE/azOt5N9oEGUctSQzpHv4OYFc2i', 'James Bird4','MD', 'Marketing and Digital');
+('jbird', '$2a$10$8FSuLLBt/POkuZfjc386wudEF5b66z4t97b6S5TL8Ws6VgInGVUp2', 'James Bird','BT', 'Business Technology'),
+('mark', '$2a$10$8FSuLLBt/POkuZfjc386wudEF5b66z4t97b6S5TL8Ws6VgInGVUp2', 'Marketing Leader','BD', 'Business Development'),
+('jbird3', '$2a$10$8FSuLLBt/POkuZfjc386wudEF5b66z4t97b6S5TL8Ws6VgInGVUp2', 'James Bird3','GO', 'Geo-Spacial Design'), 
+('jbird4', '$2a$10$8FSuLLBt/POkuZfjc386wudEF5b66z4t97b6S5TL8Ws6VgInGVUp2', 'James Bird4','MD', 'Marketing and Digital');
 
 
 INSERT INTO "tlist_capitalized_life" ("life","life_nominclature") VALUES

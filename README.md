@@ -22,11 +22,15 @@ Before you get started, make sure you have the following software installed on y
 Create a new database called `prime_app` and create a `user` table:
 
 ```SQL
-CREATE TABLE "user" (
-    "id" SERIAL PRIMARY KEY,
-    "username" VARCHAR (80) UNIQUE NOT NULL,
-    "password" VARCHAR (1000) NOT NULL
-);
+
+Create database as per pool.js, the current default is: 'it_rolling_budget'
+
+Run Postgres SQL to create tables as per database.sql
+In database.sql, the select examples do not need to be run, they are examples
+In database.sql, run data inserts if sample data is desired 
+
+Login ids in loaded data use generic password of 'password'
+
 ```
 
 If you would like to name your database something else, you will need to change `prime_app` to the name of your new database name in `server/modules/pool.js`

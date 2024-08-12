@@ -19,8 +19,6 @@ Before you get started, make sure you have the following software installed on y
 
 ## Create database and table
 
-Create a new database called `prime_app` and create a `user` table:
-
 ```SQL
 
 Create database as per pool.js, the current default is: 'it_rolling_budget'
